@@ -34,13 +34,14 @@ MODULE_DEVICE_TABLE(usb, id_table);
 static int cfan_probe(struct usb_interface *interface,
 		      const struct usb_device_id *id)
 {
-	pr_info("%s: USB Cheeky Fan has been connected\n", __func__);
+        pr_info("cfan:%s: USB Cheeky Fan has been connected\n", __func__);
 	return 0;
 }
 
 static void cfan_disconnect(struct usb_interface *interface)
 {
-	pr_info("%s: USB Cheeky Fan has been disconnected.\n", __func__);
+        pr_info("cfan:%s: USB Cheeky Fan has been disconnected.\n",
+                __func__);
 }
 
 static struct usb_driver cfan_driver = {
@@ -53,11 +54,10 @@ static struct usb_driver cfan_driver = {
 static int __init usb_cfan_init(void)
 {
         int retval = 0;
-	/* To register the USB driver with the USB subsystem. */
+	/* Register the USB driver. */
 	retval = usb_register(&cfan_driver);
         if (retval < 0) {
-	    pr_info("%s: cfan: unable to register USB driver.\n",
-                    __func__);
+	    pr_info("cfan:%s(): unable to register USB driver.\n", __func__);
             return retval;
         }
         return 0;
@@ -65,7 +65,7 @@ static int __init usb_cfan_init(void)
 
 static void __exit usb_cfan_exit(void)
 {
-	/* deregister this driver with the USB subsystem */
+	/* Un-register this USB driver. */
 	usb_deregister(&cfan_driver);
 }
 
