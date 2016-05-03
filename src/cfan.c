@@ -34,14 +34,35 @@ MODULE_DEVICE_TABLE(usb, id_table);
 static int cfan_probe(struct usb_interface *interface,
 		      const struct usb_device_id *id)
 {
+        struct usb_device *udev = interface_to_usbdev(interface);
+        struct usb_cfan *dev;
+
         pr_info("cfan:%s: USB Cheeky Fan has been connected\n", __func__);
+
+        dev = kmalloc(sizeof(struct usb_cfan), GFP_KERNEL);
+
+        if (dev == NULL) {
+            dev_err(&interface->dev, "cfan: Out of memory\n");
+            return -ENOMEM;
+        }
+
+        memset(dev, 0x00, sizeof(*dev));
+        dev->udev = usb_get_dev(udev);
+        usb_set_intfdata(interface, dev);
+
 	return 0;
 }
 
 static void cfan_disconnect(struct usb_interface *interface)
 {
+        struct usb_cfan *dev;
+
         pr_info("cfan:%s: USB Cheeky Fan has been disconnected.\n",
                 __func__);
+
+        dev = usb_get_intfdata (interface);
+        usb_set_intfdata (interface, NULL);
+        kfree(dev);
 }
 
 static struct usb_driver cfan_driver = {
