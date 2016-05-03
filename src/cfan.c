@@ -18,8 +18,8 @@ MODULE_LICENSE("GPL");
 
 struct usb_cfan {
 	struct usb_device	*udev;
-	unsigned char		bmp[39][8];
-	unsigned int		cfg[8];
+	u64	        	bmp[39][8];
+	u64 		        cfg[8];
 };
 
 static struct usb_driver cfan_driver;
