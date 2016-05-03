@@ -52,8 +52,15 @@ static struct usb_driver cfan_driver = {
 
 static int __init usb_cfan_init(void)
 {
+        int retval = 0;
 	/* To register the USB driver with the USB subsystem. */
-	return usb_register(&cfan_driver);
+	retval = usb_register(&cfan_driver);
+        if (retval < 0) {
+	    pr_info("%s: cfan: unable to register USB driver.\n",
+                    __func__);
+            return retval;
+        }
+        return 0;
 }
 
 static void __exit usb_cfan_exit(void)
