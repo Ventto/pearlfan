@@ -34,6 +34,9 @@ MODULE_DEVICE_TABLE(usb, id_table);
 static int cfan_probe(struct usb_interface *interface,
 		      const struct usb_device_id *id)
 {
+        /* interface_to_usbdev -> to_usb_device(intf->dev.parent) ->
+         * container_of
+         */
         struct usb_device *udev = interface_to_usbdev(interface);
         struct usb_cfan *dev;
 
@@ -47,8 +50,20 @@ static int cfan_probe(struct usb_interface *interface,
         }
 
         memset(dev, 0x00, sizeof(*dev));
+        /* Increment the reference count of the usb device structure
+         * usb_get_dev -> get_dev -> kobj_to_dev -> kref_get ->
+         * atomic_inc_return -> (asm)
+         */
         dev->udev = usb_get_dev(udev);
+
+        /* Increment the ref counter */
         usb_set_intfdata(interface, dev);
+
+        pr_info("cfan:%s: [devnum=%d;bus_id=%d;devid=%d]\n",
+                __func__,
+                dev->udev->devnum,
+                dev->udev->bus->busnum,
+                dev->udev->dev.id);
 
 	return 0;
 }
