@@ -1,13 +1,13 @@
 /*
  * Linux driver for Led Fan by Dream Cheeky (version 0)
  */
-#include <linux/kernel.h>
+#include <asm/uaccess.h>
 #include <linux/errno.h>
 #include <linux/init.h>
-#include <linux/slab.h>
+#include <linux/kernel.h>
 #include <linux/module.h>
+#include <linux/slab.h>
 #include <linux/usb.h>
-#include <asm/uaccess.h>
 
 MODULE_AUTHOR("Thomas Venries, EPITA");
 MODULE_DESCRIPTION("CheekyFan module, v0.1");
