@@ -31,6 +31,22 @@ static struct usb_device_id id_table[] = {
 };
 MODULE_DEVICE_TABLE(usb, id_table);
 
+/* FIXME */
+static ssize_t show_status(struct device *dev, struct device_attribute *attr,
+			   char *buf)
+{
+	return 0;
+}
+
+/* FIXME */
+static ssize_t store_status(struct device *dev, struct device_attribute *attr,
+			    const char *buf,
+			    size_t count)
+{
+	return count;
+}
+static DEVICE_ATTR(status, 0600, show_status, store_status);
+
 static int cfan_probe(struct usb_interface *interface,
 		      const struct usb_device_id *id)
 {
@@ -39,6 +55,7 @@ static int cfan_probe(struct usb_interface *interface,
 	*/
 	struct usb_device *udev = interface_to_usbdev(interface);
 	struct usb_cfan *dev;
+	int ret;
 
 	pr_info("cfan:%s: USB Cheeky Fan has been connected\n", __func__);
 
@@ -63,6 +80,15 @@ static int cfan_probe(struct usb_interface *interface,
 		dev->udev->bus->busnum,
 		dev->udev->dev.id);
 
+	/* Create a virtual repository to define the device, /sys entry FIXME */
+	ret = device_create_file(&interface->dev, &dev_attr_status);
+
+	if (ret < 0) {
+		dev_warn(&interface->dev,
+			 "cfan: device_create_file() error\n");
+		return ret;
+	}
+
 	return 0;
 }
 
@@ -75,6 +101,9 @@ static void cfan_disconnect(struct usb_interface *interface)
 
 	dev = usb_get_intfdata(interface);
 	usb_set_intfdata(interface, NULL);
+
+	/* FIXME */
+	device_remove_file(&interface->dev, &dev_attr_status);
 	kfree(dev);
 }
 
