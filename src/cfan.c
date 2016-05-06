@@ -112,6 +112,17 @@ static int cfan_probe(struct usb_interface *interface,
 		return ret;
 	}
 
+	/* send usb msg */
+	ret = usb_control_msg(cfan->udev, usb_sndctrlpipe(cfan->udev, 0),
+			      0x09, 0x21, 0x200, 0x00, &cfan->cfg[0], 0x008,
+			      10 * HZ);
+
+	if (ret < 0) {
+		dev_warn(&interface->dev,
+			 "cfan: usb_control_msg() error\n");
+		return ret;
+	}
+
 	return 0;
 }
 
