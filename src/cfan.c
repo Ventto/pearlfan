@@ -55,31 +55,31 @@ static int cfan_probe(struct usb_interface *interface,
 	* container_of
 	*/
 	struct usb_device *udev = interface_to_usbdev(interface);
-	struct usb_cfan *dev;
+	struct usb_cfan *cfan;
 	int ret;
 
 	pr_info("cfan:%s: USB Cheeky Fan has been connected\n", __func__);
 
-	dev = kmalloc(sizeof(*dev), GFP_KERNEL);
+	cfan = kmalloc(sizeof(*cfan), GFP_KERNEL);
 
-	if (!dev)
+	if (!cfan)
 		return -ENOMEM;
 
-	memset(dev, 0x00, sizeof(*dev));
+	memset(cfan, 0x00, sizeof(*cfan));
 	/* Increment the reference count of the usb device structure
 	* usb_get_dev -> get_dev -> kobj_to_dev -> kref_get ->
 	* atomic_inc_return -> (asm)
 	*/
-	dev->udev = usb_get_dev(udev);
+	cfan->udev = usb_get_dev(udev);
 
 	/* Increment the ref counter */
-	usb_set_intfdata(interface, dev);
+	usb_set_intfdata(interface, cfan);
 
 	pr_info("cfan:%s: [devnum=%d;bus_id=%d;devid=%d]\n",
 		__func__,
-		dev->udev->devnum,
-		dev->udev->bus->busnum,
-		dev->udev->dev.id);
+		cfan->udev->devnum,
+		cfan->udev->bus->busnum,
+		cfan->udev->dev.id);
 
 	/* Create a virtual repository to define the device, /sys entry FIXME */
 	ret = device_create_file(&interface->dev, &dev_attr_status);
