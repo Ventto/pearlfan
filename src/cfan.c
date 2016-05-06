@@ -48,6 +48,26 @@ static ssize_t store_status(struct device *dev, struct device_attribute *attr,
 }
 static DEVICE_ATTR(status, 0600, show_status, store_status);
 
+static void init_cfan_cfg(struct usb_cfan *cfan)
+{
+	/* Configuration:
+	 * A0 10 <A><B> <C><N> 55 00 00 00
+	 * [A] : OpenOption	[0 ; 5]
+	 * [B] : CloseOption	[0 ; 5]
+	 * [C] : TurnOption	(6 | c)
+	 * [D] : Display ID	[0 ; 7]
+	 * Warning: Reverse the data bloc
+	 */
+	cfan->cfg[0] = 0x000000550000010A;
+	cfan->cfg[1] = 0x000000551000010A;
+	cfan->cfg[2] = 0x000000552000010A;
+	cfan->cfg[3] = 0x000000553000010A;
+	cfan->cfg[4] = 0x000000554000010A;
+	cfan->cfg[5] = 0x000000555000010A;
+	cfan->cfg[6] = 0x000000556000010A;
+	cfan->cfg[7] = 0x000000557000010A;
+}
+
 static int cfan_probe(struct usb_interface *interface,
 		      const struct usb_device_id *id)
 {
@@ -66,6 +86,8 @@ static int cfan_probe(struct usb_interface *interface,
 		return -ENOMEM;
 
 	memset(cfan, 0x00, sizeof(*cfan));
+	init_cfan_cfg(cfan);
+
 	/* Increment the reference count of the usb device structure
 	* usb_get_dev -> get_dev -> kobj_to_dev -> kref_get ->
 	* atomic_inc_return -> (asm)
