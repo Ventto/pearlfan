@@ -15,7 +15,7 @@ if [ ! -e "$RULE" ] ; then
 fi
 
 # Build the module
-make clean && make && \
+make && \
 	echo "\n--> Make '$MODULE' has been done."
 
 # Reset the module
