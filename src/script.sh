@@ -37,14 +37,16 @@ else
 fi
 
 # Tests
-gcc ../tests/test.c -o ../tests/test
-
+cd ../tests/
+make -f Makefile.test clean && make -f Makefile.test
 if [ $? -eq 0 ]; then
-	echo "--> Make 'test' has been done."
+	echo "--> Make 'test' has been done.";
+else
+	echo "xxx Make 'test' has failed !";
+	exit 1
 fi
 
-
-sudo ./../tests/test
+sudo ./test
 
 err=$?
 
