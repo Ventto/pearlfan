@@ -16,7 +16,7 @@ fi
 
 # Build the module
 make clean && make && \
-    echo "\n--> Make has been done."
+    echo "\n-->Make '$MODULE' has been done."
 
 # Reset the module
 if [ ! -z "$(lsmod | grep $MODULE)" ] ; then
@@ -35,3 +35,21 @@ if [ -z `ls /etc/udev/rules.d/ | grep $RULE` ] ; then
 else
     echo "--> Rule '$RULE' has already been added."
 fi
+
+# Tests
+gcc ../tests/test.c -o ../tests/test
+
+if [ $? -eq 0 ]; then
+	echo "--> Make 'test' has been done."
+fi
+
+sudo ./../tests/test
+
+err=$?
+
+if [ $err != 0 ]; then
+	echo "Error[$err]: Test has failed !"
+else
+	echo "--> Test has succeeded !"
+fi
+
