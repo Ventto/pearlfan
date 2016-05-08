@@ -89,23 +89,13 @@ static int cfan_release(struct inode *i, struct file *f)
 	  return 0;
 }
 
-static void init_hello(struct usb_cfan *cfan)
-{
-	int i;
-
-	cfan->displays[0][0] = 0xFFF0;
-	cfan->displays[0][1] = 0xFBF0;
-	cfan->displays[0][2] = 0xFBF0;
-
-	for (i = 3; i < 39; ++i)
-		cfan->displays[0][i] = 0xFFFF;
-}
-
 static ssize_t cfan_write(struct file *f,
 			const char __user *buffer,
 			size_t cnt,
 			loff_t *off)
 {
+	u64 config;
+
 	if (!cfan) {
 		dev_warn(&cfan->udev->dev,
 			 "cfan: %s() : cfan is NULL !\n", __func__);
@@ -115,14 +105,15 @@ static ssize_t cfan_write(struct file *f,
 	if (cnt > MAX_CHAR_NB)
 		return -1;
 
-	init_hello(cfan);
+	config = set_config(0, 0, 0, 0);
+	send_data(cfan->udev, &config);
 
-	send_data(cfan->udev, set_config(0, 0, 0, 0));
-
-	int i;
-
-	for (i = 0; i < 156; i += 4)
-		send_data(cfan->udev, cfan->displays[0][i]);
+	/* Try to control led */
+	cfan->displays[0][0] = 0xFBFB;
+	cfan->displays[0][1] = 0xFBFB;
+	cfan->displays[0][2] = 0xFBFB;
+	cfan->displays[0][3] = 0xFBFB;
+	send_data(cfan->udev, cfan->displays);
 
 	return 1;
 }
