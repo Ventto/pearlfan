@@ -93,20 +93,12 @@ static void init_hello(struct usb_cfan *cfan)
 {
 	int i;
 
-	for (i = 0; i < 15; ++i)
-		cfan->displays[0][i] = 0xFFFFFFFFFFFFFFFF;
+	cfan->displays[0][0] = 0xFFF0;
+	cfan->displays[0][1] = 0xFBF0;
+	cfan->displays[0][2] = 0xFBF0;
 
-	cfan->displays[0][15] = 0x000000000FFFFF83;
-	cfan->displays[0][16] = 0xFF7DFF7DFF7DFF83;
-	cfan->displays[0][17] = 0xFFFFFFFDFFFDFFFD;
-	cfan->displays[0][18] = 0xFFFDFF01FFFFFFFD;
-	cfan->displays[0][19] = 0xFFFDFFFDFFFDFF01;
-	cfan->displays[0][20] = 0xFFFFFF7DFF6DFF6D;
-	cfan->displays[0][21] = 0xFF6DFF01FFFFFF01;
-	cfan->displays[0][22] = 0xFFEFFFEFFFEFFF00;
-
-	for (i = 23; i < 39; ++i)
-		cfan->displays[0][i] = 0xFFFFFFFFFFFFFFFF;
+	for (i = 3; i < 39; ++i)
+		cfan->displays[0][i] = 0xFFFF;
 }
 
 static ssize_t cfan_write(struct file *f,
