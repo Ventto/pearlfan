@@ -88,9 +88,10 @@ static void cfan_disconnect(struct usb_interface *interface)
 
 	dev = usb_get_intfdata(interface);
 	usb_set_intfdata(interface, NULL);
-
 	kfree(dev);
-	pr_info("cfan:%s: USB Cheeky Fan has been disconnected.\n", __func__);
+
+	pr_info("cfan: %s(): USB Cheeky Fan has been disconnected.\n",
+		__func__);
 }
 
 static struct usb_driver cfan_driver = {
@@ -106,8 +107,8 @@ static int __init usb_cfan_init(void)
 	/* Register the USB driver. */
 	retval = usb_register(&cfan_driver);
 	if (retval < 0) {
-		pr_info("cfan:%s(): unable to register USB driver.\n",
-			__func__);
+		pr_info("cfan: %s(): unable to register USB driver.\n",
+		       __func__);
 		return retval;
 	}
 	return 0;
