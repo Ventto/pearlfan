@@ -32,7 +32,11 @@ static struct usb_device_id id_table[] = {
 };
 MODULE_DEVICE_TABLE(usb, id_table);
 
-static void init_cfan_cfg(struct usb_cfan *cfan)
+/* Set effect config for a fan view */
+static u64 set_config(const unsigned char id,
+		      const unsigned char open_op,
+		      const unsigned char close_op,
+		      const unsigned char turn_op)
 {
 	/* Configuration:
 	 * A0 10 <A><B> <C><N> 55 00 00 00
@@ -40,16 +44,12 @@ static void init_cfan_cfg(struct usb_cfan *cfan)
 	 * [B] : CloseOption	[0 ; 5]
 	 * [C] : TurnOption	(6 | c)
 	 * [D] : Display ID	[0 ; 7]
-	 * Warning: Reverse the data bloc
+	 * Warning: Reverse bytes sequence (stack behind)
 	 */
-	cfan->cfg[0] = 0x000000550000010A;
-	cfan->cfg[1] = 0x000000551000010A;
-	cfan->cfg[2] = 0x000000552000010A;
-	cfan->cfg[3] = 0x000000553000010A;
-	cfan->cfg[4] = 0x000000554000010A;
-	cfan->cfg[5] = 0x000000555000010A;
-	cfan->cfg[6] = 0x000000556000010A;
-	cfan->cfg[7] = 0x000000557000010A;
+	return 0x00000055000010A0 | (id << 24)
+			| (open_op << 16)
+			| (close_op << 20)
+			| (turn_op << 25);
 }
 
 static int cfan_open(struct inode *i, struct file *f)
@@ -100,7 +100,6 @@ static int cfan_probe(struct usb_interface *interface,
 		return -ENOMEM;
 
 	memset(cfan, 0x00, sizeof(*cfan));
-	init_cfan_cfg(cfan);
 
 	/* Increment the reference count of the usb device structure */
 	cfan->udev = usb_get_dev(udev);
