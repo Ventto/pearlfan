@@ -5,6 +5,11 @@ RULE="99-$MODULE.rules"
 ID_VENDOR="0c45"
 ID_PRODUCT="7701"
 
+if { [ -z "$(ls /dev | grep cfan0)" ] && [ -n "$(lsmod | grep cfan)" ]; }; then
+	echo "xxx Error: Plug the USB Fan !";
+	exit 1
+fi
+
 # Creation of the udev rule file
 if [ ! -e "$RULE" ] ; then
 	echo -n "ATTRS{idVendor}==\"$ID_VENDOR\", " >> $RULE;
