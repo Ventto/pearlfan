@@ -56,7 +56,7 @@ static u64 set_config(const unsigned char id,
 }
 
 /* Send a '8 bytes' packet followed by an INTERRUPT_IN msg */
-static int send_data(struct usb_device *udev, u64 data)
+static int send_data(struct usb_device *udev, void *data)
 {
 	char buf[8];
 	int l = 0;
@@ -66,7 +66,7 @@ static int send_data(struct usb_device *udev, u64 data)
 	buf[7] = 0x02;
 
 	ret = usb_control_msg(udev, usb_sndctrlpipe(udev, 0),
-			      0x09, 0x21, 0x200, 0x00, &data, 0x008,
+			      0x09, 0x21, 0x200, 0x00, data, 0x008,
 			      10 * HZ);
 
 	if (ret <= 0)
