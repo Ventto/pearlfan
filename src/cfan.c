@@ -121,7 +121,7 @@ static ssize_t cfan_write(struct file *f,
 
 	int i;
 
-	for (i = 0; i < 39; ++i)
+	for (i = 0; i < 156; i += 4)
 		send_data(cfan->udev, cfan->displays[0][i]);
 
 	return 1;
