@@ -24,6 +24,7 @@ struct usb_cfan {
 };
 
 static struct usb_driver cfan_driver;
+static struct usb_cfan *cfan;
 
 /* Add the device to this driver's supported device list */
 static struct usb_device_id id_table[] = {
@@ -56,7 +57,7 @@ static int cfan_probe(struct usb_interface *interface,
 		      const struct usb_device_id *id)
 {
 	struct usb_device *udev = interface_to_usbdev(interface);
-	struct usb_cfan *cfan;
+	int ret;
 
 	cfan = kmalloc(sizeof(*cfan), GFP_KERNEL);
 
