@@ -16,7 +16,6 @@ MODULE_LICENSE("GPL");
 #define VENDOR_ID	0x0c45
 #define PRODUCT_ID	0x7701
 
-
 struct usb_cfan {
 	struct usb_device	*udev;
 	u64	displays[8][39][8];
