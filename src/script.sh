@@ -36,17 +36,7 @@ else
 	echo "--> Rule '$RULE' has already been added."
 fi
 
-# Tests
-cd ../tests/
-make -f Makefile.test clean && make -f Makefile.test
-if [ $? -eq 0 ]; then
-	echo "--> Make 'test' has been done.";
-else
-	echo "xxx Make 'test' has failed !";
-	exit 1
-fi
-
-sudo ./test
+sudo ./../tests/test
 
 err=$?
 
