@@ -69,7 +69,7 @@ static ssize_t cfan_write(struct file *f,
 {
 	if (!cfan) {
 		dev_warn(&cfan->udev->dev,
-			 "cfan: cfan_write() : cfan is NULL !\n");
+			 "cfan: %s() : cfan is NULL !\n", __func__);
 		return -1;
 	}
 
