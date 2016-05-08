@@ -20,8 +20,8 @@ MODULE_LICENSE("GPL");
 
 struct usb_cfan {
 	struct usb_device	*udev;
-	u64	displays[8][39];
 	u64     cfg[8];
+	u16	displays[8][156];
 	u8	views_nb;
 };
 
