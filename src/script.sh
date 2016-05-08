@@ -41,6 +41,13 @@ else
 	echo "--> Rule '$RULE' has already been added."
 fi
 
+if [ -z "$(ls /dev | grep cfan0)" ]; then
+	echo "xxx Error: /dev/cfan0 is not found !"
+	echo "xxx You might have disconnected the fan."
+	echo "xxx Tip: Launch the script one again."
+	exit 1
+fi
+
 sudo ./../tests/test
 
 err=$?
