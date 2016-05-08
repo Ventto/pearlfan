@@ -1,0 +1,9 @@
+*.swo
+*.swp
+*.cmd
+*.ko
+*.o
+cfan.mod*
+modules.*
+Module*
+.tmp_versions/
