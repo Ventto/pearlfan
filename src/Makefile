@@ -10,5 +10,5 @@ install:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules_install
 
 clean:
-	rm -f *~ Module.markers Modules.symvers $(PROG)
+	rm -rf *~ Module.markers Modules.symvers $(PROG)
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) clean
