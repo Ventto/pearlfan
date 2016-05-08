@@ -53,6 +53,42 @@ static void init_cfan_cfg(struct usb_cfan *cfan)
 	cfan->cfg[7] = 0x000000557000010A;
 }
 
+static int cfan_open(struct inode *i, struct file *f)
+{
+	  return 0;
+}
+
+static int cfan_release(struct inode *i, struct file *f)
+{
+	  return 0;
+}
+
+static ssize_t cfan_write(struct file *f,
+			const char __user *buffer,
+			size_t cnt,
+			loff_t *off)
+{
+	if (!cfan) {
+		dev_warn(&cfan->udev->dev,
+			 "cfan: cfan_write() : cfan is NULL !\n");
+		return -1;
+	}
+
+	return 1;
+}
+
+const struct file_operations cfan_fops = {
+	.open    = cfan_open,
+	.release = cfan_release,
+	.write = cfan_write,
+};
+
+static struct usb_class_driver cfan_class_driver = {
+	.name = "usb/cfan0",
+	.fops = &cfan_fops,
+	.minor_base = 0
+};
+
 static int cfan_probe(struct usb_interface *interface,
 		      const struct usb_device_id *id)
 {
@@ -80,6 +116,15 @@ static int cfan_probe(struct usb_interface *interface,
 		cfan->udev->bus->busnum,
 		cfan->udev->dev.id);
 
+	ret = usb_register_dev(interface, &cfan_class_driver);
+
+	if (ret < 0) {
+		pr_info("cfan: %s(): unable to register the device.\n",
+		       __func__);
+		return ret;
+	}
+
+
 	return 0;
 }
 
@@ -89,6 +134,7 @@ static void cfan_disconnect(struct usb_interface *interface)
 
 	dev = usb_get_intfdata(interface);
 	usb_set_intfdata(interface, NULL);
+	usb_deregister_dev(interface, &cfan_class_driver);
 	kfree(dev);
 
 	pr_info("cfan: %s(): USB Cheeky Fan has been disconnected.\n",
