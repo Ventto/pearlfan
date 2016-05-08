@@ -55,13 +55,8 @@ static void init_cfan_cfg(struct usb_cfan *cfan)
 static int cfan_probe(struct usb_interface *interface,
 		      const struct usb_device_id *id)
 {
-	/* interface_to_usbdev -> to_usb_device(intf->dev.parent) ->
-	* container_of
-	*/
 	struct usb_device *udev = interface_to_usbdev(interface);
 	struct usb_cfan *cfan;
-
-	pr_info("cfan:%s: USB Cheeky Fan has been connected\n", __func__);
 
 	cfan = kmalloc(sizeof(*cfan), GFP_KERNEL);
 
@@ -71,15 +66,13 @@ static int cfan_probe(struct usb_interface *interface,
 	memset(cfan, 0x00, sizeof(*cfan));
 	init_cfan_cfg(cfan);
 
-	/* Increment the reference count of the usb device structure
-	* usb_get_dev -> get_dev -> kobj_to_dev -> kref_get ->
-	* atomic_inc_return -> (asm)
-	*/
+	/* Increment the reference count of the usb device structure */
 	cfan->udev = usb_get_dev(udev);
 
 	/* Increment the ref counter */
 	usb_set_intfdata(interface, cfan);
 
+	pr_info("cfan:%s: USB Cheeky Fan has been connected\n", __func__);
 	pr_info("cfan:%s: [devnum=%d;bus_id=%d;devid=%d]\n",
 		__func__,
 		cfan->udev->devnum,
@@ -93,12 +86,11 @@ static void cfan_disconnect(struct usb_interface *interface)
 {
 	struct usb_cfan *dev;
 
-	pr_info("cfan:%s: USB Cheeky Fan has been disconnected.\n",
-		__func__);
-
 	dev = usb_get_intfdata(interface);
 	usb_set_intfdata(interface, NULL);
+
 	kfree(dev);
+	pr_info("cfan:%s: USB Cheeky Fan has been disconnected.\n", __func__);
 }
 
 static struct usb_driver cfan_driver = {
