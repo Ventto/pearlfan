@@ -54,6 +54,30 @@ static u64 set_config(const unsigned char id,
 			| (turn_op << 25);
 }
 
+/* Send a '8 bytes' packet followed by an INTERRUPT_IN msg */
+static int send_data(struct usb_device *udev, u64 data)
+{
+	char buf[8];
+	int l = 0;
+	int ret;
+
+	memset(buf, 0, 8);
+	buf[7] = 0x02;
+
+	ret = usb_control_msg(udev, usb_sndctrlpipe(udev, 0),
+			      0x09, 0x21, 0x200, 0x00, &data, 0x008,
+			      10 * HZ);
+
+	if (ret <= 0)
+		return ret;
+
+	usb_interrupt_msg(udev, usb_rcvintpipe(udev, 1),
+			  buf, 8, &l,
+			  10 * HZ);
+
+	return 0;
+}
+
 static int cfan_open(struct inode *i, struct file *f)
 {
 	  return 0;
