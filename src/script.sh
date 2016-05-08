@@ -43,12 +43,20 @@ if [ $? -eq 0 ]; then
 	echo "--> Make 'test' has been done."
 fi
 
+
 sudo ./../tests/test
 
 err=$?
 
-if [ $err != 0 ]; then
-	echo "Error[$err]: Test has failed !"
+if [ $err -eq 2 ]; then
+	echo "xxx Error[$err]: Test has failed (unable to open /dev/cfan0) !"
+	if [ ! -f /dev/cfan0 ]; then
+		echo "xxx Error: '/dev/cfan0' does not exist !"
+	fi
+elif [ $err -eq 3 ]; then
+	echo "xxx Error[$err]: Test has failed (unable to write on /dev/cfan0) !"
+elif [ $err != 0 ]; then
+	echo "xxx Error[$err]: Test has failed !"
 else
 	echo "--> Test has succeeded !"
 fi
