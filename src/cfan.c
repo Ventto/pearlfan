@@ -109,11 +109,18 @@ static ssize_t cfan_write(struct file *f,
 	send_data(cfan->udev, &config);
 
 	/* Try to control led */
-	cfan->displays[0][0] = 0xFBFB;
-	cfan->displays[0][1] = 0xFBFB;
-	cfan->displays[0][2] = 0xFBFB;
-	cfan->displays[0][3] = 0xFBFB;
-	send_data(cfan->udev, cfan->displays);
+	cfan->displays[0][0] = 0x9EFF;
+	cfan->displays[0][1] = 0x6EFF;
+	cfan->displays[0][2] = 0x6EFF;
+	cfan->displays[0][3] = 0x00FF;
+
+	cfan->displays[0][4] = 0x9EFF;
+	cfan->displays[0][5] = 0x6EFF;
+	cfan->displays[0][6] = 0x6EFF;
+	cfan->displays[0][7] = 0x00FF;
+
+	send_data(cfan->udev, &cfan->displays);
+	send_data(cfan->udev, ((u16 *)cfan->displays + 4));
 
 	return 1;
 }
@@ -163,7 +170,6 @@ static int cfan_probe(struct usb_interface *interface,
 		       __func__);
 		return ret;
 	}
-
 
 	return 0;
 }
