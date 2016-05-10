@@ -48,9 +48,10 @@ static u64 set_config(const unsigned char id,
 	 * Warning: Reverse bytes sequence (stack behind)
 	 */
 	return 0x00000055000010A0 | (id << 24)
-			| (open_op << 16)
-			| (close_op << 20)
-			| (turn_op << 28);
+		| (open_op << 20)
+		| (close_op << 16)
+		| (turn_op << 28);
+}
 }
 
 /* Send a '8 bytes' packet followed by an INTERRUPT_IN msg */
