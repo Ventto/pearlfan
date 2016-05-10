@@ -16,8 +16,6 @@ MODULE_LICENSE("GPL");
 #define VENDOR_ID	0x0c45
 #define PRODUCT_ID	0x7701
 
-#define MAX_CHAR_NB	26
-
 struct usb_cfan {
 	struct usb_device	*udev;
 	u64     cfg[8];
@@ -101,9 +99,6 @@ static ssize_t cfan_write(struct file *f,
 			 "cfan: %s() : cfan is NULL !\n", __func__);
 		return -1;
 	}
-
-	if (cnt > MAX_CHAR_NB)
-		return -1;
 
 	config = set_config(0, 0, 0, 0);
 	send_data(cfan->udev, &config);
