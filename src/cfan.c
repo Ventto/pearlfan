@@ -9,7 +9,7 @@
 #include <linux/slab.h>
 #include <linux/usb.h>
 
-MODULE_AUTHOR("Thomas Venries, EPITA");
+MODULE_AUTHOR("Thomas Venries, Franklin Mathieu");
 MODULE_DESCRIPTION("CheekyFan module, v0.1");
 MODULE_LICENSE("GPL");
 
