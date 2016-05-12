@@ -34,10 +34,7 @@ static struct usb_device_id id_table[] = {
 MODULE_DEVICE_TABLE(usb, id_table);
 
 /* Set effect config for a fan view */
-static u64 set_config(const unsigned char id,
-		      const unsigned char open_op,
-		      const unsigned char close_op,
-		      const unsigned char turn_op)
+static u64 set_config(const u16 *cfg)
 {
 	/* Configuration:
 	 * A0 10 <A><B> <C><N> 55 00 00 00
@@ -45,13 +42,11 @@ static u64 set_config(const unsigned char id,
 	 * [B] : CloseOption	[0 ; 5]
 	 * [C] : TurnOption	(6 | c)
 	 * [D] : Display ID	[0 ; 7]
-	 * Warning: Reverse bytes sequence (stack behind)
+	 * Warning: Reverse bytes sequence (stack behind) :
+	 * 00 00 00 55 [CN] [AB] 10 A0
+	 * [CNAB] : u16
 	 */
-	return 0x00000055000010A0 | (id << 24)
-		| (open_op << 20)
-		| (close_op << 16)
-		| (turn_op << 28);
-}
+	return 0x00000055000010A0 | (*cfg << 16);
 }
 
 /* Send a '8 bytes' packet followed by an INTERRUPT_IN msg */
