@@ -140,34 +140,62 @@ static int cfan_release(struct inode *i, struct file *f)
 }
 
 static ssize_t cfan_write(struct file *f,
-			const char __user *buffer,
-			size_t cnt,
-			loff_t *off)
+			  const char __user *buffer,
+			  size_t cnt,
+			  loff_t *off)
 {
-	u64 config;
+	if (!cfan)
+		return -ENODEV;
 
-	if (!cfan) {
-		dev_warn(&cfan->udev->dev,
-			 "cfan: %s() : cfan is NULL !\n", __func__);
-		return -1;
+	if (cnt == 0)
+		return 0;
+
+	if (!buffer || cnt > 233)
+		return -EINVAL;
+
+	u64 config;
+	unsigned char i;
+	unsigned char j = 0;
+	unsigned char count = 0;
+	unsigned char column_index = 0;
+
+	pr_info("cfan:%s: =---------[ WRITE ] :\n", __func__);
+	pr_info("cfan:%s: displays_nb: %d\n", __func__, buffer[0]);
+
+	/* Get the number of displays */
+	cfan->displays_nb = buffer[0];
+	j++;
+
+	/* Set the configuration */
+	config = set_config((buffer + j));
+	j += 2;
+
+	pr_info("cfan:%s: 'j' before string: %d\n", __func__, j);
+
+	/* Strlen with the acc 'j' */
+	while (buffer[j++] != '\0' && count < 26)
+		count++;
+	j--;
+	j--;
+
+	pr_info("cfan:%s: 'j' after string: %d\n", __func__, j);
+	pr_info("cfan:%s: nb of characters: %d\n", __func__, count);
+	pr_info("cfan:%s: config: %p\n", __func__, config);
+
+	i = j - count;
+	/* Write letter in the buffer */
+	for (; j > i; j--) {
+		pr_info("cfan:%s: 'j' reverse: %d\n", __func__, j);
+		column_index = write_letter(buffer[j], 0, column_index);
 	}
 
-	config = set_config(0, 0, 0, 0);
+	pr_info("cfan:%s: column_index: %d\n", __func__, column_index);
+
+	/* Send config */
 	send_data(cfan->udev, &config);
-
-	/* Try to control led */
-	cfan->displays[0][0] = 0x9EFF;
-	cfan->displays[0][1] = 0x6EFF;
-	cfan->displays[0][2] = 0x6EFF;
-	cfan->displays[0][3] = 0x00FF;
-
-	cfan->displays[0][4] = 0x9EFF;
-	cfan->displays[0][5] = 0x6EFF;
-	cfan->displays[0][6] = 0x6EFF;
-	cfan->displays[0][7] = 0x00FF;
-
-	send_data(cfan->udev, &cfan->displays);
-	send_data(cfan->udev, ((u16 *)cfan->displays + 4));
+	/* Send display */
+	for (i = 0; i < column_index; i += 4)
+		send_data(cfan->udev, (u16 *)cfan->displays + i);
 
 	return 1;
 }
