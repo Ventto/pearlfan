@@ -49,6 +49,54 @@ static u64 set_config(const u16 *cfg)
 	return 0x00000055000010A0 | (*cfg << 16);
 }
 
+static u8 write_letter(const unsigned char letter,
+			 const unsigned char id,
+			 const unsigned char column)
+{
+	unsigned char col = column;
+
+	if (col)
+		cfan->displays[id][col++] = 0xFFFF;
+
+	pr_info("cfan:%s: detected letter: %x\n", __func__, letter);
+
+	switch (letter) {
+	case 'A':
+		cfan->displays[id][col++] = 0x00FF;
+		cfan->displays[id][col++] = 0x6EFF;
+		cfan->displays[id][col++] = 0x6EFF;
+		cfan->displays[id][col++] = 0x00FF;
+		cfan->displays[id][col++] = 0xFEFF;
+		break;
+	case 'B':
+		cfan->displays[id][col++] = 0x82FF;
+		cfan->displays[id][col++] = 0x6CFF;
+		cfan->displays[id][col++] = 0x6CFF;
+		cfan->displays[id][col++] = 0x00FF;
+		break;
+	case 'C':
+		cfan->displays[id][col++] = 0x7CFF;
+		cfan->displays[id][col++] = 0x7CFF;
+		cfan->displays[id][col++] = 0x7CFF;
+		cfan->displays[id][col++] = 0x00FF;
+		break;
+	case 'D':
+		cfan->displays[id][col++] = 0xC6FF;
+		cfan->displays[id][col++] = 0xBAFF;
+		cfan->displays[id][col++] = 0x7CFF;
+		cfan->displays[id][col++] = 0x00FF;
+		break;
+	case 'P':
+		cfan->displays[id][col++] = 0x9EFF;
+		cfan->displays[id][col++] = 0x6EFF;
+		cfan->displays[id][col++] = 0x6EFF;
+		cfan->displays[id][col++] = 0x00FF;
+		break;
+	}
+
+	return col;
+}
+
 /* Send a '8 bytes' packet followed by an INTERRUPT_IN msg */
 static int send_data(struct usb_device *udev, void *data)
 {
