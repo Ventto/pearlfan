@@ -9,6 +9,8 @@
 #include <linux/slab.h>
 #include <linux/usb.h>
 
+#include "includes/cfan_data.h"
+
 MODULE_AUTHOR("Thomas Venries, Franklin Mathieu");
 MODULE_DESCRIPTION("CheekyFan module, v0.1");
 MODULE_LICENSE("GPL");
