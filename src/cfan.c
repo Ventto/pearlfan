@@ -35,6 +35,28 @@ static struct usb_device_id id_table[] = {
 };
 MODULE_DEVICE_TABLE(usb, id_table);
 
+/*
+ * Global array which helps to convert a given PBM raster to
+ * a ventilator's display (see pbm_to_display function below).
+ */
+static u16 pbm_mask[11];
+
+/* Initializes masks which represent eleven LEDs's activation */
+static void pbm_masks_init(void)
+{
+	pbm_mask[10] = 0xFFF7;
+	pbm_mask[9] = 0xFFFB;
+	pbm_mask[8] = 0xFFFD;
+	pbm_mask[7] = 0xFFFE;
+	pbm_mask[6] = 0xBFFF;
+	pbm_mask[5] = 0xDFFF;
+	pbm_mask[4] = 0xEFFF;
+	pbm_mask[3] = 0xF7FF;
+	pbm_mask[2] = 0xFBFF;
+	pbm_mask[1] = 0xFDFF;
+	pbm_mask[0] = 0xFEFF;
+}
+
 /* Set effect config for a fan view */
 static u64 set_config(unsigned char id,
 		      unsigned char open_option,
