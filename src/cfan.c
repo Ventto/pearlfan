@@ -99,14 +99,6 @@ static u8 write_letter(const unsigned char letter,
 	return col;
 }
 
-static void write_space(const unsigned char id,
-			unsigned char column)
-{
-		cfan->displays[id][column++] = 0xFFFF;
-		cfan->displays[id][column++] = 0xFFFF;
-		cfan->displays[id][column++] = 0xFFFF;
-}
-
 /* Send a '8 bytes' packet followed by an INTERRUPT_IN msg */
 static int send_data(struct usb_device *udev, void *data)
 {
