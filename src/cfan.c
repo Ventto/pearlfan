@@ -36,19 +36,29 @@ static struct usb_device_id id_table[] = {
 MODULE_DEVICE_TABLE(usb, id_table);
 
 /* Set effect config for a fan view */
-static u64 set_config(const u16 *cfg)
+static u64 set_config(unsigned char id,
+		      unsigned char open_option,
+		      unsigned char close_option,
+		      unsigned char turn_option)
 {
 	/* Configuration:
-	 * A0 10 <A><B> <C><N> 55 00 00 00
+	 * A0 10 <A><B> <C><D> 55 00 00 00
 	 * [A] : OpenOption	[0 ; 5]
 	 * [B] : CloseOption	[0 ; 5]
 	 * [C] : TurnOption	(6 | c)
 	 * [D] : Display ID	[0 ; 7]
-	 * Warning: Reverse bytes sequence (stack behind) :
-	 * 00 00 00 55 [CN] [AB] 10 A0
-	 * [CNAB] : u16
+	 * Warning: Reverse bytes sequence (stack behind ?) :
+	 * 00 00 00 55 [CD] [AB] 10 A0
+	 * [CDAB] : u16
 	 */
-	return 0x00000055000010A0 | (*cfg << 16);
+	u16 cdab = 0;
+
+	cdab |= close_option;
+	cdab |= (open_option << 4);
+	cdab |= (id << 8);
+	cdab |= (turn_option << 12);
+
+	return 0x00000055000010A0 | (cdab << 16);
 }
 
 static u8 write_letter(const unsigned char letter,
@@ -160,8 +170,10 @@ static ssize_t cfan_write(struct file *f,
 	cfan->displays_nb = buffer[0];
 	j++;
 
-	/* Set the configuration */
-	config = set_config((u16 *)(buffer + j));
+	/* Set the configuration
+	 * Warning: set_config has been modified due to pbm version
+	 */
+	/* config = set_config((u16 *)(buffer + j)); */
 	j += 2;
 
 	pr_info("cfan:%s: 'j' before string: %d\n", __func__, j);
