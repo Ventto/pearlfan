@@ -57,6 +57,23 @@ static void pbm_masks_init(void)
 	pbm_mask[0] = 0xFEFF;
 }
 
+/* Converts a given PBM raster to a ventilator's display */
+static void pbm_to_display(unsigned char id,
+			   unsigned char *raster,
+			   uint16_t *display)
+{
+	unsigned char i;
+	unsigned char j;
+	unsigned char col_end;
+
+	for (i = 0; i < 156; ++i) {
+		col_end = 155 - i;
+		for (j = 0; j < 11; ++j)
+			if (raster[j * 156 + i] == 1)
+				display[col_end] &= pbm_mask[10 - j];
+	}
+}
+
 /* Set effect config for a fan view */
 static u64 set_config(unsigned char id,
 		      unsigned char open_option,
