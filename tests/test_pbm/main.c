@@ -19,19 +19,18 @@ int main(int argc, char **argv)
 	/* Initialization */
 	pm_init(argv[0], 0);
 
+	if (argc < 2) {
+		printf("Error: no arg\n");
+		return EXIT_FAILURE;
+	}
+
 	/* Open PBM image */
-	pbm = pm_openr("image.pbm");
+	pbm = pm_openr(argv[1]);
 
 	if (!pbm) {
 		printf("Error: pm_openr()\n");
 		return EXIT_FAILURE;
 	}
-
-	/* Check image format and parameters */
-	/* enum pm_check_code retval; */
-	/* pbm_check(pbm, PM_CHECK_BASIC, PBM_FORMAT, 152, 11, &retval); */
-	/* pbm_check_verbose(retval); */
-	/* if (retval != PM_CHECK_OK) { } */
 
 	pbm_readpbminit(pbm, &cols, &rows, &format);
 
