@@ -138,6 +138,12 @@ static ssize_t cfan_write(struct file *f,
 			  size_t cnt,
 			  loff_t *off)
 {
+	u64 config;
+	unsigned char i;
+	unsigned char j = 0;
+	unsigned char count = 0;
+	unsigned char column_index = 0;
+
 	if (!cfan)
 		return -ENODEV;
 
@@ -147,12 +153,6 @@ static ssize_t cfan_write(struct file *f,
 	if (!buffer || cnt > 233)
 		return -EINVAL;
 
-	u64 config;
-	unsigned char i;
-	unsigned char j = 0;
-	unsigned char count = 0;
-	unsigned char column_index = 0;
-
 	pr_info("cfan:%s: =---------[ WRITE ] :\n", __func__);
 	pr_info("cfan:%s: displays_nb: %d\n", __func__, buffer[0]);
 
@@ -161,7 +161,7 @@ static ssize_t cfan_write(struct file *f,
 	j++;
 
 	/* Set the configuration */
-	config = set_config((buffer + j));
+	config = set_config((u16 *)(buffer + j));
 	j += 2;
 
 	pr_info("cfan:%s: 'j' before string: %d\n", __func__, j);
@@ -174,7 +174,7 @@ static ssize_t cfan_write(struct file *f,
 
 	pr_info("cfan:%s: 'j' after string: %d\n", __func__, j);
 	pr_info("cfan:%s: nb of characters: %d\n", __func__, count);
-	pr_info("cfan:%s: config: %p\n", __func__, config);
+	pr_info("cfan:%s: config: %x\n", __func__, (unsigned int)config);
 
 	i = j - count;
 	/* Write letter in the buffer */
