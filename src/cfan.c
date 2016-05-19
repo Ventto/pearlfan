@@ -61,7 +61,7 @@ static void pbm_masks_init(void)
 
 /* Converts a given PBM raster to a ventilator's display */
 static void pbm_to_display(unsigned char id,
-			   unsigned char *raster,
+			   char *raster,
 			   uint16_t *display)
 {
 	unsigned char i;
