@@ -8,7 +8,7 @@
 
 #include "includes/cfan_data.h"
 
-#define DEBUG	1
+#define DEBUG	0
 
 static uint16_t pbm_mask[11];
 
@@ -51,7 +51,8 @@ static void pbm_to_display(unsigned char id,
 	unsigned char j;
 	unsigned char col_end;
 
-	print_raster(raster);
+	if (DEBUG)
+		print_raster(raster);
 
 	for (i = 0; i < 156; ++i) {
 		col_end = 155 - i;
@@ -119,24 +120,30 @@ int main(int argc, char **argv)
 	/* Test conversion PBM data to fan display */
 	uint16_t display[8][156];
 
-	for (i = 0; i < 8; ++i)
-		for (j = 0; j < 156; ++j)
-			display[i][j] = 0xFFFF;
+	if (DEBUG) {
+		for (i = 0; i < 8; ++i)
+			for (j = 0; j < 156; ++j)
+				display[i][j] = 0xFFFF;
+	}
 
-	pbm_masks_init();
-	pbm_to_display(0, raster, display[0]);
+	if (DEBUG) {
+		pbm_masks_init();
+		pbm_to_display(0, raster, display[0]);
+	}
 
-	printf("\nDISPLAY 0:\n");
+	if (DEBUG)
+		printf("\nDISPLAY 0:\n");
 
-	for (i = 0; i < 156; ++i)
-		printf("%x\n", display[0][i]);
+	if (DEBUG)
+		for (i = 0; i < 156; ++i)
+			printf("%x\n", display[0][i]);
 
 
 	/* Stock PBM data in cfan_data structure */
 	cfan->n = 1;
-	cfan->cfg[0][0] = 0;
-	cfan->cfg[0][1] = 0;
-	cfan->cfg[0][2] = 0;
+	cfan->cfg[0][0] = 2;
+	cfan->cfg[0][1] = 3;
+	cfan->cfg[0][2] = 6;
 	cfan->bitmaps = malloc(sizeof(unsigned char *));
 	cfan->bitmaps[0] = raster;
 
@@ -147,10 +154,10 @@ int main(int argc, char **argv)
 	if (fd <= 0)
 		ret = -EBADF;
 
-	if (!write(fd, cfan, sizeof(cfan))) {
-		printf("Error: write()\n");
-		ret = EXIT_FAILURE;
-	}
+	ret = write(fd, cfan, sizeof(*cfan));
+	printf("Info: write(): code %d\n", ret);
+	printf("Info: cfan->bitmaps addr: %p\n", cfan->bitmaps);
+	ret = (ret <= 0) ? EXIT_FAILURE : EXIT_SUCCESS;
 
 	close(fd);
 	pbm_freerow(raster);
