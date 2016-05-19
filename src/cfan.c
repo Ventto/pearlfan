@@ -44,17 +44,19 @@ static u16 pbm_mask[11];
 /* Initializes masks which represent eleven LEDs's activation */
 static void pbm_masks_init(void)
 {
-	pbm_mask[10] = 0xFFF7;
-	pbm_mask[9] = 0xFFFB;
-	pbm_mask[8] = 0xFFFD;
-	pbm_mask[7] = 0xFFFE;
-	pbm_mask[6] = 0xBFFF;
-	pbm_mask[5] = 0xDFFF;
-	pbm_mask[4] = 0xEFFF;
-	pbm_mask[3] = 0xF7FF;
-	pbm_mask[2] = 0xFBFF;
-	pbm_mask[1] = 0xFDFF;
-	pbm_mask[0] = 0xFEFF;
+	pbm_mask[10] = 0xFFF7;	/* led 11 */
+	pbm_mask[9] = 0xFFFB;	/* led 10 */
+	pbm_mask[8] = 0xFFFD;	/* led 9 */
+	pbm_mask[7] = 0xFFFE;	/* led 8 */
+
+	pbm_mask[6] = 0xBFFF;	/* led 7 */
+	pbm_mask[5] = 0xDFFF;	/* led 6 */
+	pbm_mask[4] = 0xEFFF;	/* led 5 */
+
+	pbm_mask[3] = 0xF7FF;	/* led 4 */
+	pbm_mask[2] = 0xFBFF;	/* led 3 */
+	pbm_mask[1] = 0xFDFF;	/* led 2 */
+	pbm_mask[0] = 0xFEFF;	/* led 1 */
 }
 
 /* Converts a given PBM raster to a ventilator's display */
