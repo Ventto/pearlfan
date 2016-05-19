@@ -74,6 +74,8 @@ static void pbm_to_display(unsigned char id,
 			if (raster[j * 156 + i] == 1)
 				display[col_end] &= pbm_mask[10 - j];
 	}
+	for (i = 0; i < 156; ++i)
+		pr_info("%x\n", display[i]);
 }
 
 /* Set effect config for a fan view */
@@ -93,6 +95,11 @@ static u64 set_config(unsigned char id,
 	 * [CDAB] : u16
 	 */
 	u16 cdab = 0;
+
+	pr_info("cfan:%s: ID: %d\n", __func__, id);
+	pr_info("cfan:%s: open option: %d\n", __func__, open_option);
+	pr_info("cfan:%s: close option: %d\n", __func__, close_option);
+	pr_info("cfan:%s: turn option: %d\n", __func__, turn_option);
 
 	cdab |= close_option;
 	cdab |= (open_option << 4);
@@ -189,59 +196,55 @@ static ssize_t cfan_write(struct file *f,
 			  size_t cnt,
 			  loff_t *off)
 {
-	u64 config;
+	struct cfan_data *cfan_data = NULL;
 	unsigned char i;
-	unsigned char j = 0;
-	unsigned char count = 0;
-	unsigned char column_index = 0;
 
-	if (!cfan)
-		return -ENODEV;
-
-	if (cnt == 0)
+	if (cnt == 0) {
+		pr_err("cfan:%s: buffer size is null !\n", __func__);
 		return 0;
-
-	if (!buffer || cnt > 233)
-		return -EINVAL;
-
-	pr_info("cfan:%s: =---------[ WRITE ] :\n", __func__);
-	pr_info("cfan:%s: displays_nb: %d\n", __func__, buffer[0]);
-
-	/* Get the number of displays */
-	cfan->displays_nb = buffer[0];
-	j++;
-
-	/* Set the configuration
-	 * Warning: set_config has been modified due to pbm version
-	 */
-	/* config = set_config((u16 *)(buffer + j)); */
-	j += 2;
-
-	pr_info("cfan:%s: 'j' before string: %d\n", __func__, j);
-
-	/* Strlen with the acc 'j' */
-	while (buffer[j++] != '\0' && count < 26)
-		count++;
-	j--;
-	j--;
-
-	pr_info("cfan:%s: 'j' after string: %d\n", __func__, j);
-	pr_info("cfan:%s: nb of characters: %d\n", __func__, count);
-	pr_info("cfan:%s: config: %x\n", __func__, (unsigned int)config);
-
-	i = j - count;
-	/* Write letter in the buffer */
-	for (; j > i; j--) {
-		pr_info("cfan:%s: 'j' reverse: %d\n", __func__, j);
-		column_index = write_letter(buffer[j], 0, column_index);
 	}
 
-	pr_info("cfan:%s: column_index: %d\n", __func__, column_index);
+	if (!buffer) {
+		pr_err("cfan:%s: buffer is null but its size is not !\n",
+		       __func__);
+		return -EINVAL;
+	}
+
+	if (cnt > sizeof(struct cfan_data) || cnt < sizeof(struct cfan_data)) {
+		pr_err("cfan:%s: the size's value is unexpected !\n", __func__);
+		return -EINVAL;
+	}
+
+	pr_info("cfan:%s: user buffer count: %d\n", __func__, cnt);
+
+	cfan_data = (struct cfan_data *)buffer;
+	cfan->displays_nb = cfan_data->n;
+	cfan->cfg[0] = set_config(0, cfan_data->cfg[0][0],
+				  cfan_data->cfg[0][1],
+				  cfan_data->cfg[0][2]);
+
+	pr_info("cfan:%s: Number of displays: %d\n", __func__,
+		cfan->displays_nb);
+	pr_info("cfan:%s: Bitmaps addr: %p\n", __func__,
+		cfan_data->bitmaps);
+	pr_info("cfan:%s: Configuration: %p\n", __func__,
+		cfan->cfg[0]);
+
+	/* Clear the ventilator */
+	/*
+	* for (i = 0; i < 156; i += 4)
+	*	send_data(cfan->udev, (u16 *)cfan->displays + i);
+	* return 2;
+	*/
+
+	pbm_masks_init();
+	pbm_to_display(0, cfan_data->bitmaps[0], cfan->displays[0]);
 
 	/* Send config */
-	send_data(cfan->udev, &config);
+	send_data(cfan->udev, &cfan->cfg[0]);
+
 	/* Send display */
-	for (i = 0; i < column_index; i += 4)
+	for (i = 0; i < 156; i += 4)
 		send_data(cfan->udev, (u16 *)cfan->displays + i);
 
 	return 1;
@@ -271,6 +274,13 @@ static int cfan_probe(struct usb_interface *interface,
 		return -ENOMEM;
 
 	memset(cfan, 0x00, sizeof(*cfan));
+
+	int i;
+	int j;
+
+	for (j = 0; j < 8; ++j)
+		for (i = 0; i < 156; i++)
+			cfan->displays[j][i] = 0xFFFF;
 
 	/* Increment the reference count of the usb device structure */
 	cfan->udev = usb_get_dev(udev);
