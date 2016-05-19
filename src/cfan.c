@@ -52,8 +52,8 @@ static u64 set_config(const u16 *cfg)
 }
 
 static u8 write_letter(const unsigned char letter,
-			 const unsigned char id,
-			 const unsigned char column)
+		       const unsigned char id,
+		       const unsigned char column)
 {
 	unsigned char col = column;
 
@@ -125,12 +125,12 @@ static int send_data(struct usb_device *udev, void *data)
 
 static int cfan_open(struct inode *i, struct file *f)
 {
-	  return 0;
+	return 0;
 }
 
 static int cfan_release(struct inode *i, struct file *f)
 {
-	  return 0;
+	return 0;
 }
 
 static ssize_t cfan_write(struct file *f,
@@ -236,7 +236,7 @@ static int cfan_probe(struct usb_interface *interface,
 
 	if (ret < 0) {
 		pr_info("cfan: %s(): unable to register the device.\n",
-		       __func__);
+			__func__);
 		return ret;
 	}
 
@@ -270,7 +270,7 @@ static int __init usb_cfan_init(void)
 	retval = usb_register(&cfan_driver);
 	if (retval < 0) {
 		pr_info("cfan: %s(): unable to register USB driver.\n",
-		       __func__);
+			__func__);
 		return retval;
 	}
 	return 0;
