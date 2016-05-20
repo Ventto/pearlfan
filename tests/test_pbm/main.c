@@ -1,7 +1,6 @@
 #include <errno.h>
 #include <inttypes.h>	/* uintX_t types */
 #include <pbm.h>
-#include <libpbm.h>
 #include <stdio.h>	/* FILE */
 #include <stdlib.h>
 #include <string.h>	/* strtok() */
