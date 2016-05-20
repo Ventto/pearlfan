@@ -49,14 +49,14 @@ static void pbm_masks_init(void)
 	pbm_mask[8] = 0xFFFD;	/* led 9 */
 	pbm_mask[7] = 0xFFFE;	/* led 8 */
 
-	pbm_mask[6] = 0xBFFF;	/* led 7 */
-	pbm_mask[5] = 0xDFFF;	/* led 6 */
-	pbm_mask[4] = 0xEFFF;	/* led 5 */
+	pbm_mask[6] = 0x7FFF;	/* led 7 */
+	pbm_mask[5] = 0xBFFF;	/* led 6 */
+	pbm_mask[4] = 0xCFFF;	/* led 5 */
 
-	pbm_mask[3] = 0xF7FF;	/* led 4 */
-	pbm_mask[2] = 0xFBFF;	/* led 3 */
-	pbm_mask[1] = 0xFDFF;	/* led 2 */
-	pbm_mask[0] = 0xFEFF;	/* led 1 */
+	pbm_mask[3] = 0xFEFF;	/* led 4 */
+	pbm_mask[2] = 0xF7FF;	/* led 3 */
+	pbm_mask[1] = 0xFBFF;	/* led 2 */
+	pbm_mask[0] = 0xFCFF;	/* led 1 */
 }
 
 /* Converts a given PBM raster to a ventilator's display */
