@@ -1,28 +1,26 @@
+INCLUDES = -I../../src/includes
 DEBUG=yes
 
 ifeq ($(DEBUG),yes)
-	CFLAGS=-g3 -Wall -Werror -std=c99
-	LDFLAGS=
+	CFLAGS=-g3 -Wall -Werror -std=c99 $(INCLUDES)
 else
-	CFLAGS=
-	LDFLAGS=
+	CFLAGS=-Wall -Werror -std=c99 $(INCLUDES)
 endif
-CC=gcc
-HEADERFILES = includes/cfan_api.h includes/cfan_data.h
-SRCS = test.c cfan_api.c read_config.c
+
+CC = gcc
+HEADERFILES = $(wildcard ./includes/*.h)
+SRCS = $(wildcard *.c)
 OBJS = $(SRCS:.c=.o)
+LIBS =
 EXEC = test
 
 all: $(EXEC)
 
-$(EXEC): test.o cfan_api.o /usr/lib/libpbm.a
-	$(CC) $(CFLAGS) $^ -o test
+$(EXEC): $(OBJS) $(LIBS)
+	$(CC) $(CFLAGS) $^ -o $(EXEC)
 
-test.o: test.c $(HEADERFILES)
-	$(CC) $(CFLAGS) -c test.c -o test.o
-
-cfan_api.o: cfan_api.c
-	$(CC) $(CFLAGS) -c cfan_api.c
+%.o: %.c $(HEADERFILES)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 .PHONY: clean
 

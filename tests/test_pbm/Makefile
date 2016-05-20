@@ -1,16 +1,18 @@
-DEBUG=yes
+INCLUDES = -I../../src/includes
+DEBUG = yes
 
 ifeq ($(DEBUG),yes)
-	CFLAGS=-g3 -Wall -Werror -std=c99
+	CFLAGS=-g3 -Wall -Werror -std=c99 $(INCLUDES)
 else
-	CFLAGS=
+	CFLAGS=-Wall -Werror -std=c99 $(INCLUDES)
 endif
+
 CC = gcc
 HEADERFILES =
 SRCS = $(wildcard *.c)
 OBJS = $(SRCS:.c=.o)
 LIBS = /usr/lib/libpbm.a
-EXEC = test_pbm
+EXEC = test
 
 all: $(EXEC)
 

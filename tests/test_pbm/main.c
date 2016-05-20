@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>	/* strtok() */
 
-#include "includes/cfan_data.h"
+#include "cfan_data.h"
 
 #define DEBUG	0
 

@@ -1,14 +1,12 @@
 #include <errno.h>
 #include <fcntl.h>	/* write() */
 #include <inttypes.h>	/* uintX_t types */
-#include <pbm.h>
-#include <libpbm.h>
 #include <stdio.h>	/* FILE */
 #include <stdlib.h>
 #include <string.h>	/* strtok() */
 #include <unistd.h>	/* read() */
 
-#include "includes/cfan_data.h"
+#include "cfan_data.h"
 
 #define MAX_LINE	264
 
