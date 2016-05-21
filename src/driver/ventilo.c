@@ -19,8 +19,8 @@ MODULE_LICENSE("GPL");
 #define PRODUCT_ID	0x7701
 
 struct usb_ventilo {
-	struct 	usb_device	*udev;
-	u64     cfg[8];			/* displays configuration */
+	struct	usb_device	*udev;
+	u64	cfg[8];			/* displays configuration */
 	u16	displays[8][156];	/* displays's buffer */
 	u8	displays_nb;		/* number of displays */
 };
@@ -39,7 +39,8 @@ MODULE_DEVICE_TABLE(usb, id_table);
  * Global array which helps to convert a given PBM raster to
  * a ventilator's display (see pbm_to_display function below).
  */
-static const u16 pbm_mask[11] = {
+#define LEDS_NUMBER	11
+static const u16 pbm_mask[LEDS_NUMBER] = {
 	0xFEFF, 0xFDFF, 0xFBFF,
 	0xF7FF, 0xEFFF, 0xDFFF,
 	0xBFFF, 0xFFFE, 0xFFFD,
