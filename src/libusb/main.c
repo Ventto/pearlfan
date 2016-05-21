@@ -1,10 +1,178 @@
 #include <libusb-1.0/libusb.h>
+#include <pbm.h>
 #include <string.h>		/* memset() */
 #include <stdio.h>		/* printf() */
 #include <stdlib.h>		/* malloc() */
 
 #define VENDOR_ID	3141
 #define PRODUCT_ID	30465
+
+
+#include "ventilo_data.h"
+
+/* ------------CONFIG-------------- */
+
+#define MAX_LINE	264
+
+static int read_fan_config(char *cfg, char *str)
+{
+	unsigned char i = 0;
+
+	if (!cfg || !str)
+		return -1;
+
+	/*
+	 * Parses the display's configuration string (ex: '1/2/3')
+	 * Stocks 1,2,3 in cfg.
+	 */
+	while (i < 2) {
+		if (*str >= 48 && *str <= 53) {
+			cfg[i++] = *(str++) - 48;
+			if (*(str++) != '/')
+				return -1;
+		} else
+			return -1;
+	}
+
+	if (*str >= 48 && *str <= 53)
+		cfg[i] = *str - 48;
+
+	return 0;
+}
+
+static int read_config_file(char *filename,
+			    unsigned char *n,
+			    char **imgs,
+			    char **cfgs)
+{
+	FILE *cfgfile = NULL;
+	char *img_name = NULL;
+	char *cfg_str = NULL;
+	char line[MAX_LINE];
+
+	cfgfile = fopen(filename, "r+");
+
+	if (!cfgfile) {
+		printf("Cannot Open Config File: %s\n", filename);
+		return -1;
+	}
+
+	*n = 0;
+
+	while (fgets(line, sizeof(line), cfgfile) && *n < 8) {
+		if (line[0] == '+') {
+			img_name = strtok(line + 1, "+");
+			if (img_name) {
+				strcpy(imgs[*n], img_name);
+				cfg_str = line + strlen(img_name) + 2;
+				if (read_fan_config(cfgs[*n], cfg_str) != 0) {
+					printf("Invalid Config File Error\n");
+					return -1;
+				}
+				printf("[%s]\n", imgs[*n]);
+			} else {
+				printf("Invalid Config File Error\n");
+				return -1;
+			}
+			(*n)++;
+		} else {
+			printf("Invalid Config File Error\n");
+			return -1;
+		}
+	}
+	return 0;
+}
+
+/* -------------PBM-------------- */
+
+#define IMAGE_WIDTH	156
+#define IMAGE_HEIGHT	11
+
+static uint16_t pbm_mask[11];
+
+static void pbm_masks_init(void)
+{
+	pbm_mask[10] = 0xFFF7;
+	pbm_mask[9] = 0xFFFB;
+	pbm_mask[8] = 0xFFFD;
+	pbm_mask[7] = 0xFFFE;
+	pbm_mask[6] = 0xBFFF;
+	pbm_mask[5] = 0xDFFF;
+	pbm_mask[4] = 0xEFFF;
+	pbm_mask[3] = 0xF7FF;
+	pbm_mask[2] = 0xFBFF;
+	pbm_mask[1] = 0xFDFF;
+	pbm_mask[0] = 0xFEFF;
+}
+
+static void pbm_to_usbdata(unsigned char id,
+			   unsigned char *raster,
+			   uint16_t *display)
+{
+	unsigned char i;
+	unsigned char j;
+	unsigned char col_end;
+
+	for (i = 0; i < 156; ++i) {
+		col_end = 155 - i;
+		for (j = 0; j < 11; ++j)
+			if (raster[j * 156 + i] == 1)
+				display[col_end] &= pbm_mask[10 - j];
+	}
+}
+
+static void print_raster(bit *raster)
+{
+	int i;
+	int j = 0;
+
+	printf("=------[ PBM Raster ]------=\n");
+	for (i = 0; i < 1716; ++i) {
+		printf("%d", raster[i]);
+		if (j == 69) {
+			j = 0;
+			printf("\n");
+		} else
+			j++;
+	}
+}
+
+static unsigned char *pbm_get_specific_raster(FILE *img)
+{
+	bit *raster = NULL;
+	int cols = 0;
+	int rows = 0;
+	int format = 0;
+
+	/* Getting the configuration from PBM image */
+	pbm_readpbminit(img, &cols, &rows, &format);
+
+	/* Invalid image's configuration for the ventilator */
+	if (cols != IMAGE_WIDTH && rows != IMAGE_HEIGHT
+	    && format != PBM_FORMAT) {
+		pm_close(img);
+		printf("Error: pbm_check() [cols=%d;rows=%d;format=%d]\n",
+		       cols, rows, format);
+		printf("Invalid Image Format Error\n");
+		return NULL;
+	}
+
+	/* Allocation of the raster */
+	raster = pbm_allocrow(1716);
+
+	/* Cannot allocate */
+	if (!raster) {
+		printf("Error: pbm_allocrow()\n");
+		return NULL;
+	}
+
+	/* Getting the raster from the PBM image */
+	pbm_readpbmrow(img, raster, 1716, format);
+
+	return (unsigned char *)raster;
+}
+
+/* ------------LIBUSB--------------- */
 
 /* Release the claimed interface and exit & close the USB device */
 static void release_usb(libusb_context *context,
@@ -64,8 +232,8 @@ static int send_usb_data(libusb_device_handle *dev_handle,
  * one.
  */
 static libusb_device_handle *get_usb_device(libusb_context *context,
-						 int vid,
-						 int pid)
+					    int vid,
+					    int pid)
 {
 	int r;
 
@@ -103,16 +271,30 @@ static libusb_device_handle *get_usb_device(libusb_context *context,
 	return dev_handle;
 }
 
+/* -------------------------------- */
+
 int main(int argc, char **argv)
 {
 	/* LIBUSB */
 	libusb_device_handle *dev_handle;
 	libusb_context *context = NULL;
 	int r;
+	/* CONFIG */
+	char **imgs = malloc(8);
+	char **cfgs = malloc(8);
+	unsigned char i;
+
+	for (i = 0; i < 8; ++i) {
+		imgs[i] = malloc(255);
+		cfgs[i] = malloc(3);
+		if (!imgs[i] || !cfgs[i])
+			return 1;
+	}
+
+	unsigned char n;
 	/* PBM image */
 	FILE *img = NULL;
 	bit *raster = NULL;
-	int ret;
 
 	/* Initialize the library for the session we just declared */
 	r = libusb_init(&context);
@@ -127,10 +309,7 @@ int main(int argc, char **argv)
 	if (!dev_handle)
 		return 1;
 
-	/* =--------------------------------------------------= */
-
-	/* Initialization before importing PBM image*/
-	pm_init(argv[0], 0);
+	/* =-------------------CONFIG--------------------------= */
 
 	/* Missing argument */
 	if (argc < 2) {
@@ -138,42 +317,32 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
+
+	if (read_config_file("config", &n, imgs, cfgs) < 0)
+		return EXIT_FAILURE;
+
+	/* =-------------------PBM--------------------------= */
+
+
+	/* Initialization before importing PBM image*/
+	pm_init(argv[0], 0);
+
 	/* Open a given PBM image as parameter */
 	img = pm_openr(argv[1]);
-
 	/* Cannot open file */
 	if (!img) {
-		printf("Error: pm_openr()\n");
+		printf("Cannot open PBM image\n");
 		return EXIT_FAILURE;
 	}
 
 	/* Getting the configuration from PBM image */
 	raster = pbm_get_specific_raster(img);
 
-	/* Send data to the ventilator */
-	uint64_t cfg = 0x00000055602210A0;
-	unsigned char data[8];
+	/* =--------------------------------------------------= */
 
-	data[0] = 0x00;
-	data[1] = 0x00;
-	data[2] = 0xFF;
-	data[3] = 0x00;
-	data[4] = 0xFF;
-	data[5] = 0xFF;
-	data[6] = 0x00;
-	data[7] = 0xFF;
+	/* Send data to USB driver */
 
-	r = 0;
-
-	r = send_usb_data(dev_handle, (unsigned char *)&cfg);
-
-	if (r < 0)
-		printf("Sending USB Packets Error\n");
-
-	r = send_usb_data(dev_handle, (unsigned char *)data);
-
-	if (r < 0)
-		printf("Sending USB Packets Error\n");
+	/* =--------------------------------------------------= */
 
 	/* Free USB resources */
 	release_usb(context, dev_handle);
