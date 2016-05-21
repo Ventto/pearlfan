@@ -214,9 +214,9 @@ static ssize_t ventilo_write(struct file *f,
 	/*     Convertion PBM to USB data      */
 	/* =--------------------------------= */
 	for (i = 0; i < ventilo->displays_nb ; i++) {
-		ventilo->cfgs[i] = set_config(i, data->cfgs[0][0],
-					     data->cfgs[0][1],
-					     data->cfgs[0][2]);
+		ventilo->cfgs[i] = set_config(i, data->cfgs[i][0],
+					     data->cfgs[i][1],
+					     data->cfgs[i][2]);
 		pbm_to_usbdata(i, data->images[i], ventilo->displays[i]);
 	}
 
@@ -225,7 +225,7 @@ static ssize_t ventilo_write(struct file *f,
 	/* =--------------------------------= */
 	for (i = 0; i < ventilo->displays_nb; ++i) {
 		send_data(ventilo->udev, &ventilo->cfgs[i]);
-		for (j = 0; j < 39; j += 4)
+		for (j = 0; j < 39; j = 4)
 			send_data(ventilo->udev,
 				  (u16 *)&ventilo->displays[i][j * 4]);
 	}
