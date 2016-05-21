@@ -1,6 +1,6 @@
-# cfan
+# Ventilo
 
-Contrôle d'un ventilateur ARM par USB.
+Contrôle d'un ventilateur USB DreamCheeky.
 
 ## Dépendances
 
