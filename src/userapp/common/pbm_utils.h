@@ -1,5 +1,7 @@
-#ifndef PBM_H_
-# define PBM_H_
+#ifndef _PBM_UTILS_
+# define _PBM_UTILS_H_
+
+#include <stdint.h>
 
 #define IMAGE_WIDTH	156
 #define IMAGE_HEIGHT	11
@@ -12,12 +14,14 @@ static const uint16_t pbm_mask[LEDS_NUMBER] = {
 	0xFEFF, 0xCFFF, 0xBFFF,
 	0x7FFF, 0xFFFE, 0xFFFD,
 	0xFFFB, 0xFFF7
-};
+} ;
 
-void pbm_to_usbdata(unsigned char id,
-			   unsigned char *raster,
-			   uint16_t display[156]);
+void pbm_to_usbdata(char id,
+		    unsigned char *raster,
+		    uint16_t display[156]);
 
 unsigned char *pbm_get_specific_raster(FILE *img);
 
-#endif /* !PBM_H_ */
+void free_pbm_rasters(unsigned char **rasters, int n);
+
+#endif /* !_PBM_UTILS_H_ */

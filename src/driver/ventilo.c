@@ -15,12 +15,9 @@ MODULE_AUTHOR("Thomas Venries, Franklin Mathieu");
 MODULE_DESCRIPTION("CheekyFan module, v0.1");
 MODULE_LICENSE("GPL");
 
-#define VENDOR_ID	0x0c45
-#define PRODUCT_ID	0x7701
-
 struct usb_ventilo {
 	struct	usb_device	*udev;
-	u64	cfg[8];			/* displays configuration */
+	u64	cfgs[8];			/* displays configuration */
 	u16	displays[8][156];	/* displays's buffer */
 	u8	displays_nb;		/* number of displays */
 };
@@ -48,7 +45,7 @@ static const u16 pbm_mask[LEDS_NUMBER] = {
 };
 
 /* Converts a given PBM raster to a ventilator's display */
-static void pbm_to_display(unsigned char id,
+static void pbm_to_usbdata(unsigned char id,
 			   char *raster,
 			   uint16_t *display)
 {
@@ -180,12 +177,13 @@ static int ventilo_release(struct inode *i, struct file *f)
 }
 
 static ssize_t ventilo_write(struct file *f,
-			  const char __user *buffer,
-			  size_t cnt,
-			  loff_t *off)
+			     const char __user *buffer,
+			     size_t cnt,
+			     loff_t *off)
 {
-	struct ventilo_data *ventilo_data = NULL;
-	unsigned char i;
+	struct ventilo_data *data = NULL;
+	int i;
+	int j;
 
 	if (cnt == 0) {
 		pr_err("ventilo:%s: buffer size is null !\n", __func__);
@@ -205,30 +203,34 @@ static ssize_t ventilo_write(struct file *f,
 		return -EINVAL;
 	}
 
-	ventilo_data = (struct ventilo_data *)buffer;
-	ventilo->displays_nb = ventilo_data->n;
-	ventilo->cfg[0] = set_config(0, ventilo_data->cfg[0][0],
-				  ventilo_data->cfg[0][1],
-				  ventilo_data->cfg[0][2]);
+	/* =--------------------------------= */
+	/*       Getting data from user       */
+	/* =--------------------------------= */
+	data = (struct ventilo_data *)buffer;
+	ventilo->displays_nb = data->n;
 
 	pr_info("ventilo:%s: Number of displays: %d\n", __func__,
 		ventilo->displays_nb);
 
-	/* Clear the ventilator */
-	/*
-	* for (i = 0; i < 156; i += 4)
-	*	send_data(ventilo->udev, (u16 *)ventilo->displays + i);
-	* return 2;
-	*/
+	/* =--------------------------------= */
+	/*     Convertion PBM to USB data      */
+	/* =--------------------------------= */
+	for (i = 0; i < ventilo->displays_nb ; i++) {
+		ventilo->cfgs[i] = set_config(0, data->cfgs[0][0],
+					     data->cfgs[0][1],
+					     data->cfgs[0][2]);
+		pbm_to_usbdata(i, data->images[i], ventilo->displays[i]);
+	}
 
-	pbm_to_display(0, ventilo_data->bitmaps[0], ventilo->displays[0]);
-
-	/* Send config */
-	send_data(ventilo->udev, &ventilo->cfg[0]);
-
-	/* Send display */
-	for (i = 0; i < 156; i += 4)
-		send_data(ventilo->udev, (u16 *)ventilo->displays + i);
+	/* =--------------------------------= */
+	/*    Send all data to the debvice    */
+	/* =--------------------------------= */
+	for (i = 0; i < ventilo->displays_nb; ++i) {
+		send_data(ventilo->udev, &ventilo->cfgs[i]);
+		for (j = 0; j < 39; j += 4)
+			send_data(ventilo->udev,
+				  (u16 *)&ventilo->displays[i][j * 4]);
+	}
 
 	return 1;
 }
@@ -246,7 +248,7 @@ static struct usb_class_driver ventilo_class_driver = {
 };
 
 static int ventilo_probe(struct usb_interface *interface,
-		      const struct usb_device_id *id)
+			 const struct usb_device_id *id)
 {
 	struct usb_device *udev = interface_to_usbdev(interface);
 	int i;

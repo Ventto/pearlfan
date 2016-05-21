@@ -1,6 +1,10 @@
 #ifndef __VENTILO_DATA_H
 #define __VENTILO_DATA_H
 
+#define VENDOR_ID	3141
+#define PRODUCT_ID	30465
+#define DEVICE		"/dev/ventilo0"
+
 /**
  * struct ventilo_data - designed to be the buffer as parameter for the module
  * driver's write function.
@@ -16,8 +20,8 @@
  */
 struct ventilo_data {
 	uint8_t n;
-	uint8_t cfg[8][3];
-	unsigned char **bitmaps;
+	uint8_t cfgs[8][3];
+	unsigned char **images;
 };
 
 #endif /* __VENTILO_DATA_H */

@@ -2,9 +2,9 @@
 #include "config.h"
 
 int read_config_file(char *filename,
-			    unsigned char *n,
-			    char imgs[8][PATH_MAX],
-			    char cfgs[8][3])
+		     int *n,
+		     char imgs[8][PATH_MAX],
+		     char cfgs[8][3])
 {
 	FILE *cfgfile = fopen(filename, "r+");
 

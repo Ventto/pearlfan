@@ -1,8 +1,8 @@
-INCLUDES =-I../driver/includes -I../common
+INCLUDES =-I../../driver/includes -I../common
 DEBUG = yes
 
 ifeq ($(DEBUG),yes)
-	CFLAGS=-g3 -Wall -std=c99 $(INCLUDES)
+	CFLAGS=-g3 -Wall -Werror -std=c99 $(INCLUDES)
 else
 	CFLAGS=-Wall -Werror -std=c99 $(INCLUDES)
 endif
@@ -13,7 +13,7 @@ SRCS = $(wildcard *.c) $(wildcard ../common/*.c)
 OBJS = $(SRCS:.c=.o)
 LIBS += $(shell pkg-config --libs --cflags libusb-1.0)
 LIBS += /usr/lib/libpbm.a
-EXEC = test
+EXEC = app
 
 all: $(EXEC)
 

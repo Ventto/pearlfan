@@ -49,7 +49,7 @@ if [ -z "$(ls /dev | grep $DEV)" ]; then
 	exit 1
 fi
 
-cd ../../tests/test_pbm && make && sudo ./test img_test.pbm
+cd ../userapp/driver_app/ && make && ./app config
 
 err=$?
 

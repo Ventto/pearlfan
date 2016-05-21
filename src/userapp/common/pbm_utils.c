@@ -2,11 +2,11 @@
 #include <pbm.h>
 #include <stdio.h>
 
-#include "pbm_local.h"
+#include "pbm_utils.h"
 
-void pbm_to_usbdata(unsigned char id,
-			   unsigned char *raster,
-			   uint16_t display[156])
+void pbm_to_usbdata(char id,
+		    unsigned char *raster,
+		    uint16_t display[156])
 {
 	unsigned char i;
 	unsigned char j;
@@ -54,4 +54,15 @@ unsigned char *pbm_get_specific_raster(FILE *img)
 	pbm_readpbmrow(img, raster, IMAGE_WIDTH * IMAGE_HEIGHT, format);
 
 	return (unsigned char *)raster;
+}
+
+void free_pbm_rasters(unsigned char **rasters, int n)
+{
+	if (!rasters)
+		return;
+
+	int i;
+
+	for (i = 0; i < n; ++i)
+		pbm_freerow(rasters[i]);
 }
