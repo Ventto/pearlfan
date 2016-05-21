@@ -35,7 +35,7 @@ static int read_config_file(char *filename,
 
 	fclose(cfgfile);
 
-	if (res != 4) {
+	if (res != 4 && res != EOF) {
 		printf("Invalid Config File Error\n");
 		return -1;
 	}
