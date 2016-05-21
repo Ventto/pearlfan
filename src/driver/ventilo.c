@@ -225,7 +225,7 @@ static ssize_t ventilo_write(struct file *f,
 	/* =--------------------------------= */
 	for (i = 0; i < ventilo->displays_nb; ++i) {
 		send_data(ventilo->udev, &ventilo->cfgs[i]);
-		for (j = 0; j < 39; j = 4)
+		for (j = 0; j < 39; j++)
 			send_data(ventilo->udev,
 				  (u16 *)&ventilo->displays[i][j * 4]);
 	}
