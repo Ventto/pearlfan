@@ -23,6 +23,11 @@ $ cd ./src/userapp/libusb_app/
 $ ./test config
 ```
 
+## Charger le driver
+
+Un script utilitaire pour charger le module est disponible dans
+`./src/driver/script.sh`.
+
 ## Auteurs
 
 * Thomas Venries
