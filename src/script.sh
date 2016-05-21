@@ -48,7 +48,7 @@ if [ -z "$(ls /dev | grep cfan0)" ]; then
 	exit 1
 fi
 
-cd ../tests/test_pbm && make && sudo ./test_pbm img_test.pbm
+cd ../tests/test_pbm && make && sudo ./test img_test.pbm
 
 err=$?
 
