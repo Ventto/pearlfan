@@ -48,22 +48,12 @@ static int read_config_file(char *filename,
 #define IMAGE_WIDTH	156
 #define IMAGE_HEIGHT	11
 
-static uint16_t pbm_mask[11];
-
-static void pbm_masks_init(void)
-{
-	pbm_mask[10] = 0xFFF7;
-	pbm_mask[9] = 0xFFFB;
-	pbm_mask[8] = 0xFFFD;
-	pbm_mask[7] = 0xFFFE;
-	pbm_mask[6] = 0xBFFF;
-	pbm_mask[5] = 0xDFFF;
-	pbm_mask[4] = 0xEFFF;
-	pbm_mask[3] = 0xF7FF;
-	pbm_mask[2] = 0xFBFF;
-	pbm_mask[1] = 0xFDFF;
-	pbm_mask[0] = 0xFEFF;
-}
+static const uint16_t pbm_mask[11] = {
+	0xFEFF, 0xFDFF, 0xFBFF,
+	0xF7FF, 0xEFFF, 0xDFFF,
+	0xBFFF, 0xFFFE, 0xFFFD,
+	0xFFFB, 0xFFF7
+};
 
 static void pbm_to_usbdata(unsigned char id,
 			   unsigned char *raster,
