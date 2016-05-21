@@ -63,27 +63,11 @@ static void pbm_to_usbdata(unsigned char id,
 	unsigned char j;
 	unsigned char col_end;
 
-	for (i = 0; i < 156; ++i) {
-		col_end = 155 - i;
-		for (j = 0; j < 11; ++j)
-			if (raster[j * 156 + i] == 1)
-				display[col_end] &= pbm_mask[10 - j];
-	}
-}
-
-static void print_raster(bit *raster)
-{
-	int i;
-	int j = 0;
-
-	printf("=------[ PBM Raster ]------=\n");
-	for (i = 0; i < 1716; ++i) {
-		printf("%d", raster[i]);
-		if (j == 69) {
-			j = 0;
-			printf("\n");
-		} else
-			j++;
+	for (i = 0; i < IMAGE_WIDTH; ++i) {
+		col_end = IMAGE_WIDTH - i - 1;
+		for (j = 0; j < IMAGE_HEIGHT; ++j)
+			if (raster[j * IMAGE_WIDTH + i] == 1)
+				display[col_end] &= pbm_mask[IMAGE_HEIGHT - j - 1];
 	}
 }
 
@@ -108,7 +92,7 @@ static unsigned char *pbm_get_specific_raster(FILE *img)
 	}
 
 	/* Allocation of the raster */
-	raster = pbm_allocrow(1716);
+	raster = pbm_allocrow(IMAGE_WIDTH * IMAGE_HEIGHT);
 
 	/* Cannot allocate */
 	if (!raster) {
@@ -117,7 +101,7 @@ static unsigned char *pbm_get_specific_raster(FILE *img)
 	}
 
 	/* Getting the raster from the PBM image */
-	pbm_readpbmrow(img, raster, 1716, format);
+	pbm_readpbmrow(img, raster, IMAGE_WIDTH * IMAGE_HEIGHT, format);
 
 	return (unsigned char *)raster;
 }
