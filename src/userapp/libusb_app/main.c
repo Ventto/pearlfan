@@ -5,6 +5,9 @@
 #include <stdio.h>		/* printf() */
 #include <stdlib.h>		/* malloc() */
 
+#include "config.h"
+#include "pbm_common.h"
+
 #define VENDOR_ID	3141
 #define PRODUCT_ID	30465
 
@@ -39,110 +42,6 @@ static uint64_t set_config(unsigned char id,
 	cdab |= (turn_option << 12);
 
 	return 0x00000055000010A0 | (cdab << 16);
-}
-
-/* ------------CONFIG-------------- */
-
-static int read_config_file(char *filename,
-			    unsigned char *n,
-			    char imgs[8][PATH_MAX],
-			    char cfgs[8][3])
-{
-	FILE *cfgfile = fopen(filename, "r+");
-
-	if (!cfgfile) {
-		printf("Cannot Open Config File: %s\n", filename);
-		return -1;
-	}
-
-	*n = 0;
-
-	int res;
-
-	do {
-		res = fscanf(cfgfile, "+%[^+]+%hhu/%hhu/%hhu\n", imgs[*n],
-			     &cfgs[*n][0], &cfgs[*n][1], &cfgs[*n][2]);
-		++*n;
-	} while (res == 4 && *n < 8);
-
-	fclose(cfgfile);
-
-	if (res != 4 && res != EOF) {
-		printf("Invalid Config File Error\n");
-		return -1;
-	}
-
-	--*n;
-
-	return 0;
-}
-
-/* -------------PBM-------------- */
-
-#define IMAGE_WIDTH	156
-#define IMAGE_HEIGHT	11
-#define LEDS_NUMBER	11
-#define FAN_DISPLAY_8BYTES_PACKET_NUMBER	39
-#define FAN_DISPLAY_MAX_NUMBER	8
-
-static const uint16_t pbm_mask[LEDS_NUMBER] = {
-	0xFCFF, 0xFBFF, 0xF7FF,
-	0xFEFF, 0xCFFF, 0xBFFF,
-	0x7FFF, 0xFFFE, 0xFFFD,
-	0xFFFB, 0xFFF7
-};
-
-static void pbm_to_usbdata(unsigned char id,
-			   unsigned char *raster,
-			   uint16_t display[156])
-{
-
-	unsigned char i;
-	unsigned char j;
-	unsigned char col_end;
-
-	for (i = 0; i < IMAGE_WIDTH; ++i) {
-		col_end = IMAGE_WIDTH - i - 1;
-		for (j = 0; j < IMAGE_HEIGHT; ++j)
-			if (raster[j * IMAGE_WIDTH + i] == 1)
-				display[col_end] &=
-					pbm_mask[IMAGE_HEIGHT - j - 1];
-	}
-}
-
-static unsigned char *pbm_get_specific_raster(FILE *img)
-{
-	bit *raster = NULL;
-	int cols = 0;
-	int rows = 0;
-	int format = 0;
-
-	/* Getting the configuration from PBM image */
-	pbm_readpbminit(img, &cols, &rows, &format);
-
-	/* Invalid image's configuration for the ventilator */
-	if (cols != IMAGE_WIDTH && rows != IMAGE_HEIGHT
-	    && format != PBM_FORMAT) {
-		pm_close(img);
-		printf("Error: pbm_check() [cols=%d;rows=%d;format=%d]\n",
-		       cols, rows, format);
-		printf("Invalid Image Format Error\n");
-		return NULL;
-	}
-
-	/* Allocation of the raster */
-	raster = pbm_allocrow(IMAGE_WIDTH * IMAGE_HEIGHT);
-
-	/* Cannot allocate */
-	if (!raster) {
-		printf("Error: pbm_allocrow()\n");
-		return NULL;
-	}
-
-	/* Getting the raster from the PBM image */
-	pbm_readpbmrow(img, raster, IMAGE_WIDTH * IMAGE_HEIGHT, format);
-
-	return (unsigned char *)raster;
 }
 
 /* ------------LIBUSB--------------- */
