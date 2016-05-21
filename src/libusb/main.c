@@ -1,5 +1,6 @@
 #include <libusb-1.0/libusb.h>
 #include <pbm.h>
+#include <linux/limits.h>
 #include <string.h>		/* memset() */
 #include <stdio.h>		/* printf() */
 #include <stdlib.h>		/* malloc() */
@@ -14,43 +15,12 @@
 
 #define MAX_LINE	264
 
-static int read_fan_config(char *cfg, char *str)
-{
-	unsigned char i = 0;
-
-	if (!cfg || !str)
-		return -1;
-
-	/*
-	 * Parses the display's configuration string (ex: '1/2/3')
-	 * Stocks 1,2,3 in cfg.
-	 */
-	while (i < 2) {
-		if (*str >= 48 && *str <= 53) {
-			cfg[i++] = *(str++) - 48;
-			if (*(str++) != '/')
-				return -1;
-		} else
-			return -1;
-	}
-
-	if (*str >= 48 && *str <= 53)
-		cfg[i] = *str - 48;
-
-	return 0;
-}
-
 static int read_config_file(char *filename,
 			    unsigned char *n,
-			    char **imgs,
-			    char **cfgs)
+			    char imgs[8][PATH_MAX],
+			    char cfgs[8][3])
 {
-	FILE *cfgfile = NULL;
-	char *img_name = NULL;
-	char *cfg_str = NULL;
-	char line[MAX_LINE];
-
-	cfgfile = fopen(filename, "r+");
+	FILE *cfgfile = fopen(filename, "r+");
 
 	if (!cfgfile) {
 		printf("Cannot Open Config File: %s\n", filename);
@@ -59,27 +29,19 @@ static int read_config_file(char *filename,
 
 	*n = 0;
 
-	while (fgets(line, sizeof(line), cfgfile) && *n < 8) {
-		if (line[0] == '+') {
-			img_name = strtok(line + 1, "+");
-			if (img_name) {
-				strcpy(imgs[*n], img_name);
-				cfg_str = line + strlen(img_name) + 2;
-				if (read_fan_config(cfgs[*n], cfg_str) != 0) {
-					printf("Invalid Config File Error\n");
-					return -1;
-				}
-				printf("[%s]\n", imgs[*n]);
-			} else {
-				printf("Invalid Config File Error\n");
-				return -1;
-			}
-			(*n)++;
-		} else {
-			printf("Invalid Config File Error\n");
-			return -1;
-		}
+	int res;
+	do {
+		res = fscanf(cfgfile, "+%s+%hhu/%hhu/%hhu\n", imgs[*n],
+				&cfgs[*n][0], &cfgs[*n][1], &cfgs[*n][2]);
+	} while (res == 4 && *n < 8);
+
+	fclose(cfgfile);
+
+	if (res != 4) {
+		printf("Invalid Config File Error\n");
+		return -1;
 	}
+
 	return 0;
 }
 
@@ -278,26 +240,17 @@ int main(int argc, char **argv)
 	/* LIBUSB */
 	libusb_device_handle *dev_handle;
 	libusb_context *context = NULL;
-	int r;
+
 	/* CONFIG */
-	char **imgs = malloc(8);
-	char **cfgs = malloc(8);
-	unsigned char i;
+	char imgs[8][PATH_MAX];
+	char cfgs[8][3];
 
-	for (i = 0; i < 8; ++i) {
-		imgs[i] = malloc(255);
-		cfgs[i] = malloc(3);
-		if (!imgs[i] || !cfgs[i])
-			return 1;
-	}
-
-	unsigned char n;
 	/* PBM image */
 	FILE *img = NULL;
 	bit *raster = NULL;
 
 	/* Initialize the library for the session we just declared */
-	r = libusb_init(&context);
+	int r = libusb_init(&context);
 	if (r < 0) {
 		printf("Init Error %d\n", r);
 		return 1;
@@ -317,7 +270,7 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-
+	unsigned char n;
 	if (read_config_file("config", &n, imgs, cfgs) < 0)
 		return EXIT_FAILURE;
 
