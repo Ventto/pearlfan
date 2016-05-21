@@ -39,25 +39,12 @@ MODULE_DEVICE_TABLE(usb, id_table);
  * Global array which helps to convert a given PBM raster to
  * a ventilator's display (see pbm_to_display function below).
  */
-static u16 pbm_mask[11];
-
-/* Initializes masks which represent eleven LEDs's activation */
-static void pbm_masks_init(void)
-{
-	pbm_mask[10] = 0xFFF7;	/* led 11 */
-	pbm_mask[9] = 0xFFFB;	/* led 10 */
-	pbm_mask[8] = 0xFFFD;	/* led 9 */
-	pbm_mask[7] = 0xFFFE;	/* led 8 */
-
-	pbm_mask[6] = 0x7FFF;	/* led 7 */
-	pbm_mask[5] = 0xBFFF;	/* led 6 */
-	pbm_mask[4] = 0xCFFF;	/* led 5 */
-
-	pbm_mask[3] = 0xFEFF;	/* led 4 */
-	pbm_mask[2] = 0xF7FF;	/* led 3 */
-	pbm_mask[1] = 0xFBFF;	/* led 2 */
-	pbm_mask[0] = 0xFCFF;	/* led 1 */
-}
+static const u16 pbm_mask[11] = {
+	0xFEFF, 0xFDFF, 0xFBFF,
+	0xF7FF, 0xEFFF, 0xDFFF,
+	0xBFFF, 0xFFFE, 0xFFFD,
+	0xFFFB, 0xFFF7
+};
 
 /* Converts a given PBM raster to a ventilator's display */
 static void pbm_to_display(unsigned char id,
@@ -233,7 +220,6 @@ static ssize_t ventilo_write(struct file *f,
 	* return 2;
 	*/
 
-	pbm_masks_init();
 	pbm_to_display(0, ventilo_data->bitmaps[0], ventilo->displays[0]);
 
 	/* Send config */
