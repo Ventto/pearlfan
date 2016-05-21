@@ -92,11 +92,11 @@ static u64 set_config(unsigned char id,
 	return 0x00000055000010A0 | (cdab << 16);
 }
 
-static u8 write_letter(const unsigned char letter,
+u8 write_letter(const unsigned char letter,
 		       const unsigned char id,
 		       const unsigned char column)
 {
-	unsigned char col = column;
+	u8 col = column;
 
 	if (col)
 		ventilo->displays[id][col++] = 0xFFFF;
