@@ -5,7 +5,12 @@
 #include <stdlib.h>
 #include <string.h>	/* strtok() */
 
-#include "cfan_data.h"
+#include "ventilo_data.h"
+
+#define DEVICE		"/dev/ventilo0"
+
+#define IMAGE_WIDTH	156
+#define IMAGE_HEIGHT	11
 
 #define DEBUG	0
 
@@ -61,6 +66,18 @@ static void pbm_to_display(unsigned char id,
 	}
 }
 
+static void free_data(FILE *pbm,
+		      bit *raster,
+		      struct ventilo_data *ventilo) {
+	pbm_freerow(raster);
+	pm_close(pbm);
+	if (!ventilo)
+		return;
+	if (ventilo->bitmaps)
+		free(ventilo->bitmaps);
+	free(ventilo);
+}
+
 int main(int argc, char **argv)
 {
 	FILE *pbm = NULL;
@@ -68,52 +85,61 @@ int main(int argc, char **argv)
 	int cols = 0;
 	int rows = 0;
 	int format = 0;
+	int fd;
+	int ret;
+	unsigned int i;
+	unsigned int j = 0;
 
-	/* Initialization */
+	/* Initialization before importing PBM image*/
 	pm_init(argv[0], 0);
 
+	/* Missing argument */
 	if (argc < 2) {
-		printf("Error: no arg\n");
+		printf("Error: a parameter is missing.\n");
 		return EXIT_FAILURE;
 	}
 
-	/* Open PBM image */
+	/* Open a given PBM image as parameter */
 	pbm = pm_openr(argv[1]);
 
+	/* Cannot open file */
 	if (!pbm) {
 		printf("Error: pm_openr()\n");
 		return EXIT_FAILURE;
 	}
 
+	/* Getting the configuration from PBM image */
 	pbm_readpbminit(pbm, &cols, &rows, &format);
 
-	if (cols != 156 && rows != 11 && format != PBM_FORMAT) {
+	/* Invalid image's configuration for the ventilator */
+	if (cols != IMAGE_WIDTH && rows != IMAGE_HEIGHT
+	    && format != PBM_FORMAT) {
 		pm_close(pbm);
 		printf("Error: pbm_check() [cols=%d;rows=%d;format=%d]\n",
 		       cols, rows, format);
 		return EXIT_FAILURE;
 	}
 
+	/* Allocation of the raster */
 	raster = pbm_allocrow(1716);
 
+	/* Cannot allocate */
 	if (!raster) {
 		printf("Error: pbm_allocrow()\n");
 		return EXIT_FAILURE;
 	}
 
+	/* Getting the raster from the PBM image */
 	pbm_readpbmrow(pbm, raster, 1716, format);
-
-	unsigned int i;
-	unsigned int j = 0;
 
 	if (DEBUG)
 		print_raster(raster);
 
-	struct cfan_data *cfan = NULL;
+	struct ventilo_data *ventilo = NULL;
 
-	cfan = malloc(sizeof(*cfan));
+	ventilo = malloc(sizeof(*ventilo));
 
-	if (!cfan)
+	if (!ventilo)
 		return -ENOMEM;
 
 	/* Test conversion PBM data to fan display */
@@ -131,38 +157,43 @@ int main(int argc, char **argv)
 	}
 
 	if (DEBUG)
-		printf("\nDISPLAY 0:\n");
+		printf("\nVentilator Data:\n");
 
+	/* Print the data for the ventilator */
 	if (DEBUG)
 		for (i = 0; i < 156; ++i)
 			printf("%x\n", display[0][i]);
 
+	/* Set the ventilator configuration */
+	ventilo->n = 1;
+	ventilo->cfg[0][0] = 2;
+	ventilo->cfg[0][1] = 3;
+	ventilo->cfg[0][2] = 6;
+	ventilo->bitmaps = malloc(sizeof(unsigned char *));
 
-	/* Stock PBM data in cfan_data structure */
-	cfan->n = 1;
-	cfan->cfg[0][0] = 2;
-	cfan->cfg[0][1] = 3;
-	cfan->cfg[0][2] = 6;
-	cfan->bitmaps = malloc(sizeof(unsigned char *));
-	cfan->bitmaps[0] = raster;
+	/* Stock PBM data in ventilo_data structure */
+	ventilo->bitmaps[0] = raster;
+
+	/* Target the ventialtor device */
+	fd = open(DEVICE, O_WRONLY);
+
+	/* Error: Cannot open file */
+	if (fd <= 0) {
+		free_data(pbm, raster, ventilo);
+		printf("AppPBM: Error: Cannot open the ventilator device.\n");
+		return -EBADF;
+	}
 
 	/* Send the data to the driver */
-	int fd = open("/dev/cfan0", O_WRONLY);
-	int ret = EXIT_SUCCESS;
+	ret = write(fd, ventilo, sizeof(*ventilo));
 
-	if (fd <= 0)
-		ret = -EBADF;
-
-	ret = write(fd, cfan, sizeof(*cfan));
-	printf("Info: write(): code %d\n", ret);
-	printf("Info: cfan->bitmaps addr: %p\n", cfan->bitmaps);
-	ret = (ret <= 0) ? EXIT_FAILURE : EXIT_SUCCESS;
+	if (ret <= 0) {
+		printf("AppPBM: Error: write error.\n");
+		ret = EXIT_FAILURE;
+	}
+	ret = EXIT_SUCCESS;
 
 	close(fd);
-	pbm_freerow(raster);
-	pm_close(pbm);
-	free(cfan->bitmaps);
-	free(cfan);
-
+	free_data(pbm, raster, ventilo);
 	return ret;
 }

@@ -3,7 +3,7 @@
 *.cmd
 *.ko
 *.o
-cfan.mod*
+ventilo.mod*
 modules.*
 Module*
 .tmp_versions/

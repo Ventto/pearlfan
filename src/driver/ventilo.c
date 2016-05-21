@@ -1,5 +1,5 @@
 /*
- * Linux driver for Led Fan by Dream Cheeky (version 0)
+ * Linux driver for USB Leds Fan (by Dream Cheeky)
  */
 #include <asm/uaccess.h>
 #include <linux/errno.h>
@@ -9,7 +9,7 @@
 #include <linux/slab.h>
 #include <linux/usb.h>
 
-#include "includes/cfan_data.h"
+#include "includes/ventilo_data.h"
 
 MODULE_AUTHOR("Thomas Venries, Franklin Mathieu");
 MODULE_DESCRIPTION("CheekyFan module, v0.1");
@@ -18,15 +18,15 @@ MODULE_LICENSE("GPL");
 #define VENDOR_ID	0x0c45
 #define PRODUCT_ID	0x7701
 
-struct usb_cfan {
-	struct usb_device	*udev;
+struct usb_ventilo {
+	struct 	usb_device	*udev;
 	u64     cfg[8];			/* displays configuration */
 	u16	displays[8][156];	/* displays's buffer */
 	u8	displays_nb;		/* number of displays */
 };
 
-static struct usb_driver cfan_driver;
-static struct usb_cfan *cfan;
+static struct usb_driver ventilo_driver;
+static struct usb_ventilo *ventilo;
 
 /* Add the device to this driver's supported device list */
 static struct usb_device_id id_table[] = {
@@ -96,10 +96,10 @@ static u64 set_config(unsigned char id,
 	 */
 	u16 cdab = 0;
 
-	pr_info("cfan:%s: ID: %d\n", __func__, id);
-	pr_info("cfan:%s: open option: %d\n", __func__, open_option);
-	pr_info("cfan:%s: close option: %d\n", __func__, close_option);
-	pr_info("cfan:%s: turn option: %d\n", __func__, turn_option);
+	pr_info("ventilo:%s: ID: %d\n", __func__, id);
+	pr_info("ventilo:%s: open option: %d\n", __func__, open_option);
+	pr_info("ventilo:%s: close option: %d\n", __func__, close_option);
+	pr_info("ventilo:%s: turn option: %d\n", __func__, turn_option);
 
 	cdab |= close_option;
 	cdab |= (open_option << 4);
@@ -116,41 +116,41 @@ static u8 write_letter(const unsigned char letter,
 	unsigned char col = column;
 
 	if (col)
-		cfan->displays[id][col++] = 0xFFFF;
+		ventilo->displays[id][col++] = 0xFFFF;
 
-	pr_info("cfan:%s: detected letter: %x\n", __func__, letter);
+	pr_info("ventilo:%s: detected letter: %x\n", __func__, letter);
 
 	switch (letter) {
 	case 'A':
-		cfan->displays[id][col++] = 0x00FF;
-		cfan->displays[id][col++] = 0x6EFF;
-		cfan->displays[id][col++] = 0x6EFF;
-		cfan->displays[id][col++] = 0x00FF;
-		cfan->displays[id][col++] = 0xFEFF;
+		ventilo->displays[id][col++] = 0x00FF;
+		ventilo->displays[id][col++] = 0x6EFF;
+		ventilo->displays[id][col++] = 0x6EFF;
+		ventilo->displays[id][col++] = 0x00FF;
+		ventilo->displays[id][col++] = 0xFEFF;
 		break;
 	case 'B':
-		cfan->displays[id][col++] = 0x82FF;
-		cfan->displays[id][col++] = 0x6CFF;
-		cfan->displays[id][col++] = 0x6CFF;
-		cfan->displays[id][col++] = 0x00FF;
+		ventilo->displays[id][col++] = 0x82FF;
+		ventilo->displays[id][col++] = 0x6CFF;
+		ventilo->displays[id][col++] = 0x6CFF;
+		ventilo->displays[id][col++] = 0x00FF;
 		break;
 	case 'C':
-		cfan->displays[id][col++] = 0x7CFF;
-		cfan->displays[id][col++] = 0x7CFF;
-		cfan->displays[id][col++] = 0x7CFF;
-		cfan->displays[id][col++] = 0x00FF;
+		ventilo->displays[id][col++] = 0x7CFF;
+		ventilo->displays[id][col++] = 0x7CFF;
+		ventilo->displays[id][col++] = 0x7CFF;
+		ventilo->displays[id][col++] = 0x00FF;
 		break;
 	case 'D':
-		cfan->displays[id][col++] = 0xC6FF;
-		cfan->displays[id][col++] = 0xBAFF;
-		cfan->displays[id][col++] = 0x7CFF;
-		cfan->displays[id][col++] = 0x00FF;
+		ventilo->displays[id][col++] = 0xC6FF;
+		ventilo->displays[id][col++] = 0xBAFF;
+		ventilo->displays[id][col++] = 0x7CFF;
+		ventilo->displays[id][col++] = 0x00FF;
 		break;
 	case 'P':
-		cfan->displays[id][col++] = 0x9EFF;
-		cfan->displays[id][col++] = 0x6EFF;
-		cfan->displays[id][col++] = 0x6EFF;
-		cfan->displays[id][col++] = 0x00FF;
+		ventilo->displays[id][col++] = 0x9EFF;
+		ventilo->displays[id][col++] = 0x6EFF;
+		ventilo->displays[id][col++] = 0x6EFF;
+		ventilo->displays[id][col++] = 0x00FF;
 		break;
 	}
 
@@ -181,82 +181,84 @@ static int send_data(struct usb_device *udev, void *data)
 	return 0;
 }
 
-static int cfan_open(struct inode *i, struct file *f)
+static int ventilo_open(struct inode *i, struct file *f)
 {
 	return 0;
 }
 
-static int cfan_release(struct inode *i, struct file *f)
+static int ventilo_release(struct inode *i, struct file *f)
 {
 	return 0;
 }
 
-static ssize_t cfan_write(struct file *f,
+static ssize_t ventilo_write(struct file *f,
 			  const char __user *buffer,
 			  size_t cnt,
 			  loff_t *off)
 {
-	struct cfan_data *cfan_data = NULL;
+	struct ventilo_data *ventilo_data = NULL;
 	unsigned char i;
 
 	if (cnt == 0) {
-		pr_err("cfan:%s: buffer size is null !\n", __func__);
+		pr_err("ventilo:%s: buffer size is null !\n", __func__);
 		return 0;
 	}
 
 	if (!buffer) {
-		pr_err("cfan:%s: buffer is null but its size is not !\n",
+		pr_err("ventilo:%s: buffer is null but its size is not !\n",
 		       __func__);
 		return -EINVAL;
 	}
 
-	if (cnt > sizeof(struct cfan_data) || cnt < sizeof(struct cfan_data)) {
-		pr_err("cfan:%s: the size's value is unexpected !\n", __func__);
+	if (cnt > sizeof(struct ventilo_data)
+	    || cnt < sizeof(struct ventilo_data)) {
+		pr_err("ventilo:%s: the size's value is unexpected !\n",
+		       __func__);
 		return -EINVAL;
 	}
 
-	cfan_data = (struct cfan_data *)buffer;
-	cfan->displays_nb = cfan_data->n;
-	cfan->cfg[0] = set_config(0, cfan_data->cfg[0][0],
-				  cfan_data->cfg[0][1],
-				  cfan_data->cfg[0][2]);
+	ventilo_data = (struct ventilo_data *)buffer;
+	ventilo->displays_nb = ventilo_data->n;
+	ventilo->cfg[0] = set_config(0, ventilo_data->cfg[0][0],
+				  ventilo_data->cfg[0][1],
+				  ventilo_data->cfg[0][2]);
 
-	pr_info("cfan:%s: Number of displays: %d\n", __func__,
-		cfan->displays_nb);
+	pr_info("ventilo:%s: Number of displays: %d\n", __func__,
+		ventilo->displays_nb);
 
 	/* Clear the ventilator */
 	/*
 	* for (i = 0; i < 156; i += 4)
-	*	send_data(cfan->udev, (u16 *)cfan->displays + i);
+	*	send_data(ventilo->udev, (u16 *)ventilo->displays + i);
 	* return 2;
 	*/
 
 	pbm_masks_init();
-	pbm_to_display(0, cfan_data->bitmaps[0], cfan->displays[0]);
+	pbm_to_display(0, ventilo_data->bitmaps[0], ventilo->displays[0]);
 
 	/* Send config */
-	send_data(cfan->udev, &cfan->cfg[0]);
+	send_data(ventilo->udev, &ventilo->cfg[0]);
 
 	/* Send display */
 	for (i = 0; i < 156; i += 4)
-		send_data(cfan->udev, (u16 *)cfan->displays + i);
+		send_data(ventilo->udev, (u16 *)ventilo->displays + i);
 
 	return 1;
 }
 
-const struct file_operations cfan_fops = {
-	.open    = cfan_open,
-	.release = cfan_release,
-	.write = cfan_write,
+const struct file_operations ventilo_fops = {
+	.open    = ventilo_open,
+	.release = ventilo_release,
+	.write = ventilo_write,
 };
 
-static struct usb_class_driver cfan_class_driver = {
-	.name = "usb/cfan0",
-	.fops = &cfan_fops,
+static struct usb_class_driver ventilo_class_driver = {
+	.name = "usb/ventilo0",
+	.fops = &ventilo_fops,
 	.minor_base = 0
 };
 
-static int cfan_probe(struct usb_interface *interface,
+static int ventilo_probe(struct usb_interface *interface,
 		      const struct usb_device_id *id)
 {
 	struct usb_device *udev = interface_to_usbdev(interface);
@@ -264,33 +266,33 @@ static int cfan_probe(struct usb_interface *interface,
 	int j;
 	int ret;
 
-	cfan = kmalloc(sizeof(*cfan), GFP_KERNEL);
+	ventilo = kmalloc(sizeof(*ventilo), GFP_KERNEL);
 
-	if (!cfan)
+	if (!ventilo)
 		return -ENOMEM;
 
-	memset(cfan, 0x00, sizeof(*cfan));
+	memset(ventilo, 0x00, sizeof(*ventilo));
 
 	for (j = 0; j < 8; ++j)
 		for (i = 0; i < 156; i++)
-			cfan->displays[j][i] = 0xFFFF;
+			ventilo->displays[j][i] = 0xFFFF;
 
 	/* Increment the reference count of the usb device structure */
-	cfan->udev = usb_get_dev(udev);
+	ventilo->udev = usb_get_dev(udev);
 
 	/* Increment the ref counter */
-	usb_set_intfdata(interface, cfan);
+	usb_set_intfdata(interface, ventilo);
 
-	pr_info("cfan:%s: USB Cheeky Fan has been connected\n", __func__);
-	pr_info("cfan:%s: [devnum=%d;bus_id=%d]\n",
+	pr_info("ventilo:%s: USB Cheeky Fan has been connected\n", __func__);
+	pr_info("ventilo:%s: [devnum=%d;bus_id=%d]\n",
 		__func__,
-		cfan->udev->devnum,
-		cfan->udev->bus->busnum);
+		ventilo->udev->devnum,
+		ventilo->udev->bus->busnum);
 
-	ret = usb_register_dev(interface, &cfan_class_driver);
+	ret = usb_register_dev(interface, &ventilo_class_driver);
 
 	if (ret < 0) {
-		pr_info("cfan: %s(): unable to register the device.\n",
+		pr_info("ventilo: %s(): unable to register the device.\n",
 			__func__);
 		return ret;
 	}
@@ -298,44 +300,44 @@ static int cfan_probe(struct usb_interface *interface,
 	return 0;
 }
 
-static void cfan_disconnect(struct usb_interface *interface)
+static void ventilo_disconnect(struct usb_interface *interface)
 {
-	struct usb_cfan *dev;
+	struct usb_ventilo *dev;
 
 	dev = usb_get_intfdata(interface);
 	usb_set_intfdata(interface, NULL);
-	usb_deregister_dev(interface, &cfan_class_driver);
+	usb_deregister_dev(interface, &ventilo_class_driver);
 	kfree(dev);
 
-	pr_info("cfan: %s(): USB Cheeky Fan has been disconnected.\n",
+	pr_info("ventilo: %s(): USB Cheeky Fan has been disconnected.\n",
 		__func__);
 }
 
-static struct usb_driver cfan_driver = {
-	.name       =	"cfan",
-	.probe      =	cfan_probe,
-	.disconnect =	cfan_disconnect,
+static struct usb_driver ventilo_driver = {
+	.name       =	"ventilo",
+	.probe      =	ventilo_probe,
+	.disconnect =	ventilo_disconnect,
 	.id_table   =	id_table,
 };
 
-static int __init usb_cfan_init(void)
+static int __init usb_ventilo_init(void)
 {
 	int retval = 0;
 	/* Register the USB driver. */
-	retval = usb_register(&cfan_driver);
+	retval = usb_register(&ventilo_driver);
 	if (retval < 0) {
-		pr_info("cfan: %s(): unable to register USB driver.\n",
+		pr_info("ventilo: %s(): unable to register USB driver.\n",
 			__func__);
 		return retval;
 	}
 	return 0;
 }
 
-static void __exit usb_cfan_exit(void)
+static void __exit usb_ventilo_exit(void)
 {
 	/* Un-register this USB driver. */
-	usb_deregister(&cfan_driver);
+	usb_deregister(&ventilo_driver);
 }
 
-module_init(usb_cfan_init);
-module_exit(usb_cfan_exit);
+module_init(usb_ventilo_init);
+module_exit(usb_ventilo_exit);

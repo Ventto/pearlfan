@@ -1,4 +1,4 @@
-INCLUDES = -I../../src/driver/includes
+INCLUDES =-I../driver/includes
 DEBUG = yes
 
 ifeq ($(DEBUG),yes)
@@ -11,13 +11,13 @@ CC = gcc
 HEADERFILES =
 SRCS = $(wildcard *.c)
 OBJS = $(SRCS:.c=.o)
-LIBS = /usr/lib/libpbm.a
+LIBS += $(shell pkg-config --libs --cflags libusb-1.0)
 EXEC = test
 
 all: $(EXEC)
 
-$(EXEC): $(OBJS) $(LIBS)
-	$(CC) $(CFLAGS) $^ -o $(EXEC)
+$(EXEC): $(OBJS)
+	$(CC) $(CFLAGS) $^ -o $(EXEC) $(LIBS)
 
 %.o: %.c $(HEADERFILES)
 	$(CC) $(CFLAGS) -c $< -o $@

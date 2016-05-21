@@ -1,7 +1,7 @@
 KDIR= /lib/modules/$(shell uname -r)/build
 PWD= $(shell pwd)
 
-obj-m := cfan.o
+obj-m := ventilo.o
 
 all:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
