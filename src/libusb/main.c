@@ -33,6 +33,7 @@ static int read_config_file(char *filename,
 	do {
 		res = fscanf(cfgfile, "+%s+%hhu/%hhu/%hhu\n", imgs[*n],
 				&cfgs[*n][0], &cfgs[*n][1], &cfgs[*n][2]);
+		++*n;
 	} while (res == 4 && *n < 8);
 
 	fclose(cfgfile);
