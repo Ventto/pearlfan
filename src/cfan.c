@@ -215,8 +215,6 @@ static ssize_t cfan_write(struct file *f,
 		return -EINVAL;
 	}
 
-	pr_info("cfan:%s: user buffer count: %d\n", __func__, cnt);
-
 	cfan_data = (struct cfan_data *)buffer;
 	cfan->displays_nb = cfan_data->n;
 	cfan->cfg[0] = set_config(0, cfan_data->cfg[0][0],
@@ -225,10 +223,6 @@ static ssize_t cfan_write(struct file *f,
 
 	pr_info("cfan:%s: Number of displays: %d\n", __func__,
 		cfan->displays_nb);
-	pr_info("cfan:%s: Bitmaps addr: %p\n", __func__,
-		cfan_data->bitmaps);
-	pr_info("cfan:%s: Configuration: %p\n", __func__,
-		cfan->cfg[0]);
 
 	/* Clear the ventilator */
 	/*
@@ -266,6 +260,8 @@ static int cfan_probe(struct usb_interface *interface,
 		      const struct usb_device_id *id)
 {
 	struct usb_device *udev = interface_to_usbdev(interface);
+	int i;
+	int j;
 	int ret;
 
 	cfan = kmalloc(sizeof(*cfan), GFP_KERNEL);
@@ -274,9 +270,6 @@ static int cfan_probe(struct usb_interface *interface,
 		return -ENOMEM;
 
 	memset(cfan, 0x00, sizeof(*cfan));
-
-	int i;
-	int j;
 
 	for (j = 0; j < 8; ++j)
 		for (i = 0; i < 156; i++)
@@ -289,11 +282,10 @@ static int cfan_probe(struct usb_interface *interface,
 	usb_set_intfdata(interface, cfan);
 
 	pr_info("cfan:%s: USB Cheeky Fan has been connected\n", __func__);
-	pr_info("cfan:%s: [devnum=%d;bus_id=%d;devid=%d]\n",
+	pr_info("cfan:%s: [devnum=%d;bus_id=%d]\n",
 		__func__,
 		cfan->udev->devnum,
-		cfan->udev->bus->busnum,
-		cfan->udev->dev.id);
+		cfan->udev->bus->busnum);
 
 	ret = usb_register_dev(interface, &cfan_class_driver);
 
