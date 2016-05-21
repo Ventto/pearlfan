@@ -10,6 +10,37 @@
 
 #include "ventilo_data.h"
 
+/* Set effect config for a fan view */
+static uint64_t set_config(unsigned char id,
+		      unsigned char open_option,
+		      unsigned char close_option,
+		      unsigned char turn_option)
+{
+	/* Configuration:
+	 * A0 10 <A><B> <C><D> 55 00 00 00
+	 * [A] : OpenOption	[0 ; 5]
+	 * [B] : CloseOption	[0 ; 5]
+	 * [C] : TurnOption	(6 | c)
+	 * [D] : Display ID	[0 ; 7]
+	 * Warning: Reverse bytes sequence (stack behind ?) :
+	 * 00 00 00 55 [CD] [AB] 10 A0
+	 * [CDAB] : u16
+	 */
+	uint16_t cdab = 0;
+
+	printf("Config: ID: %d\n", id);
+	printf("Config: open option: %d\n", open_option);
+	printf("Config: close option: %d\n", close_option);
+	printf("Config: turn option: %d\n", turn_option);
+
+	cdab |= close_option;
+	cdab |= (open_option << 4);
+	cdab |= (id << 8);
+	cdab |= (turn_option << 12);
+
+	return 0x00000055000010A0 | (cdab << 16);
+}
+
 /* ------------CONFIG-------------- */
 
 static int read_config_file(char *filename,
@@ -27,9 +58,10 @@ static int read_config_file(char *filename,
 	*n = 0;
 
 	int res;
+
 	do {
 		res = fscanf(cfgfile, "+%[^+]+%hhu/%hhu/%hhu\n", imgs[*n],
-				&cfgs[*n][0], &cfgs[*n][1], &cfgs[*n][2]);
+			     &cfgs[*n][0], &cfgs[*n][1], &cfgs[*n][2]);
 		++*n;
 	} while (res == 4 && *n < 8);
 
@@ -40,6 +72,8 @@ static int read_config_file(char *filename,
 		return -1;
 	}
 
+	--*n;
+
 	return 0;
 }
 
@@ -47,8 +81,10 @@ static int read_config_file(char *filename,
 
 #define IMAGE_WIDTH	156
 #define IMAGE_HEIGHT	11
+#define LEDS_NUMBER	11
+#define FAN_DISPLAY_8BYTES_PACKET_NUMBER	39
 
-static const uint16_t pbm_mask[11] = {
+static const uint16_t pbm_mask[LEDS_NUMBER] = {
 	0xFEFF, 0xFDFF, 0xFBFF,
 	0xF7FF, 0xEFFF, 0xDFFF,
 	0xBFFF, 0xFFFE, 0xFFFD,
@@ -57,8 +93,9 @@ static const uint16_t pbm_mask[11] = {
 
 static void pbm_to_usbdata(unsigned char id,
 			   unsigned char *raster,
-			   uint16_t *display)
+			   uint16_t display[156])
 {
+
 	unsigned char i;
 	unsigned char j;
 	unsigned char col_end;
@@ -67,7 +104,8 @@ static void pbm_to_usbdata(unsigned char id,
 		col_end = IMAGE_WIDTH - i - 1;
 		for (j = 0; j < IMAGE_HEIGHT; ++j)
 			if (raster[j * IMAGE_WIDTH + i] == 1)
-				display[col_end] &= pbm_mask[IMAGE_HEIGHT - j - 1];
+				display[col_end] &=
+					pbm_mask[IMAGE_HEIGHT - j - 1];
 	}
 }
 
@@ -213,16 +251,9 @@ int main(int argc, char **argv)
 	libusb_device_handle *dev_handle;
 	libusb_context *context = NULL;
 
-	/* CONFIG */
-	char imgs[8][PATH_MAX];
-	char cfgs[8][3];
-
-	/* PBM image */
-	FILE *img = NULL;
-	bit *raster = NULL;
-
 	/* Initialize the library for the session we just declared */
 	int r = libusb_init(&context);
+
 	if (r < 0) {
 		printf("Init Error %d\n", r);
 		return 1;
@@ -234,45 +265,70 @@ int main(int argc, char **argv)
 	if (!dev_handle)
 		return 1;
 
-	/* =-------------------CONFIG--------------------------= */
-
+	/* =--------------------------------= */
+	/*     Open the configuration file    */
+	/* =--------------------------------= */
 	/* Missing argument */
 	if (argc < 2) {
 		printf("Error: a parameter is missing.\n");
 		return EXIT_FAILURE;
 	}
 
+	char imgs[8][PATH_MAX];
+	char cfgs[8][3];
 	unsigned char n;
+
 	if (read_config_file("config", &n, imgs, cfgs) < 0)
 		return EXIT_FAILURE;
 
-	/* =-------------------PBM--------------------------= */
-
-
+	/* =--------------------------------= */
+	/*   Extract rasters from PBM images  */
+	/* =--------------------------------= */
+	FILE *img = NULL;
+	bit **rasters = malloc(sizeof(bit) * n);
 	/* Initialization before importing PBM image*/
 	pm_init(argv[0], 0);
 
-	/* Open a given PBM image as parameter */
-	img = pm_openr(argv[1]);
-	/* Cannot open file */
-	if (!img) {
-		printf("Cannot open PBM image\n");
-		return EXIT_FAILURE;
+	unsigned char i;
+	/* Getting the configuration from PBM image */
+	for (i = 0; i < n; i++) {
+		img = pm_openr(imgs[i]);
+		/* Cannot open file */
+		if (!img) {
+			printf("Cannot open PBM image\n");
+			return EXIT_FAILURE;
+		}
+		rasters[i] = pbm_get_specific_raster(img);
+		/* Close image file */
+		pm_close(img);
 	}
 
-	/* Getting the configuration from PBM image */
-	raster = pbm_get_specific_raster(img);
+	/* =--------------------------------= */
+	/*     Converton PBM to USB data      */
+	/* =--------------------------------= */
+	uint16_t fan_displays[8][156];
+	uint64_t fan_configs[8];
 
-	/* =--------------------------------------------------= */
+	for (i = 0; i < n ; i++) {
+		fan_configs[i] = set_config(i, cfgs[i][0], cfgs[i][1],
+					       cfgs[i][2]);
+		pbm_to_usbdata(i, rasters[i], fan_displays[i]);
+	}
 
-	/* Send data to USB driver */
+	/* =--------------------------------= */
+	/*    Send all data to the debvice    */
+	/* =--------------------------------= */
+	unsigned char j;
 
-	/* =--------------------------------------------------= */
+	for (i = 0; i < n; i++) {
+		send_usb_data(dev_handle, (unsigned char *)&fan_configs[i]);
+		for (j = 0; j < FAN_DISPLAY_8BYTES_PACKET_NUMBER; ++j)
+			send_usb_data(dev_handle,
+				      (unsigned char *)(fan_displays[i] +
+							j * 4));
+	}
 
 	/* Free USB resources */
 	release_usb(context, dev_handle);
-	/* Free PBM image data */
-	pbm_freerow(raster);
-	pm_close(img);
 	return r;
 }
