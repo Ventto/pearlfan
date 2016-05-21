@@ -1,4 +1,3 @@
-#include <libusb-1.0/libusb.h>
 #include <pbm.h>
 #include <linux/limits.h>
 #include <string.h>		/* memset() */
@@ -49,17 +48,6 @@ int main(int argc, char **argv)
 		/* Close image file */
 		pm_close(img);
 	}
-
-	/* =--------------------------------= */
-	/*     Converton PBM to USB data      */
-	/* =--------------------------------= */
-	uint16_t fan_displays[FAN_DISPLAY_MAX_NUMBER][156];
-
-	memset(fan_displays, 0xFF, FAN_DISPLAY_MAX_NUMBER *
-	       FAN_DISPLAY_8BYTES_PACKET_NUMBER * 4);
-
-	for (i = 0; i < n ; i++)
-		pbm_to_usbdata(i, rasters[i], fan_displays[i]);
 
 	/* =--------------------------------= */
 	/* Send all data to the dev's driver  */
