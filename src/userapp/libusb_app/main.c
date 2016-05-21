@@ -83,11 +83,12 @@ static int read_config_file(char *filename,
 #define IMAGE_HEIGHT	11
 #define LEDS_NUMBER	11
 #define FAN_DISPLAY_8BYTES_PACKET_NUMBER	39
+#define FAN_DISPLAY_MAX_NUMBER	8
 
 static const uint16_t pbm_mask[LEDS_NUMBER] = {
-	0xFEFF, 0xFDFF, 0xFBFF,
-	0xF7FF, 0xEFFF, 0xDFFF,
-	0xBFFF, 0xFFFE, 0xFFFD,
+	0xFCFF, 0xFBFF, 0xF7FF,
+	0xFEFF, 0xCFFF, 0xBFFF,
+	0x7FFF, 0xFFFE, 0xFFFD,
 	0xFFFB, 0xFFF7
 };
 
@@ -306,8 +307,11 @@ int main(int argc, char **argv)
 	/* =--------------------------------= */
 	/*     Converton PBM to USB data      */
 	/* =--------------------------------= */
-	uint16_t fan_displays[8][156];
-	uint64_t fan_configs[8];
+	uint16_t fan_displays[FAN_DISPLAY_MAX_NUMBER][156];
+	uint64_t fan_configs[FAN_DISPLAY_MAX_NUMBER];
+
+	memset(fan_displays, 0xFF, FAN_DISPLAY_MAX_NUMBER *
+					FAN_DISPLAY_8BYTES_PACKET_NUMBER * 4);
 
 	for (i = 0; i < n ; i++) {
 		fan_configs[i] = set_config(i, cfgs[i][0], cfgs[i][1],
@@ -324,8 +328,8 @@ int main(int argc, char **argv)
 		send_usb_data(dev_handle, (unsigned char *)&fan_configs[i]);
 		for (j = 0; j < FAN_DISPLAY_8BYTES_PACKET_NUMBER; ++j)
 			send_usb_data(dev_handle,
-				      (unsigned char *)(fan_displays[i] +
-							j * 4));
+				      (unsigned char *)
+				      (&fan_displays[i][j * 4]));
 	}
 
 	/* Free USB resources */
