@@ -34,7 +34,6 @@ unsigned char *pbm_get_specific_raster(FILE *img)
 	/* Invalid image's configuration for the ventilator */
 	if (cols != IMAGE_WIDTH && rows != IMAGE_HEIGHT
 	    && format != PBM_FORMAT) {
-		pm_close(img);
 		printf("Error: pbm_check() [cols=%d;rows=%d;format=%d]\n",
 		       cols, rows, format);
 		printf("Invalid Image Format Error\n");
@@ -65,4 +64,6 @@ void free_pbm_rasters(unsigned char **rasters, int n)
 
 	for (i = 0; i < n; ++i)
 		pbm_freerow(rasters[i]);
+
+	free(rasters);
 }

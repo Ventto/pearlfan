@@ -38,9 +38,9 @@ MODULE_DEVICE_TABLE(usb, id_table);
  */
 #define LEDS_NUMBER	11
 static const u16 pbm_mask[LEDS_NUMBER] = {
-	0xFEFF, 0xFDFF, 0xFBFF,
-	0xF7FF, 0xEFFF, 0xDFFF,
-	0xBFFF, 0xFFFE, 0xFFFD,
+	0xFCFF, 0xFBFF, 0xF7FF,
+	0xFEFF, 0xCFFF, 0xBFFF,
+	0x7FFF, 0xFFFE, 0xFFFD,
 	0xFFFB, 0xFFF7
 };
 
@@ -59,8 +59,6 @@ static void pbm_to_usbdata(unsigned char id,
 			if (raster[j * 156 + i] == 1)
 				display[col_end] &= pbm_mask[10 - j];
 	}
-	for (i = 0; i < 156; ++i)
-		pr_info("%x\n", display[i]);
 }
 
 /* Set effect config for a fan view */
@@ -216,7 +214,7 @@ static ssize_t ventilo_write(struct file *f,
 	/*     Convertion PBM to USB data      */
 	/* =--------------------------------= */
 	for (i = 0; i < ventilo->displays_nb ; i++) {
-		ventilo->cfgs[i] = set_config(0, data->cfgs[0][0],
+		ventilo->cfgs[i] = set_config(i, data->cfgs[0][0],
 					     data->cfgs[0][1],
 					     data->cfgs[0][2]);
 		pbm_to_usbdata(i, data->images[i], ventilo->displays[i]);

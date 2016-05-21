@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 	/*   Extract rasters from PBM images  */
 	/* =--------------------------------= */
 	FILE *img = NULL;
-	unsigned char **rasters = malloc(sizeof(bit) * n);
+	unsigned char **rasters = malloc(sizeof(void *) * n);
 	/* Initialization before importing PBM image*/
 	pm_init(argv[0], 0);
 
@@ -66,7 +66,7 @@ int main(int argc, char **argv)
 	/* =--------------------------------= */
 	int fd;
 
-	fd = open(DEVICE, O_RDONLY);
+	fd = open(DEVICE, O_RDWR);
 
 	if (fd <= 0) {
 		free_pbm_rasters(rasters, n);
@@ -83,7 +83,7 @@ int main(int argc, char **argv)
 	data.images = rasters;
 
 	if (write(fd, &data, sizeof(struct ventilo_data)) <= 0) {
-		printf("An error occured for write().\n");
+		printf("An error occured for write(). %s\n", strerror(errno));
 		r = EXIT_FAILURE;
 	}
 
