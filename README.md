@@ -1,47 +1,48 @@
-# Ventilo
+# DreamyFan
 
-Contrôle d'un ventilateur USB DreamCheeky.
+DreamyFan is a GNU/Linux driver for an USB LED fan by PEARL.
 
-## Dépendances
+![test](./fan.jpg)
 
-* libusb
-* netpbm
+## Dependencies
+
+* libusb - Library that provides generic access to USB devices
+* netpbm - A toolkit for manipulation of graphic images
 
 ## Compilation
 
-Depuis la racine du projet, lancez `make`.
+Run `make`.
 
 ## Execution
 
-Pour executer un des programmes, se positionner dans le dossier, puis appeller
-l'executable avec en paramètre le chemin du fichier de configuration.
+Two different approaches: 
 
-Par exemple:
+* `./src/userapp/libusb_app/`- runs the user app with libusb.
+* `./src/userapp/driver_app/`- uses the kernel driver.
 
+To execute one of user apps, get into one of the directories above.
+And run the executable file with the config file path as argument.<br>
+
+For instance:
 ```bash
 $ cd ./src/userapp/libusb_app/
 $ ./test config
 ```
 
-## Charger le driver
+## Load the driver
 
-Un script utilitaire pour charger le module est disponible dans
-`./src/driver/script.sh`.
+Load the driver by running the following shell script `./src/driver/script.sh`.
 
-## Format du fichier de configuration
+## Configuration file
 
-Un fichier de configuration est un fichier texte comprenant au plus
-8 lignes (le ventilateur ne supportant que 8 images successives)
+The latter contains at most 8 lines. Each one for a fan display.
 
-Une ligne est du format suivant: `+chemin+x/y/z`
+Line format: `+path+x/y/z`
 
-où `chemin` est un chemin vers un fichier `.pbm` valide,
-et où `x`, `y` et `z` sont les modes d'ouverture, de fermeture,
-et de transition:
+in which `path` is a valid .pbm file path `.pbm`,
+and `x`, `y` and `z` are different displaying effect options for the following actions: open, close and display.
 
-<expliquer les modes ici>
-
-## Auteurs
+## Authors
 
 * Thomas Venries
 * Franklin Mathieu
