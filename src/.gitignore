@@ -1,9 +1,0 @@
-*.swo
-*.swp
-*.cmd
-*.ko
-*.o
-ventilo.mod*
-modules.*
-Module*
-.tmp_versions/

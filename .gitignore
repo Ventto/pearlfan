@@ -1,1 +1,10 @@
-utils/
+*.swo
+*.swp
+*.cmd
+*.ko
+*.o
+app
+modules.*
+Module*
+ventilo.mod*
+.tmp_versions/
