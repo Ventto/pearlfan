@@ -1,48 +1,90 @@
-# DreamyFan
+DreamyFan
+=========
+*DreamyFan is a GNU/Linux driver for an USB LED fan by PEARL.*
 
-DreamyFan is a GNU/Linux driver for an USB LED fan by PEARL.
-
-![test](./fan.jpg)
+<div style="text-align:center"><img src="fan.jpg" /></div>
 
 ## Dependencies
 
-* libusb - Library that provides generic access to USB devices
-* netpbm - A toolkit for manipulation of graphic images
+Common:
 
-## Compilation
+* *libusb-1.0* - Library that provides generic access to USB devices
 
-Run `make`.
+Archlinux:
 
-## Execution
+* *linux-headers* - Header files and scripts for building modules for Linux kernel
+* *netpbm* - Toolkit for manipulation of graphic images (with libraries and header files)
 
-Two different approaches: 
+Ubuntu:
 
-* `./src/userapp/libusb_app/`- runs the user app with libusb.
-* `./src/userapp/driver_app/`- uses the kernel driver.
+* *linux-headers-{kernel_version}*
+* *libnetpbm10-dev* - Netpbm libraries and header files
 
-To execute one of user apps, get into one of the directories above.
-And run the executable file with the config file path as argument.<br>
+## Build
 
-For instance:
-```bash
-$ cd ./src/userapp/libusb_app/
-$ ./test config
+```
+$ make
 ```
 
-## Load the driver
+## Run
 
-Load the driver by running the following shell script `./src/driver/script.sh`.
+* Run the program using libusb:
+```
+$ cd src/userapp/libusb_app
+$ ./app <config_file>
+```
+**config_file**: path of a config file that contains image paths and effect configuration (cf. Configuration File).
 
-## Configuration file
+* Run the program using the kernel module driver (cf. Module Driver):
+```
+$ cd src/userapp/driver_app
+$ ./app <config_file>
+```
 
-The latter contains at most 8 lines. Each one for a fan display.
+## Module Driver
 
-Line format: `+path+x/y/z`
+* You need to load the module driver before running the program:
 
-in which `path` is a valid .pbm file path `.pbm`,
-and `x`, `y` and `z` are different displaying effect options for the following actions: open, close and display.
+```
+$ cd src/driver
+$ chmod +x script.sh
+$ ./script.sh
+```
 
-## Authors
+## Configuration File
 
-* Thomas Venries
-* Franklin Mathieu
+### Sample
+
+You could find a given example of a basic `config` file in each program directory.
+
+```
+$ cd src/userapp/libusb_app
+$ cat config
++./images/image1.pbm+2/2/6
++./images/image2.pbm+1/1/6
++./images/image3.pbm+0/0/0
++./images/image4.pbm+3/3/6
++./images/image3.pbm+2/5/0
+```
+
+**image.pbm**: Netpbm data image, size = 156x11.<br />
+**.PBM**: Well-known format supported by image manipulation programs like Gimp.
+
+### How to write a config file ?
+
+* Required at most 8 images so 8 lines
+  * 2 x lines: ok
+  * 9 x lines: failed
+  * 0 x line: failed
+
+* Line: `+{path}+{x}/{y}/{z}`
+  * path: valid .pbm filepath
+  * x: Opening effect [0-5]
+  * y: Closing effect [0-5]
+  * z: Rotation effect [0,6,c]
+
+## TODO
+
+* Add section to explain entirely how to upload .PBM image files into the fan
+* CMake instead of *make*
+* Remove the module driver and clean libusb app
