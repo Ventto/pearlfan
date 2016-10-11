@@ -1,4 +1,4 @@
-INCLUDES =-I../../driver/includes -I../common
+INCLUDES =-I../../driver/includes -I../common -I/usr/include/netpbm
 CFLAGS		=-Wall -Werror -std=c99 $(INCLUDES)
 
 CC = gcc

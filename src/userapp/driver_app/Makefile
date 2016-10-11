@@ -1,4 +1,4 @@
-INCLUDES =-I../../driver/includes -I../common
+INCLUDES =-I../../driver/includes -I../common -I/usr/include/netpbm
 DEBUG = yes
 
 ifeq ($(DEBUG),yes)

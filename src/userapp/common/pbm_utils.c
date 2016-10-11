@@ -1,5 +1,5 @@
 #include <linux/limits.h>
-#include <netpbm/pbm.h>
+#include <pbm.h>
 #include <stdio.h>
 
 #include "pbm_utils.h"
