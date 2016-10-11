@@ -1,4 +1,4 @@
-#include <pbm.h>
+#include <netpbm/pbm.h>
 #include <linux/limits.h>
 #include <string.h>		/* memset() */
 #include <stdio.h>		/* printf() */

@@ -1,18 +1,12 @@
 INCLUDES =-I../../driver/includes -I../common
-DEBUG = yes
-
-ifeq ($(DEBUG),yes)
-	CFLAGS=-g3 -Wall -Werror -std=c99 $(INCLUDES)
-else
-	CFLAGS=-Wall -Werror -std=c99 $(INCLUDES)
-endif
+CFLAGS		=-Wall -Werror -std=c99 $(INCLUDES)
 
 CC = gcc
 HEADERFILES =
 SRCS = $(wildcard *.c) $(wildcard ../common/*.c)
 OBJS = $(SRCS:.c=.o)
 LIBS += $(shell pkg-config --libs --cflags libusb-1.0)
-LIBS += /usr/lib/libpbm.a
+LIBS += -lnetpbm
 EXEC = app
 
 all: $(EXEC)

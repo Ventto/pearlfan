@@ -12,7 +12,7 @@ HEADERFILES =
 SRCS = $(wildcard *.c) $(wildcard ../common/*.c)
 OBJS = $(SRCS:.c=.o)
 LIBS += $(shell pkg-config --libs --cflags libusb-1.0)
-LIBS += /usr/lib/libpbm.a
+LIBS += -lnetpbm
 EXEC = app
 
 all: $(EXEC)
