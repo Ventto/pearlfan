@@ -1,6 +1,6 @@
 DreamyFan
 =========
-*DreamyFan is a GNU/Linux driver for an USB LED fan by PEARL.*
+*DreamyFan is a GNU/Linux Kernel Driver for 'PEARL.fr' USB LED fan.*
 
 <div style="text-align:center"><img src="fan.jpg" /></div>
 
