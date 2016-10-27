@@ -1,0 +1,25 @@
+PROJNAME	= dreamyfan
+MODULE		= ventilo
+UDEVRULE	= 99-$(MODULE).rules
+SRCDIR		= src/kernel-module
+
+.PHONY: all install clean distclean
+
+all:
+	$(MAKE) $(MFLAGS) -C $(SRCDIR)/module
+	$(MAKE) $(MFLAGS) -C $(SRCDIR)/user-driver
+	mv $(SRCDIR)/user-driver/dreamyfan .
+
+install:
+	cp $(SRCDIR)/rules.d/$(UDEVRULE) /etc/udev/rules.d/$(UDEVRULE)
+	udevadm control --reload-rules
+	$(MAKE) $(MFLAGS) -C $(SRCDIR)/module install
+
+clean:
+	$(MAKE) $(MFLAGS) -C $(SRCDIR)/module clean
+	$(MAKE) $(MFLAGS) -C $(SRCDIR)/user-driver clean
+	$(RM) $(PROJNAME)
+
+distclean: clean
+	$(RM) /etc/udev/rules.d/$(UDEVRULE)
+	$(MAKE) $(MFLAGS) -C $(SRCDIR)/module distclean

@@ -1,8 +1,7 @@
 DreamyFan
 =========
-*DreamyFan is a GNU/Linux Kernel Driver for 'PEARL.fr' USB LED fan.*
 
-<div style="text-align:center"><img src="fan.jpg" /></div>
+*DreamyFan is a GNU/Linux Kernel Driver for 'PEARL.fr' USB LED fan.*
 
 ## Dependencies
 
@@ -18,7 +17,7 @@ Archlinux:
 Ubuntu:
 
 * *linux-headers-{kernel_version}*
-* *libnetpbm10-dev* - Netpbm libraries and header files
+* *libnetpbm1.0-dev* - Netpbm libraries and header files
 
 ## Build
 
