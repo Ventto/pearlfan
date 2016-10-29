@@ -89,55 +89,6 @@ static u64 set_config(uint8_t id,
 	return 0x00000055000010A0 | (options << 16);
 }
 
-u8 write_letter(const uint8_t letter,
-		const uint8_t id,
-		const uint8_t column)
-{
-	u8 col = column;
-
-	if (col)
-		ventilo->displays[id][col++] = 0xFFFF;
-
-	pr_info("ventilo:%s: detected letter: %x\n", __func__, letter);
-
-	switch (letter) {
-		case 'A':
-			ventilo->displays[id][col++] = 0x00FF;
-			ventilo->displays[id][col++] = 0x6EFF;
-			ventilo->displays[id][col++] = 0x6EFF;
-			ventilo->displays[id][col++] = 0x00FF;
-			ventilo->displays[id][col++] = 0xFEFF;
-			break;
-		case 'B':
-			ventilo->displays[id][col++] = 0x82FF;
-			ventilo->displays[id][col++] = 0x6CFF;
-			ventilo->displays[id][col++] = 0x6CFF;
-			ventilo->displays[id][col++] = 0x00FF;
-			break;
-		case 'C':
-			ventilo->displays[id][col++] = 0x7CFF;
-			ventilo->displays[id][col++] = 0x7CFF;
-			ventilo->displays[id][col++] = 0x7CFF;
-			ventilo->displays[id][col++] = 0x00FF;
-			break;
-		case 'D':
-			ventilo->displays[id][col++] = 0xC6FF;
-			ventilo->displays[id][col++] = 0xBAFF;
-			ventilo->displays[id][col++] = 0x7CFF;
-			ventilo->displays[id][col++] = 0x00FF;
-			break;
-		case 'P':
-			ventilo->displays[id][col++] = 0x9EFF;
-			ventilo->displays[id][col++] = 0x6EFF;
-			ventilo->displays[id][col++] = 0x6EFF;
-			ventilo->displays[id][col++] = 0x00FF;
-			break;
-	}
-
-	return col;
-}
-
-/* Send a '8 bytes' packet followed by an INTERRUPT_IN msg */
 static int send_data(struct usb_device *udev, void *data)
 {
 	char buf[8];
