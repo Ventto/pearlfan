@@ -15,9 +15,6 @@ install:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules_install
 	insmod $(KERNELOBJ)
 
-check:
-	./tests/check.sh
-
 clean:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) clean
 
