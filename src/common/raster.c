@@ -2,9 +2,20 @@
 #include <pbm.h>
 #include <stdio.h>
 
-#include "pbm_utils.h"
+#include "raster.h"
 
-void pbm_to_usbdata(char id, bit *raster, uint16_t display[156])
+#define IMAGE_WIDTH	156
+#define IMAGE_HEIGHT	11
+#define LEDS_NUMBER	11
+
+static const uint16_t pbm_mask[] = {
+	0xFCFF, 0xFBFF, 0xF7FF,
+	0xFEFF, 0xCFFF, 0xBFFF,
+	0x7FFF, 0xFFFE, 0xFFFD,
+	0xFFFB, 0xFFF7
+} ;
+
+void pfan_convert_raster(char id, bit *raster, uint16_t display[156])
 {
 	uint8_t col_end;
 
@@ -17,33 +28,37 @@ void pbm_to_usbdata(char id, bit *raster, uint16_t display[156])
 	}
 }
 
-bit *pbm_get_specific_raster(FILE *img)
+bit *pfan_create_raster(FILE *img)
 {
+	int cols;
+	int rows;
+	int format;
 	bit *raster = NULL;
-	int cols, rows, format;
 
 	pbm_readpbminit(img, &cols, &rows, &format);
 
-	if (cols != IMAGE_WIDTH && rows != IMAGE_HEIGHT
-			&& format != PBM_FORMAT) {
-		printf("netpbm: invalid image file sizes.\n");
-		printf("[cols=%d;rows=%d;format=%d]\n", cols, rows, format);
+	if (cols != IMAGE_WIDTH && rows != IMAGE_HEIGHT) {
+		printf("pfan: invalid image sizes, '11x156' is required.\n");
+		return NULL;
+	}
+
+	if (format != PBM_FORMAT) {
+		printf("pfan: invalid image file sizes.\n");
 		return NULL;
 	}
 
 	raster = pbm_allocrow(IMAGE_WIDTH * IMAGE_HEIGHT);
 	if (!raster) {
-		printf("netpbm: cannot allocate the raster.\n");
+		printf("pfan: cannot allocate the raster.\n");
 		return NULL;
 	}
 
-	/* Getting the raster from the PBM image */
 	pbm_readpbmrow(img, raster, IMAGE_WIDTH * IMAGE_HEIGHT, format);
 
 	return raster;
 }
 
-void free_pbm_rasters(bit **rasters, int n)
+void pfan_free_rasters(bit **rasters, int n)
 {
 	if (!rasters)
 		return;

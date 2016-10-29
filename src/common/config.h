@@ -9,8 +9,7 @@
 #define CLOSING_EFFECT		1
 #define DISPLAY_EFFECT		2
 
-int read_config_file(char *filename,
-		char imgs[8][FILEPATH_MAX],
-		char cfgs[8][3]);
+int pfan_read_config(char *filename, char imgs[MAX_FAN_DISPLAYS][FILEPATH_MAX],
+		char effects[MAX_FAN_DISPLAYS][3]);
 
 #endif /* !CONFIG_H_ */

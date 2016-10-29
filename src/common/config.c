@@ -16,7 +16,7 @@ static void concat_path(char buf[FILEPATH_MAX],
 	strncat(buf, relpath, strlen(relpath));
 }
 
-int read_config_file(char *filename,
+int pfan_read_config(char *filename,
 		char imgs[MAX_FAN_DISPLAYS][FILEPATH_MAX],
 		char effects[MAX_FAN_DISPLAYS][3])
 {

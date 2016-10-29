@@ -1,10 +1,9 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "libusb_utils.h"
+#include "usb.h"
 
-libusb_device_handle *open_device_with_vid_pid(libusb_context *ctx,
-		int vid, int pid)
+libusb_device_handle *pfan_open(libusb_context *ctx, int vid, int pid)
 {
 	libusb_device_handle *dev_handle =
 		libusb_open_device_with_vid_pid(ctx, vid, pid);
@@ -24,21 +23,14 @@ libusb_device_handle *open_device_with_vid_pid(libusb_context *ctx,
 
 	if (libusb_claim_interface(dev_handle, 0) < 0) {
 		libusb_close(dev_handle);
-		printf("libusb: cannot claim interface.\n");
+		printf("libusb: cannot claim the interface.\n");
 		return NULL;
 	}
 
 	return dev_handle;
 }
 
-void release_usb(libusb_context *ctx, libusb_device_handle *dev_handle)
-{
-	libusb_close(dev_handle);
-	libusb_exit(ctx);
-	printf("libusb: release the interface with success.\n");
-}
-
-int send_usb_data(libusb_device_handle *dev_handle, void *data)
+int pfan_send(libusb_device_handle *dev_handle, void *data)
 {
 	uint8_t buf[8];
 	int l = 0;

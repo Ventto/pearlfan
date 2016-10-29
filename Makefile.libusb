@@ -1,6 +1,6 @@
 EXEC	= dreamyfan
-COMMON_SRCS = src/common/pbm_utils.c src/common/config.c
-SRCS	= $(COMMON_SRCS) src/libusb/libusb_utils.c src/libusb/main.c
+COMMON_SRCS = src/common/raster.c src/common/config.c
+SRCS	= $(COMMON_SRCS) src/libusb/usb.c src/libusb/main.c
 OBJS 	= $(SRCS:.c=.o)
 
 CC		= gcc

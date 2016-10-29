@@ -5,7 +5,7 @@
 #include <string.h>
 
 #include "config.h"
-#include "pbm_utils.h"
+#include "raster.h"
 #include "ventilo.h"
 
 int main(int argc, char **argv)
@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 	char effects[MAX_FAN_DISPLAYS][3];
 	int img_nbr;
 
-	if ((img_nbr = read_config_file(config_file, imgs, effects)) < 0) {
+	if ((img_nbr = pfan_read_config(config_file, imgs, effects)) < 0) {
 		printf("%s: invalid config file.\n", config_file);
 		return EXIT_FAILURE;
 	}
@@ -33,18 +33,18 @@ int main(int argc, char **argv)
 	for (int i = 0; i < img_nbr; i++) {
 		img = pm_openr(imgs[i]);
 		if (!img) {
-			free_pbm_rasters(rasters, i);
-			printf("Cannot open PBM image.\n");
+			pfan_free_rasters(rasters, i);
+			printf("pfan: can not open '%s'.\n", imgs[i]);
 			return EXIT_FAILURE;
 		}
-		rasters[i] = pbm_get_specific_raster(img);
+		rasters[i] = pfan_create_raster(img);
 		pm_close(img);
 	}
 
 	int fan_fd = open(DEVICE, O_RDWR);
 
 	if (fan_fd <= 0) {
-		free_pbm_rasters(rasters, img_nbr);
+		pfan_free_rasters(rasters, img_nbr);
 		printf("Cannot open the USB device.\n");
 		return EXIT_FAILURE;
 	}
@@ -62,6 +62,6 @@ int main(int argc, char **argv)
 	}
 
 	close(fan_fd);
-	free_pbm_rasters(rasters, img_nbr);
+	pfan_free_rasters(rasters, img_nbr);
 	return ret;
 }

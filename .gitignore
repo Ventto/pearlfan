@@ -6,8 +6,8 @@ src/*
 src/common/*
 !src/common/config.c
 !src/common/config.h
-!src/common/pbm_utils.h
-!src/common/pbm_utils.h
+!src/common/raster.c
+!src/common/raster.h
 !src/kernel-module
 src/kernel-module/*
 !src/kernel-module/module/
@@ -25,8 +25,8 @@ src/kernel-module/user-driver/*
 !src/libusb/
 src/libusb/*
 !src/libusb/Makefile
-!src/libusb/libusb_utils.c
-!src/libusb/libusb_utils.h
+!src/libusb/usb.c
+!src/libusb/usb.h
 !src/libusb/main.c
 
 !tests/*

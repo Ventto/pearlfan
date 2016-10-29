@@ -1,5 +1,5 @@
 EXEC	= dreamyfan
-COMMON_SRCS	= ../../common/pbm_utils.c ../../common/config.c
+COMMON_SRCS	= ../../common/raster.c ../../common/config.c
 SRCS	= $(COMMON_SRCS) main.c
 OBJS 	= $(SRCS:.c=.o)
 
