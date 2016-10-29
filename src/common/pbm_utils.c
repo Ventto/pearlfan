@@ -4,7 +4,7 @@
 
 #include "pbm_utils.h"
 
-void pbm_to_usbdata(char id, uint8_t *raster, uint16_t display[156])
+void pbm_to_usbdata(char id, bit *raster, uint16_t display[156])
 {
 	uint8_t col_end;
 
@@ -17,7 +17,7 @@ void pbm_to_usbdata(char id, uint8_t *raster, uint16_t display[156])
 	}
 }
 
-uint8_t *pbm_get_specific_raster(FILE *img)
+bit *pbm_get_specific_raster(FILE *img)
 {
 	bit *raster = NULL;
 	int cols, rows, format;
@@ -40,10 +40,10 @@ uint8_t *pbm_get_specific_raster(FILE *img)
 	/* Getting the raster from the PBM image */
 	pbm_readpbmrow(img, raster, IMAGE_WIDTH * IMAGE_HEIGHT, format);
 
-	return (uint8_t *)raster;
+	return raster;
 }
 
-void free_pbm_rasters(uint8_t **rasters, int n)
+void free_pbm_rasters(bit **rasters, int n)
 {
 	if (!rasters)
 		return;

@@ -14,10 +14,10 @@ static const uint16_t pbm_mask[LEDS_NUMBER] = {
 	0xFFFB, 0xFFF7
 } ;
 
-void pbm_to_usbdata(char id, uint8_t *raster, uint16_t display[156]);
+void pbm_to_usbdata(char id, bit *raster, uint16_t display[156]);
 
-uint8_t *pbm_get_specific_raster(FILE *img);
+bit *pbm_get_specific_raster(FILE *img);
 
-void free_pbm_rasters(uint8_t **rasters, int n);
+void free_pbm_rasters(bit **rasters, int n);
 
 #endif /* !_PBM_UTILS_H_ */

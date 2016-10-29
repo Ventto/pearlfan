@@ -1,14 +1,24 @@
+#include <libgen.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "config.h"
 
-#define MAX_DISPLAYS	8
-#define OPENING_EFFECT	0
-#define CLOSING_EFFECT	1
-#define DISPLAY_EFFECT	2
+static void concat_path(char buf[FILEPATH_MAX],
+		const char *dir,
+		const char *relpath)
+{
+	buf[0] = '\0';
+	strncat(buf, dir, strlen(dir));
+	strncat(buf, "/", 1);
+	strncat(buf, relpath, strlen(relpath));
+}
 
-int read_config_file(char *filename, char imgs[8][PATH_MAX], char cfgs[8][3])
+int read_config_file(char *filename,
+		char imgs[MAX_FAN_DISPLAYS][FILEPATH_MAX],
+		char effects[MAX_FAN_DISPLAYS][3])
 {
 	FILE *file = fopen(filename, "r");
 
@@ -17,29 +27,35 @@ int read_config_file(char *filename, char imgs[8][PATH_MAX], char cfgs[8][3])
 		return -1;
 	}
 
-	int matchs;
+	char *dir = dirname(filename);
+	char relpath[FILEPATH_MAX];
 	int n = 0;
+	int matchs;
 
-	do {
-		matchs = fscanf(file, "+%[^+]+%hhu/%hhu/%hhu\n", imgs[n],
-				&cfgs[n][OPENING_EFFECT],
-				&cfgs[n][CLOSING_EFFECT],
-				&cfgs[n][DISPLAY_EFFECT]);
+	while (n < MAX_FAN_DISPLAYS && (matchs =
+			fscanf(file, "%[^+]+%hhu/%hhu/%hhu\n", relpath,
+					&effects[n][OPENING_EFFECT],
+					&effects[n][CLOSING_EFFECT],
+					&effects[n][DISPLAY_EFFECT])) == 4) {
+
+		concat_path(imgs[n], dir, relpath);
 
 		if(access(imgs[n], F_OK ) == -1 ) {
 			printf("config: '%s' does not exist.\n", imgs[n]);
-			return -1;
+			break;
 		}
 
+		printf("config: '%s' ; [%d, %d, %d]\n", imgs[n],
+				effects[n][OPENING_EFFECT],
+				effects[n][CLOSING_EFFECT],
+				effects[n][DISPLAY_EFFECT]);
+
 		n++;
-	} while (matchs == 4 && n < MAX_DISPLAYS);
+	}
 
 	fclose(file);
 
-	if (matchs != 4 && matchs != EOF) {
-		printf("%s: invalid config file.\n", filename);
+	if (matchs != EOF && n < MAX_FAN_DISPLAYS)
 		return -1;
-	}
-
 	return n;
 }
