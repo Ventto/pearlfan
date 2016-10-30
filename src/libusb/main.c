@@ -7,12 +7,16 @@
 #include <unistd.h>
 
 #include "config.h"
-#include "usb.h"
+#include "convert.h"
+#include "data.h"
 #include "raster.h"
-#include "ventilo.h"
+#include "usb.h"
 
-#define FAN_MAX_IMG_NBR			8
-#define FAN_MAX_DATA			(FAN_MAX_IMG_NBR * 2 * 156)
+#define VENDOR_ID	3141
+#define PRODUCT_ID	30465
+
+#define PFAN_DISPLAY_MAX	8
+#define PFAN_DATA_MAX		(PFAN_DISPLAY_MAX * 2 * 156)
 
 int main(int argc, char **argv)
 {
@@ -55,8 +59,8 @@ int main(int argc, char **argv)
 		pm_close(img);
 	}
 
-	uint16_t displays[FAN_MAX_IMG_NBR][156];
-	memset(displays, 0xFF, FAN_MAX_DATA);
+	uint16_t displays[PFAN_DISPLAY_MAX][156];
+	memset(displays, 0xFF, PFAN_DATA_MAX);
 
 	for (int i = 0; i < img_n ; i++)
 		pfan_convert_raster(i, rasters[i], displays[i]);

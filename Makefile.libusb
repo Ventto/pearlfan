@@ -1,5 +1,5 @@
-EXEC	= dreamyfan
-COMMON_SRCS = src/common/raster.c src/common/config.c
+EXEC	= pearlfan
+COMMON_SRCS = src/common/config.c src/common/convert.c src/common/raster.c
 SRCS	= $(COMMON_SRCS) src/libusb/usb.c src/libusb/main.c
 OBJS 	= $(SRCS:.c=.o)
 

@@ -1,7 +1,9 @@
-MODULE		= ventilo
+MODULE		= pfan
 DEVNAME		= $(MODULE)0
 KERNELOBJ	= $(MODULE).ko
 obj-m		:= $(MODULE).o
+module-objs := ../../common/convert.o
+ccflags-y := -I$(src)/../../common
 
 KDIR		= /lib/modules/$(shell uname -r)/build
 PWD			= $(shell pwd)
@@ -19,5 +21,4 @@ clean:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) clean
 
 distclean:
-	@lsmod | grep $(MODULE) && rmmod -f $(MODULE) \
-		|| echo "$(MODULE): module not found."
+	@lsmod | grep $(MODULE) && rmmod -f $(MODULE) || echo "Module not found."

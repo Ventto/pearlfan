@@ -1,5 +1,5 @@
-PROJNAME	= dreamyfan
-MODULE		= ventilo
+PROJNAME	= pearlfan
+MODULE		= pfan
 UDEVRULE	= 99-$(MODULE).rules
 SRCDIR		= src/kernel-module
 

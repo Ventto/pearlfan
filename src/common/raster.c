@@ -6,27 +6,6 @@
 
 #define IMAGE_WIDTH	156
 #define IMAGE_HEIGHT	11
-#define LEDS_NUMBER	11
-
-static const uint16_t pbm_mask[] = {
-	0xFCFF, 0xFBFF, 0xF7FF,
-	0xFEFF, 0xCFFF, 0xBFFF,
-	0x7FFF, 0xFFFE, 0xFFFD,
-	0xFFFB, 0xFFF7
-} ;
-
-void pfan_convert_raster(char id, bit *raster, uint16_t display[156])
-{
-	uint8_t col_end;
-
-	for (uint8_t i = 0; i < IMAGE_WIDTH; ++i) {
-		col_end = IMAGE_WIDTH - i - 1;
-		for (uint8_t j = 0; j < IMAGE_HEIGHT; ++j)
-			if (raster[j * IMAGE_WIDTH + i] == 1)
-				display[col_end] &=
-					pbm_mask[IMAGE_HEIGHT - j - 1];
-	}
-}
 
 bit *pfan_create_raster(FILE *img)
 {

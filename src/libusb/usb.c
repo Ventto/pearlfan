@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "convert.h"
 #include "usb.h"
 
 libusb_device_handle *pfan_open(libusb_context *ctx, int vid, int pid)
@@ -44,24 +45,12 @@ static int send(libusb_device_handle *dev_handle, void *data)
 	return libusb_interrupt_transfer(dev_handle, 0x81, buf, 8, &l, 1000);
 }
 
-static uint64_t convert_effect(const char id, const char effect[3])
-{
-	uint16_t opts = 0;
-
-	opts |= effect[1];
-	opts |= (effect[0] << 4);
-	opts |= (id << 8);
-	opts |= (effect[2] << 12);
-
-	return 0x00000055000010A0 | (opts << 16);
-}
-
 int pfan_send_all(libusb_device_handle *dev_handle, int img_n,
 		char effects[8][3],
 		uint16_t displays[8][156])
 {
 	for (uint8_t i = 0; i < img_n; i++) {
-		uint64_t effect = convert_effect(i, effects[i]);
+		uint64_t effect = pfan_convert_effect(i, effects[i]);
 
 		if (send(dev_handle, &effect) == -1)
 			return 1;
