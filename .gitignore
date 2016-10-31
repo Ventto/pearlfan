@@ -9,7 +9,6 @@ src/common/*
 !src/common/convert.h
 !src/common/convert.c
 !src/common/data.h
-!src/common/mask.h
 !src/common/raster.h
 !src/common/raster.c
 
