@@ -36,16 +36,7 @@ src/libusb/*
 tests/*
 !tests/check-userdriver.sh
 !tests/custom.config
-!tests/images/
-tests/images/*
-!tests/images/image1.pbm
-!tests/images/image2.pbm
-!tests/images/image3.pbm
-!tests/images/image4.pbm
-!tests/images/image5.pbm
-!tests/images/image6.pbm
-!tests/images/image7.pbm
-!tests/images/image8.pbm
+!tests/images/*
 
 !Makefile.libusb
 !Makefile.module
