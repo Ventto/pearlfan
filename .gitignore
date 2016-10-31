@@ -18,7 +18,7 @@ src/kernel-module/*
 !src/kernel-module/module/
 src/kernel-module/module/*
 !src/kernel-module/module/Makefile
-!src/kernel-module/module/pfan.c
+!src/kernel-module/module/module.c
 !src/kernel-module/rules.d/
 src/kernel-module/rules.d/*
 !src/kernel-module/rules.d/99-pfan.rules

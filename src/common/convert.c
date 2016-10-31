@@ -1,3 +1,9 @@
+#include <linux/kernel.h>
+
+#ifndef EXPORT_SYMBOL
+#define EXPORT_SYMBOL(sym)
+#endif
+
 #include "convert.h"
 #include "mask.h"
 
@@ -15,6 +21,7 @@ unsigned long long pfan_convert_effect(const char id, const char effect[3])
 
 	return 0x00000055000010A0 | (opts << 16);
 }
+EXPORT_SYMBOL(pfan_convert_effect);
 
 void pfan_convert_raster(char id, unsigned char *raster,
 		unsigned short display[156])
@@ -31,3 +38,4 @@ void pfan_convert_raster(char id, unsigned char *raster,
 					pfan_mask[IMAGE_HEIGHT - j - 1];
 	}
 }
+EXPORT_SYMBOL(pfan_convert_raster);
