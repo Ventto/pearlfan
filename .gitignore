@@ -40,5 +40,6 @@ tests/*
 
 !Makefile.libusb
 !Makefile.module
+!LICENSE
 !README.md
 !.travis.yml
