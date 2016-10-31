@@ -1,7 +1,7 @@
-EXEC	= dreamyfan
-COMMON_SRCS	= ../../common/raster.c ../../common/config.c
-SRCS	= $(COMMON_SRCS) main.c
-OBJS 	= $(SRCS:.c=.o)
+EXE            = pfan
+COMMON_SRCS    = ../../common/raster.c ../../common/config.c
+SRCS          += $(COMMON_SRCS) main.c
+OBJS           = $(SRCS:.c=.o)
 
 CC	= gcc
 INCS	= -I../module -I../../common -I/usr/include/netpbm
@@ -10,13 +10,13 @@ LIBS	+= -lnetpbm
 
 .PHONY: all clean
 
-all: $(EXEC)
+all: $(EXE)
 
-$(EXEC): $(OBJS)
+$(EXE): $(OBJS)
 	$(CC) $(CFLAGS) $^ -o $@ $(LIBS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	$(RM) $(OBJS) $(EXEC)
+	$(RM) $(OBJS) $(EXE)

@@ -1,25 +1,35 @@
-PROJNAME	= pearlfan
-MODULE		= pfan
-UDEVRULE	= 99-$(MODULE).rules
-SRCDIR		= src/kernel-module
+ML_NAME           = pfan
+ML_SRCDIR         = src/kernel-module
+ML_DRIVER_SRCDIR  = $(ML_SRCDIR)/module
+
+ML_APP            = pfan
+ML_APP_SRCDIR     = $(ML_SRCDIR)/user-driver
+
+ML_UDEVRULE       = 99-$(ML_NAME).rules
 
 .PHONY: all install clean distclean
 
 all:
-	$(MAKE) $(MFLAGS) -C $(SRCDIR)/module
-	$(MAKE) $(MFLAGS) -C $(SRCDIR)/user-driver
-	mv $(SRCDIR)/user-driver/dreamyfan .
+	$(MAKE) $(MFLAGS) -C $(ML_DRIVER_SRCDIR)
+	$(MAKE) $(MFLAGS) -C $(ML_APP_SRCDIR)
+	mv $(ML_APP_SRCDIR)/$(ML_APP) .
 
 install:
-	cp $(SRCDIR)/rules.d/$(UDEVRULE) /etc/udev/rules.d/$(UDEVRULE)
-	udevadm control --reload-rules
-	$(MAKE) $(MFLAGS) -C $(SRCDIR)/module install
+	$(MAKE) $(MFLAGS) -C $(ML_DRIVER_SRCDIR) install
+	cp $(ML_SRCDIR)/rules.d/$(ML_UDEVRULE) /etc/udev/rules.d/$(ML_UDEVRULE)
 
 clean:
-	$(MAKE) $(MFLAGS) -C $(SRCDIR)/module clean
-	$(MAKE) $(MFLAGS) -C $(SRCDIR)/user-driver clean
-	$(RM) $(PROJNAME)
+	$(MAKE) $(MFLAGS) -C $(ML_DRIVER_SRCDIR) clean
+	$(MAKE) $(MFLAGS) -C $(ML_APP_SRCDIR) clean
+	$(RM) $(ML_APP)
 
 distclean: clean
-	$(RM) /etc/udev/rules.d/$(UDEVRULE)
-	$(MAKE) $(MFLAGS) -C $(SRCDIR)/module distclean
+	$(RM) /etc/udev/rules.d/$(ML_UDEVRULE)
+	@rmmod $(ML_NAME)
+
+load:
+	udevadm control --reload-rules
+	insmod $(ML_DRIVER_SRCDIR)/$(ML_NAME).ko
+
+unload:
+	rmmod $(ML_NAME)
