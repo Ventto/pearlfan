@@ -29,7 +29,6 @@ src/kernel-module/user-driver/*
 
 !src/libusb/
 src/libusb/*
-!src/libusb/Makefile
 !src/libusb/usb.c
 !src/libusb/usb.h
 !src/libusb/main.c
