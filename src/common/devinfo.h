@@ -6,6 +6,7 @@
 #define PFAN_VID           0x0c45
 #define PFAN_PID           0x7701
 #define PFAN_DISPLAY_MAX   8
+
 /**
  * struct ventilo_data - designed to be the buffer as parameter for the module
  * driver's write function.
@@ -20,9 +21,9 @@
  *	A 'display' means a whole ventilo's display.
  */
 struct pfan_data {
-	uint8_t n;
-	uint8_t effects[PFAN_DISPLAY_MAX][3];
 	unsigned char **images;
+	unsigned char effects[PFAN_DISPLAY_MAX][3];
+	unsigned char n;
 };
 
 #endif /* DATA_H_ */
