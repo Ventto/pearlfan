@@ -1,89 +1,101 @@
-DreamyFan
+
+PearlFan
 =========
 
-*DreamyFan is a GNU/Linux Kernel Driver for 'PEARL.fr' USB LED fan.*
+[![Build Status](https://travis-ci.org/Ventto/bpep.svg?branch=master)](https://travis-ci.org/Ventto/pearlfan)
+[![License](https://img.shields.io/badge/license-GPLv3-blue.svg?style=flat)](https://github.com/Ventto/pearlfan/blob/master/LICENSE)
+[![Status](https://img.shields.io/badge/status-experimental-orange.svg?style=flat)](https://github.com/Ventto/pearlfan/)
+
+*PearlFan provides a GNU/Linux Kernel driver and a libusb application for the "[PEARL.fr](https://www.pearl.fr/article/PX5939/ventilateur-usb-programmable-avec-message-defilant
+)" USB LED fan.*
 
 ## Dependencies
-
-Common:
-
-* *libusb-1.0* - Library that provides generic access to USB devices
 
 Archlinux:
 
 * *linux-headers* - Header files and scripts for building modules for Linux kernel
+* *libusb-1.0* - Library that provides generic access to USB devices
 * *netpbm* - Toolkit for manipulation of graphic images (with libraries and header files)
 
 Ubuntu:
 
-* *linux-headers-{kernel_version}*
-* *libnetpbm1.0-dev* - Netpbm libraries and header files
+* *linux-headers-$(uname -r)*
+* *libnetpbm10-dev* - Netpbm libraries and header files
+* *libusb-1.0-dev* - Library that provides generic access to USB devices
 
 ## Build
 
-```
-$ make
-```
-
-## Run
-
-* Run the program using libusb:
-```
-$ cd src/userapp/libusb_app
-$ ./app <config_file>
-```
-**config_file**: path of a config file that contains image paths and effect configuration (cf. Configuration File).
-
-* Run the program using the kernel module driver (cf. Module Driver):
-```
-$ cd src/userapp/driver_app
-$ ./app <config_file>
-```
-
-## Module Driver
-
-* You need to load the module driver before running the program:
+* Kernel module and its user application:
 
 ```
-$ cd src/driver
-$ chmod +x script.sh
-$ ./script.sh
+$ make -f Makefile.module
+```
+
+* Libusb application:
+
+```
+$ make -f Makefile.libusb
+```
+
+## Install the kernel module
+
+
+* Install the module and its udev rule file:
+
+```
+$ sudo make -f Makefile.module install
+```
+
+*  Reload udev rules and add the module with *insmod*:
+
+```
+$ sudo make -f Makefile.module load
+```
+
+## Execute
+
+```
+$ ./pfan <config_file>
 ```
 
 ## Configuration File
 
-### Sample
+### Example
 
-You could find a given example of a basic `config` file in each program directory.
+This an example of a pfan's configuration file
 
 ```
-$ cd src/userapp/libusb_app
-$ cat config
-+./images/image1.pbm+2/2/6
-+./images/image2.pbm+1/1/6
-+./images/image3.pbm+0/0/0
-+./images/image4.pbm+3/3/6
-+./images/image3.pbm+2/5/0
++images/pacman.pbm+2/2/6
++images/mario.pbm+1/1/6
++images/circle.pbm+0/0/0
++images/cols.pbm+3/3/6
++images/full.pbm+2/5/0
 ```
 
-**image.pbm**: Netpbm data image, size = 156x11.<br />
-**.PBM**: Well-known format supported by image manipulation programs like Gimp.
+### How to write it ?
 
-### How to write a config file ?
+#### What about the pattern ?
+The config's pattern is: `+{relative_img_path}+{effects}`
+* relative\_img\_path: the relative image's path according to the config file's path
+* effects: the fan provides transition effects when displaying and switching images
+	* pattern: `{open}/{close}/{before_close}`
+	* open: opening transition effect when the fan is beggining displaying an image
+	* close: closing transition effect when the fan is ending displaying an image
+	* before\_close: before displaying the next image the fan can make the image turn and more
 
-* Required at most 8 images so 8 lines
-  * 2 x lines: ok
-  * 9 x lines: failed
-  * 0 x line: failed
+#### Images
 
-* Line: `+{path}+{x}/{y}/{z}`
-  * path: valid .pbm filepath
-  * x: Opening effect [0-5]
-  * y: Closing effect [0-5]
-  * z: Rotation effect [0,6,c]
+* Image format: [.PBM](http://netpbm.sourceforge.net/doc/pbm.html) image
+* Image size: 11 x 156
 
-## TODO
+**The fan can display at most 8 images. So there is at most 8 lines in the config file.**
 
-* Add section to explain entirely how to upload .PBM image files into the fan
-* CMake instead of *make*
-* Remove the module driver and clean libusb app
+#### Effects
+
+| Effects/Value | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|---|---|
+| open | right-left | left-right | ecrase | appear | top-bottom | bottom-top | fast-mode |
+| close | left-right | right-left | ecrase | appar | top-bottom | bottom-top | fast-mode |
+| before\_close | none | x | x | turn right-left | x | x | turn left-right |
+
+* fast-mode: skip the opening and before_close transition
