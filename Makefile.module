@@ -1,9 +1,9 @@
 ML_NAME           = pfan
-ML_SRCDIR         = src/kernel-module
+ML_SRCDIR         = src/kmodule
 ML_DRIVER_SRCDIR  = $(ML_SRCDIR)/module
 
 ML_APP            = pfan
-ML_APP_SRCDIR     = $(ML_SRCDIR)/user-driver
+ML_APP_SRCDIR     = $(ML_SRCDIR)/app
 
 ML_UDEVRULE       = 99-$(ML_NAME).rules
 

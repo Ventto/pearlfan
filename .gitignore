@@ -12,19 +12,19 @@ src/common/*
 !src/common/raster.h
 !src/common/raster.c
 
-!src/kernel-module
-src/kernel-module/*
-!src/kernel-module/module/
-src/kernel-module/module/*
-!src/kernel-module/module/Makefile
-!src/kernel-module/module/module.c
-!src/kernel-module/rules.d/
-src/kernel-module/rules.d/*
-!src/kernel-module/rules.d/99-pfan.rules
-!src/kernel-module/user-driver/
-src/kernel-module/user-driver/*
-!src/kernel-module/user-driver/Makefile
-!src/kernel-module/user-driver/main.c
+!src/kmodule
+src/kmodule/*
+!src/kmodule/module/
+src/kmodule/module/*
+!src/kmodule/module/Makefile
+!src/kmodule/module/module.c
+!src/kmodule/rules.d/
+src/kmodule/rules.d/*
+!src/kmodule/rules.d/99-pfan.rules
+!src/kmodule/app/
+src/kmodule/app/*
+!src/kmodule/app/Makefile
+!src/kmodule/app/main.c
 
 !src/libusb/
 src/libusb/*
