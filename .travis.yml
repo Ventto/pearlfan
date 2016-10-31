@@ -1,0 +1,15 @@
+group: stable
+os: linux
+sudo: required
+language: c
+compiler: gcc
+
+addons:
+  apt:
+    packages:
+    - linux-headers-$(uname -r)
+    - libusb-1.0-0
+    - libnetpbm10-dev
+
+script:
+    make -f Makefile.module && make -f Makefile.libusb
