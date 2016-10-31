@@ -5,10 +5,8 @@
 #include <string.h>
 
 #include "config.h"
-#include "data.h"
+#include "devinfo.h"
 #include "raster.h"
-
-#define DEVICE	"/dev/pfan0"
 
 int main(int argc, char **argv)
 {
@@ -43,27 +41,30 @@ int main(int argc, char **argv)
 		pm_close(img);
 	}
 
-	int fan_fd = open(DEVICE, O_RDWR);
+	int pfan_fd = open(PFAN_DEVNAME, O_RDWR);
 
-	if (fan_fd <= 0) {
+	if (pfan_fd <= 0) {
 		pfan_free_rasters(rasters, img_n);
 		printf("Cannot open the USB device.\n");
 		return EXIT_FAILURE;
 	}
 
-	struct pfan_data data;
+	struct pfan_data *data = malloc(sizeof(struct pfan_data));
 	int ret = EXIT_SUCCESS;
 
-	data.n = img_n;
-	memcpy(data.effects, effects, sizeof(effects));
-	data.images = rasters;
+	memset(data, 0, sizeof(struct pfan_data));
 
-	if (write(fan_fd, &data, sizeof(struct pfan_data)) <= 0) {
+	data->n = img_n;
+	memcpy(data->effects, effects, sizeof(effects));
+	data->images = rasters;
+
+	if (write(pfan_fd, data, sizeof(struct pfan_data)) <= 0) {
 		printf("Error occured during the data sending. %s\n", strerror(errno));
 		ret = EXIT_FAILURE;
 	}
 
-	close(fan_fd);
+	close(pfan_fd);
+	free(data);
 	pfan_free_rasters(rasters, img_n);
 	return ret;
 }

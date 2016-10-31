@@ -8,7 +8,7 @@ src/common/*
 !src/common/config.h
 !src/common/convert.h
 !src/common/convert.c
-!src/common/data.h
+!src/common/devinfo.h
 !src/common/raster.h
 !src/common/raster.c
 

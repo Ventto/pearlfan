@@ -4,6 +4,8 @@
 #include "convert.h"
 #include "usb.h"
 
+#define PFAN_DISPLAY_MAX    8
+
 libusb_device_handle *pfan_open(libusb_context *ctx, int vid, int pid)
 {
 	libusb_device_handle *dev_handle =
@@ -45,9 +47,9 @@ static int send(libusb_device_handle *dev_handle, void *data)
 	return libusb_interrupt_transfer(dev_handle, 0x81, buf, 8, &l, 1000);
 }
 
-int pfan_send_all(libusb_device_handle *dev_handle, int img_n,
-		char effects[8][3],
-		uint16_t displays[8][156])
+int pfan_send(libusb_device_handle *dev_handle, int img_n,
+		char effects[PFAN_DISPLAY_MAX][3],
+		uint16_t displays[PFAN_DISPLAY_MAX][PFAN_IMG_W])
 {
 	for (uint8_t i = 0; i < img_n; i++) {
 		uint64_t effect = pfan_convert_effect(i, effects[i]);

@@ -8,15 +8,9 @@
 
 #include "config.h"
 #include "convert.h"
-#include "data.h"
+#include "devinfo.h"
 #include "raster.h"
 #include "usb.h"
-
-#define VENDOR_ID	3141
-#define PRODUCT_ID	30465
-
-#define PFAN_DISPLAY_MAX	8
-#define PFAN_DATA_MAX		(PFAN_DISPLAY_MAX * 2 * 156)
 
 int main(int argc, char **argv)
 {
@@ -59,8 +53,9 @@ int main(int argc, char **argv)
 		pm_close(img);
 	}
 
-	uint16_t displays[PFAN_DISPLAY_MAX][156];
-	memset(displays, 0xFF, PFAN_DATA_MAX);
+	uint16_t displays[PFAN_DISPLAY_MAX][PFAN_IMG_W];
+
+	memset(displays, 0xFF, sizeof(displays));
 
 	for (int i = 0; i < img_n ; i++)
 		pfan_convert_raster(i, rasters[i], displays[i]);
@@ -74,14 +69,14 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-	usb_handle = pfan_open(usb_ctx, VENDOR_ID, PRODUCT_ID);
+	usb_handle = pfan_open(usb_ctx, PFAN_VID, PFAN_PID);
 	if (!usb_handle) {
 		pfan_free_rasters(rasters, img_n);
 		libusb_exit(usb_ctx);
 		return EXIT_FAILURE;
 	}
 
-	pfan_send_all(usb_handle, img_n, effects, displays);
+	pfan_send(usb_handle, img_n, effects, displays);
 
 	libusb_close(usb_handle);
 	libusb_exit(usb_ctx);

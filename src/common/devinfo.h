@@ -1,6 +1,11 @@
 #ifndef DATA_H_
 #define DATA_H_
 
+#define PFAN_CLASSNAME    "usb/pfan0"
+#define PFAN_DEVNAME      "/dev/pfan0"
+#define PFAN_VID           0x0c45
+#define PFAN_PID           0x7701
+#define PFAN_DISPLAY_MAX   8
 /**
  * struct ventilo_data - designed to be the buffer as parameter for the module
  * driver's write function.
@@ -16,7 +21,7 @@
  */
 struct pfan_data {
 	uint8_t n;
-	uint8_t effects[8][3];
+	uint8_t effects[PFAN_DISPLAY_MAX][3];
 	unsigned char **images;
 };
 

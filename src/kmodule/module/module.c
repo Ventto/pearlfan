@@ -7,10 +7,7 @@
 #include <linux/usb.h>
 
 #include "convert.h"
-#include "data.h"
-
-#define VID  0x0c45
-#define PID  0x7701
+#include "devinfo.h"
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Thomas Venries <thomas.venries@gmail.com>");
@@ -18,7 +15,7 @@ MODULE_DESCRIPTION("Pearl USB LED Fan module");
 MODULE_VERSION("v0.7");
 
 static struct usb_device_id id_table[] = {
-	{ USB_DEVICE(VID, PID) },
+	{ USB_DEVICE(PFAN_VID, PFAN_PID) },
 	{ },
 };
 MODULE_DEVICE_TABLE(usb, id_table);
@@ -61,7 +58,7 @@ static ssize_t pfan_write(struct file *f,
 		loff_t *off)
 {
 	struct pfan_data *data = NULL;
-	u16 display[156];
+	u16 display[PFAN_IMG_W];
 	int i;
 	int j;
 
@@ -87,7 +84,7 @@ static ssize_t pfan_write(struct file *f,
 		u64 effect = pfan_convert_effect(i, data->effects[i]);
 		send(pfan, &effect);
 		for (j = 0; j < 39; j++) {
-			memset(&display, 0xFF, 156 * 2);
+			memset(&display, 0xFF, sizeof(display));
 			pfan_convert_raster(i, data->images[i], display);
 			send(pfan, (u16 *)&display[j * 4]);
 		}
@@ -103,7 +100,7 @@ static struct file_operations pfan_fops = {
 };
 
 static struct usb_class_driver pfan_class = {
-	.name = "usb/pfan0",
+	.name = PFAN_CLASSNAME,
 	.fops = &pfan_fops,
 	.minor_base = 0
 };
