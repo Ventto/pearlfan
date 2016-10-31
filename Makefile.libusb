@@ -4,7 +4,7 @@ SRCS        = $(COMMON_SRCS) src/libusb/usb.c src/libusb/main.c
 OBJS        = $(SRCS:.c=.o)
 
 CC      = gcc
-INCS    = -Isrc/kernel-module/module -Isrc/common -I/usr/include/netpbm
+INCS    = -Isrc/common -I/usr/include/netpbm
 CFLAGS  = -g3 -Wall -Werror -std=c99 $(INCS)
 LIBS   += $(shell pkg-config --libs --cflags libusb-1.0)
 LIBS   += -lnetpbm

@@ -8,6 +8,7 @@ src/common/*
 !src/common/config.h
 !src/common/convert.h
 !src/common/convert.c
+!src/common/data.h
 !src/common/mask.h
 !src/common/raster.h
 !src/common/raster.c
@@ -18,7 +19,6 @@ src/kernel-module/*
 src/kernel-module/module/*
 !src/kernel-module/module/Makefile
 !src/kernel-module/module/pfan.c
-!src/kernel-module/module/data.h
 !src/kernel-module/rules.d/
 src/kernel-module/rules.d/*
 !src/kernel-module/rules.d/99-pfan.rules
