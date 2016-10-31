@@ -12,4 +12,8 @@ addons:
     - libnetpbm10-dev
 
 script:
-    make -f Makefile.module && make -f Makefile.libusb
+    make -f Makefile.module &&
+    make -f Makefile.libusb &&
+    sudo make -f Makefile.module install &&
+    sudo make -f Makefile.module load &&
+    sudo make -f Makefile.module unload
