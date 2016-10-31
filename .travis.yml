@@ -8,7 +8,7 @@ addons:
   apt:
     packages:
     - linux-headers-$(uname -r)
-    - libusb-1.0-0
+    - libusb-1.0-0-dev
     - libnetpbm10-dev
 
 script:
