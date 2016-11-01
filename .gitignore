@@ -25,6 +25,8 @@ src/kmodule/rules.d/*
 src/kmodule/app/*
 !src/kmodule/app/Makefile
 !src/kmodule/app/main.c
+!src/kmodule/app/send.c
+!src/kmodule/app/send.h
 
 !src/libusb/
 src/libusb/*
