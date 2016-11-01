@@ -65,11 +65,11 @@ $ ./pfan <config_file>
 This an example of a pfan's configuration file
 
 ```
-+images/pacman.pbm+2/2/6
-+images/mario.pbm+1/1/6
-+images/circle.pbm+0/0/0
-+images/cols.pbm+3/3/6
-+images/full.pbm+2/5/0
+images/pacman.pbm+2/2/6
+images/mario.pbm+1/1/6
+images/circle.pbm+0/0/0
+images/cols.pbm+3/3/6
+images/full.pbm+2/5/0
 ```
 
 ### How to write it ?
