@@ -21,6 +21,21 @@ static void concat_path(char buf[FILEPATH_MAX],
 	strncat(buf, relpath, strlen(relpath));
 }
 
+static inline int check_open(uint8_t value)
+{
+	return value >= 0 && value <= 6;
+}
+
+static inline int check_close(uint8_t value)
+{
+	return check_open(value);
+}
+
+static inline int check_beforeclose(uint8_t value)
+{
+	return value == 0 || value == 6;
+}
+
 int pfan_read_config(char *filename,
 		char image_paths[PFAN_DISPLAY_MAX][FILEPATH_MAX],
 		uint8_t effects[PFAN_DISPLAY_MAX][3])
@@ -46,14 +61,16 @@ int pfan_read_config(char *filename,
 		concat_path(image_paths[n], dir, relpath);
 
 		if(access(image_paths[n], F_OK ) == -1 ) {
-			printf("config: '%s' does not exist.\n", image_paths[n]);
+			printf("pfan: image '%s' does not exist.\n", image_paths[n]);
 			break;
 		}
 
-		printf("config: '%s' ; [%d, %d, %d]\n", image_paths[n],
-				effects[n][OPEN],
-				effects[n][CLOSE],
-				effects[n][BEFORE_CLOSE]);
+		if (!check_open(effects[n][OPEN])
+				|| !check_close(effects[n][CLOSE])
+				|| !check_beforeclose(effects[n][BEFORE_CLOSE])) {
+			printf("pfan: bad effect values for '%s'.\n", image_paths[n]);
+			break;
+		}
 
 		n++;
 	}
