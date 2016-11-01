@@ -1,10 +1,15 @@
 #include <libgen.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
 #include "config.h"
+
+#define OPEN           0
+#define CLOSE          1
+#define BEFORE_CLOSE   2
 
 static void concat_path(char buf[FILEPATH_MAX],
 		const char *dir,
@@ -17,8 +22,8 @@ static void concat_path(char buf[FILEPATH_MAX],
 }
 
 int pfan_read_config(char *filename,
-		char imgs[MAX_FAN_DISPLAYS][FILEPATH_MAX],
-		char effects[MAX_FAN_DISPLAYS][3])
+		char image_paths[PFAN_DISPLAY_MAX][FILEPATH_MAX],
+		uint8_t effects[PFAN_DISPLAY_MAX][3])
 {
 	FILE *file = fopen(filename, "r");
 
@@ -32,30 +37,30 @@ int pfan_read_config(char *filename,
 	int n = 0;
 	int matchs;
 
-	while (n < MAX_FAN_DISPLAYS && (matchs =
+	while (n < PFAN_DISPLAY_MAX && (matchs =
 			fscanf(file, "%[^+]+%hhu/%hhu/%hhu\n", relpath,
-					&effects[n][OPENING_EFFECT],
-					&effects[n][CLOSING_EFFECT],
-					&effects[n][DISPLAY_EFFECT])) == 4) {
+					&effects[n][OPEN],
+					&effects[n][CLOSE],
+					&effects[n][BEFORE_CLOSE])) == 4) {
 
-		concat_path(imgs[n], dir, relpath);
+		concat_path(image_paths[n], dir, relpath);
 
-		if(access(imgs[n], F_OK ) == -1 ) {
-			printf("config: '%s' does not exist.\n", imgs[n]);
+		if(access(image_paths[n], F_OK ) == -1 ) {
+			printf("config: '%s' does not exist.\n", image_paths[n]);
 			break;
 		}
 
-		printf("config: '%s' ; [%d, %d, %d]\n", imgs[n],
-				effects[n][OPENING_EFFECT],
-				effects[n][CLOSING_EFFECT],
-				effects[n][DISPLAY_EFFECT]);
+		printf("config: '%s' ; [%d, %d, %d]\n", image_paths[n],
+				effects[n][OPEN],
+				effects[n][CLOSE],
+				effects[n][BEFORE_CLOSE]);
 
 		n++;
 	}
 
 	fclose(file);
 
-	if (matchs != EOF && n < MAX_FAN_DISPLAYS)
+	if (matchs != EOF && n < PFAN_DISPLAY_MAX)
 		return -1;
 	return n;
 }

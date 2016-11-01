@@ -4,8 +4,8 @@
 
 #include "raster.h"
 
-#define IMAGE_WIDTH	156
-#define IMAGE_HEIGHT	11
+#define PFAN_IMG_W    156
+#define PFAN_IMG_H    11
 
 bit *pfan_create_raster(FILE *img)
 {
@@ -16,7 +16,7 @@ bit *pfan_create_raster(FILE *img)
 
 	pbm_readpbminit(img, &cols, &rows, &format);
 
-	if (cols != IMAGE_WIDTH && rows != IMAGE_HEIGHT) {
+	if (cols != PFAN_IMG_W && rows != PFAN_IMG_H) {
 		printf("pfan: invalid image sizes, '11x156' is required.\n");
 		return NULL;
 	}
@@ -26,13 +26,13 @@ bit *pfan_create_raster(FILE *img)
 		return NULL;
 	}
 
-	raster = pbm_allocrow(IMAGE_WIDTH * IMAGE_HEIGHT);
+	raster = pbm_allocrow(PFAN_IMG_W * PFAN_IMG_H);
 	if (!raster) {
 		printf("pfan: cannot allocate the raster.\n");
 		return NULL;
 	}
 
-	pbm_readpbmrow(img, raster, IMAGE_WIDTH * IMAGE_HEIGHT, format);
+	pbm_readpbmrow(img, raster, PFAN_IMG_W * PFAN_IMG_H, format);
 
 	return raster;
 }

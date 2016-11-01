@@ -6,16 +6,19 @@
 
 #include "convert.h"
 
-#define PFAN_IMG_H    11
+#define OPEN            0
+#define CLOSE           1
+#define BEFORE_CLOSE    2
 
-unsigned long long pfan_convert_effect(const char id, const char effect[3])
+unsigned long long pfan_convert_effect(const char id,
+		const char unsigned effect[3])
 {
 	unsigned short opts = 0;
 
-	opts |= effect[1];
-	opts |= (effect[0] << 4);
+	opts |= effect[CLOSE];
+	opts |= (effect[OPEN] << 4);
 	opts |= (id << 8);
-	opts |= (effect[2] << 12);
+	opts |= (effect[BEFORE_CLOSE] << 12);
 
 	return 0x00000055000010A0 | (opts << 16);
 }

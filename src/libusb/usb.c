@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
 
 #include "convert.h"
 #include "usb.h"
@@ -41,14 +42,14 @@ static int send(libusb_device_handle *dev_handle, void *data)
 	memset((void *)buf, 0, 8);
 	buf[7] = 0x2;
 
-	if (libusb_control_transfer(dev_handle, 0x21, 9, 0x200, 0, data, 8,
-				1000) <= 0)
+	if (libusb_control_transfer(dev_handle, 0x21, 9, 0x200, 0,
+				data, 8, 1000) <= 0)
 		return -1;
 	return libusb_interrupt_transfer(dev_handle, 0x81, buf, 8, &l, 1000);
 }
 
 int pfan_send(libusb_device_handle *dev_handle, int img_n,
-		char effects[PFAN_DISPLAY_MAX][3],
+		uint8_t effects[PFAN_DISPLAY_MAX][3],
 		uint16_t displays[PFAN_DISPLAY_MAX][PFAN_IMG_W])
 {
 	for (uint8_t i = 0; i < img_n; i++) {

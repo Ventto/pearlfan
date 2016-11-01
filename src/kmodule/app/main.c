@@ -1,4 +1,3 @@
-#include <linux/limits.h>
 #include <pbm.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,11 +15,11 @@ int main(int argc, char **argv)
 	}
 
 	char *config_file = argv[1];
-	char imgs[MAX_FAN_DISPLAYS][FILEPATH_MAX];
-	char effects[MAX_FAN_DISPLAYS][3];
+	char image_paths[PFAN_DISPLAY_MAX][FILEPATH_MAX];
+	char effects[PFAN_DISPLAY_MAX][3];
 	int img_n;
 
-	if ((img_n = pfan_read_config(config_file, imgs, effects)) < 0) {
+	if ((img_n = pfan_read_config(config_file, image_paths, effects)) < 0) {
 		printf("%s: invalid config file.\n", config_file);
 		return EXIT_FAILURE;
 	}
@@ -31,10 +30,10 @@ int main(int argc, char **argv)
 	pm_init(argv[0], 0);
 
 	for (int i = 0; i < img_n; i++) {
-		img = pm_openr(imgs[i]);
+		img = pm_openr(image_paths[i]);
 		if (!img) {
 			pfan_free_rasters(rasters, i);
-			printf("pfan: can not open '%s'.\n", imgs[i]);
+			printf("pfan: can not open '%s'.\n", image_paths[i]);
 			return EXIT_FAILURE;
 		}
 		rasters[i] = pfan_create_raster(img);
