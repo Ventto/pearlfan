@@ -13,25 +13,31 @@ libusb_device_handle *pfan_open(libusb_context *ctx, int vid, int pid)
 		libusb_open_device_with_vid_pid(ctx, vid, pid);
 
 	if (!dev_handle) {
-		printf("libusb: device cannot be opened or found.\n");
+		printf("pfan: device cannot be opened or found.\n\n");
 		return NULL;
 	}
 
 	if (libusb_kernel_driver_active(dev_handle, 0) == 1) {
 		if (libusb_detach_kernel_driver(dev_handle, 0) != 0) {
 			libusb_close(dev_handle);
-			printf("libusb: can not dettach the device from the driver.\n");
+			printf("pfan: can not dettach the device from the driver.\n\n");
 			return NULL;
 		}
 	}
 
 	if (libusb_claim_interface(dev_handle, 0) < 0) {
 		libusb_close(dev_handle);
-		printf("libusb: cannot claim the interface.\n");
+		printf("pfan: cannot claim the interface.\n\n");
 		return NULL;
 	}
 
 	return dev_handle;
+}
+
+void pfan_close(libusb_context *ctx, libusb_device_handle *dev_handle)
+{
+	libusb_close(dev_handle);
+	libusb_exit(ctx);
 }
 
 static int send(libusb_device_handle *dev_handle, void *data)

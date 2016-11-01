@@ -7,7 +7,7 @@
 #define PFAN_IMG_W    156
 #define PFAN_IMG_H    11
 
-bit *pfan_create_raster(FILE *img)
+static bit *create_raster(FILE *img)
 {
 	int cols;
 	int rows;
@@ -35,6 +35,31 @@ bit *pfan_create_raster(FILE *img)
 	pbm_readpbmrow(img, raster, PFAN_IMG_W * PFAN_IMG_H, format);
 
 	return raster;
+}
+
+bit **pfan_create_rasters(char image_paths[8][8193], int image_nbr)
+{
+	pm_init("pfan", 0);
+
+	bit **rasters = malloc(sizeof(void *) * image_nbr);
+
+	if (!rasters)
+		return NULL;
+
+	FILE *img = NULL;
+
+	for (int i = 0; i < image_nbr; ++i) {
+		img = pm_openr(image_paths[i]);
+		if (!img) {
+			pfan_free_rasters(rasters, i);
+			printf("pfan: can not open '%s'\n", image_paths[i]);
+			return NULL;
+		}
+		rasters[i] = create_raster(img);
+		pm_close(img);
+	}
+
+	return rasters;
 }
 
 void pfan_free_rasters(bit **rasters, int n)

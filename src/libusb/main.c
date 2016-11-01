@@ -28,59 +28,53 @@ int main(int argc, char **argv)
 
 	char image_paths[PFAN_DISPLAY_MAX][FILEPATH_MAX];
 	uint8_t effects[PFAN_DISPLAY_MAX][3];
-	int img_n;
+	int image_nbr;
 
-	if ((img_n = pfan_read_config(config_file, image_paths, effects)) < 0) {
-		printf("pfan: '%s' invalid config file.\n", config_file);
+	if ((image_nbr = pfan_read_config(config_file, image_paths, effects)) < 0) {
+		printf("pfan: invalid config file.\n\n");
 		return EXIT_FAILURE;
 	}
 
-	if (!img_n)
+	if (!image_nbr)
 		return EXIT_SUCCESS;
 
-	FILE *img = NULL;
-	bit **rasters = malloc(sizeof(void *) * img_n);
+	bit **rasters = pfan_create_rasters(image_paths, image_nbr);
 
-	pm_init(argv[0], 0);
-
-	for (int i = 0; i < img_n; i++) {
-		img = pm_openr(image_paths[i]);
-		if (!img) {
-			printf("pfan: can not open '%s'\n", image_paths[i]);
-			return EXIT_FAILURE;
-		}
-		rasters[i] = pfan_create_raster(img);
-		pm_close(img);
-	}
+	if (!rasters)
+		return EXIT_FAILURE;
 
 	uint16_t displays[PFAN_DISPLAY_MAX][PFAN_IMG_W];
 
 	memset(displays, 0xFF, sizeof(displays));
 
-	for (int i = 0; i < img_n ; i++)
+	for (int i = 0; i < image_nbr ; i++)
 		pfan_convert_raster(i, rasters[i], displays[i]);
 
 	libusb_device_handle *usb_handle = NULL;
 	libusb_context *usb_ctx = NULL;
 
 	if (libusb_init(&usb_ctx) < 0) {
-		pfan_free_rasters(rasters, img_n);
-		printf("pfan: libusb initialization failed.\n");
+		pfan_free_rasters(rasters, image_nbr);
+		printf("pfan: libusb initialization failed.\n\n");
 		return EXIT_FAILURE;
 	}
 
 	usb_handle = pfan_open(usb_ctx, PFAN_VID, PFAN_PID);
 	if (!usb_handle) {
-		pfan_free_rasters(rasters, img_n);
+		pfan_free_rasters(rasters, image_nbr);
 		libusb_exit(usb_ctx);
 		return EXIT_FAILURE;
 	}
 
-	pfan_send(usb_handle, img_n, effects, displays);
-
-	libusb_close(usb_handle);
-	libusb_exit(usb_ctx);
-	pfan_free_rasters(rasters, img_n);
+	printf("pfan: device found.\n");
+	printf("pfan: transfer is starting.\n");
+	if (pfan_send(usb_handle, image_nbr, effects, displays) != 0) {
+		printf("pfan: transfer is not complete.\n\n");
+		return EXIT_FAILURE;
+	}
+	printf("pfan: transfer is complete.\n\n");
+	pfan_close(usb_ctx, usb_handle);
+	pfan_free_rasters(rasters, image_nbr);
 
 	return EXIT_SUCCESS;
 }

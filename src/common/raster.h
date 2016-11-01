@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-bit *pfan_create_raster(FILE *img);
+bit **pfan_create_rasters(char image_paths[8][8193], int image_nbr);
 
 void pfan_free_rasters(bit **rasters, int n);
 
