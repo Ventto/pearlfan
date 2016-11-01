@@ -15,7 +15,7 @@
 int main(int argc, char **argv)
 {
 	if (argc != 2) {
-		printf("Usage: pearlfan <config_file>\n");
+		printf("Usage: pfan <config>\n");
 		return EXIT_FAILURE;
 	}
 
