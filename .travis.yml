@@ -13,7 +13,7 @@ addons:
 
 script:
     make -f Makefile.module &&
-    make -f Makefile.libusb &&
     sudo make -f Makefile.module install &&
     sudo make -f Makefile.module load &&
-    sudo make -f Makefile.module unload
+    sudo make -f Makefile.module unload &&
+    make -f Makefile.libusb

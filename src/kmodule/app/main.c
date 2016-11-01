@@ -1,4 +1,5 @@
 #include <pbm.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,7 +17,7 @@ int main(int argc, char **argv)
 
 	char *config_file = argv[1];
 	char image_paths[PFAN_DISPLAY_MAX][FILEPATH_MAX];
-	char effects[PFAN_DISPLAY_MAX][3];
+	uint8_t effects[PFAN_DISPLAY_MAX][3];
 	int img_n;
 
 	if ((img_n = pfan_read_config(config_file, image_paths, effects)) < 0) {
@@ -25,7 +26,7 @@ int main(int argc, char **argv)
 	}
 
 	FILE *img = NULL;
-	unsigned char **rasters = malloc(sizeof(void *) * img_n);
+	uint8_t **rasters = malloc(sizeof(void *) * img_n);
 
 	pm_init(argv[0], 0);
 
