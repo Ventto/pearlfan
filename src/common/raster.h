@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-bit **pfan_create_rasters(char image_paths[8][8193], int image_nbr);
+uint8_t **pfan_create_rasters(char image_paths[8][8193], int image_nbr);
 
-void pfan_free_rasters(bit **rasters, int n);
+void pfan_free_rasters(uint8_t **rasters, int n);
 
 #endif /* !RASTER_H_ */

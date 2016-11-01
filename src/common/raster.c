@@ -37,11 +37,11 @@ static bit *create_raster(FILE *img)
 	return raster;
 }
 
-bit **pfan_create_rasters(char image_paths[8][8193], int image_nbr)
+uint8_t **pfan_create_rasters(char image_paths[8][8193], int image_nbr)
 {
 	pm_init("pfan", 0);
 
-	bit **rasters = malloc(sizeof(void *) * image_nbr);
+	uint8_t **rasters = malloc(sizeof(void *) * image_nbr);
 
 	if (!rasters)
 		return NULL;
@@ -62,7 +62,7 @@ bit **pfan_create_rasters(char image_paths[8][8193], int image_nbr)
 	return rasters;
 }
 
-void pfan_free_rasters(bit **rasters, int n)
+void pfan_free_rasters(uint8_t **rasters, int n)
 {
 	if (!rasters)
 		return;

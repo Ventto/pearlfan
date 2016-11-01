@@ -1,64 +1,55 @@
-#include <pbm.h>
+#include <fcntl.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <unistd.h>
 
 #include "config.h"
 #include "devinfo.h"
 #include "raster.h"
+#include "send.h"
 
 int main(int argc, char **argv)
 {
 	if (argc != 2) {
 		printf("Usage: pfan <config>\n");
-		return EXIT_FAILURE;
+		return 1;
 	}
 
 	char *config_file = argv[1];
-	char image_paths[PFAN_DISPLAY_MAX][FILEPATH_MAX];
-	uint8_t effects[PFAN_DISPLAY_MAX][3];
+	char image_paths[8][FILEPATH_MAX];
+	uint8_t effects[8][3];
 	int image_nbr;
 
 	if ((image_nbr = pfan_read_config(config_file, image_paths, effects)) < 0) {
 		printf("pfan: invalid config file.\n\n");
-		return EXIT_FAILURE;
+		return 1;
 	}
 
-	bit **rasters = pfan_create_rasters(image_paths, image_nbr);
+	uint8_t **images = pfan_create_rasters(image_paths, image_nbr);
 
-	if (!rasters)
-		return EXIT_FAILURE;
+	if (!images)
+		return 1;
 
 	int pfan_fd = open(PFAN_DEVNAME, O_RDWR);
 
 	if (pfan_fd <= 0) {
-		pfan_free_rasters(rasters, image_nbr);
+		pfan_free_rasters(images, image_nbr);
 		printf("pfan: device cannot be opened or found.\n\n");
-		return EXIT_FAILURE;
+		return 1;
 	}
 
 	printf("pfan: device found.\n");
-
-	struct pfan_data *data = malloc(sizeof(struct pfan_data));
-	int ret = EXIT_SUCCESS;
-
-	memset(data, 0, sizeof(struct pfan_data));
-
-	data->n = image_nbr;
-	memcpy(data->effects, effects, sizeof(effects));
-	data->images = rasters;
-
 	printf("pfan: transfer is starting.\n");
-	if (write(pfan_fd, data, sizeof(struct pfan_data)) <= 0) {
-		printf("pfan: transfer is not complete.\n\n");
-		ret = EXIT_FAILURE;
-	}
 
-	printf("pfan: transfer is complete.\n\n");
+	int ret = 0;
+
+	if (send(pfan_fd, image_nbr, images, effects) < sizeof(struct pfan_data)) {
+		printf("pfan: transfer was aborted.\n\n");
+		ret = 1;
+	} else
+		printf("pfan: transfer is complete.\n\n");
 
 	close(pfan_fd);
-	free(data);
-	pfan_free_rasters(rasters, image_nbr);
+	pfan_free_rasters(images, image_nbr);
 	return ret;
 }

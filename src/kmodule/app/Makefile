@@ -1,7 +1,6 @@
-EXE            = pfan
-COMMON_SRCS    = ../../common/raster.c ../../common/config.c
-SRCS          += $(COMMON_SRCS) main.c
-OBJS           = $(SRCS:.c=.o)
+EXE     = pfan
+SRCS    = ../../common/raster.c ../../common/config.c send.c main.c
+OBJS    = $(SRCS:.c=.o)
 
 CC      = gcc
 INCS    = -I../../common -I/usr/include/netpbm
