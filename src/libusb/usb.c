@@ -13,21 +13,22 @@ libusb_device_handle *pfan_open(libusb_context *ctx, int vid, int pid)
 		libusb_open_device_with_vid_pid(ctx, vid, pid);
 
 	if (!dev_handle) {
-		printf("pfan: device cannot be opened or found.\n\n");
+		fprintf(stderr, "Device can not be opened or found.\n");
+		fprintf(stderr, "You may need permission.\n\n");
 		return NULL;
 	}
 
 	if (libusb_kernel_driver_active(dev_handle, 0) == 1) {
 		if (libusb_detach_kernel_driver(dev_handle, 0) != 0) {
 			libusb_close(dev_handle);
-			printf("pfan: can not dettach the device from the driver.\n\n");
+			fprintf(stderr, "Can not dettach the device from the driver.\n\n");
 			return NULL;
 		}
 	}
 
 	if (libusb_claim_interface(dev_handle, 0) < 0) {
 		libusb_close(dev_handle);
-		printf("pfan: cannot claim the interface.\n\n");
+		fprintf(stderr, "Cannot claim the interface.\n\n");
 		return NULL;
 	}
 
@@ -55,8 +56,8 @@ static int send(libusb_device_handle *dev_handle, void *data)
 }
 
 int pfan_send(libusb_device_handle *dev_handle, int img_n,
-		uint8_t effects[PFAN_DISPLAY_MAX][3],
-		uint16_t displays[PFAN_DISPLAY_MAX][PFAN_IMG_W])
+		      uint8_t effects[PFAN_DISPLAY_MAX][3],
+		      uint16_t displays[PFAN_DISPLAY_MAX][PFAN_IMG_W])
 {
 	for (uint8_t i = 0; i < img_n; i++) {
 		uint64_t effect = pfan_convert_effect(i, effects[i]);

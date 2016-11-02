@@ -3,11 +3,16 @@
 
 #include <stdint.h>
 
-#define FILEPATH_MAX        8193
-#define PFAN_DISPLAY_MAX    8
+#define PFAN_IMG_MAX   8
 
-int pfan_read_config(char *filename,
-		char image_paths[PFAN_DISPLAY_MAX][FILEPATH_MAX],
-		uint8_t effects[PFAN_DISPLAY_MAX][3]);
+int pfan_read_cfg(char *path,
+                  char img_paths[PFAN_IMG_MAX][4096],
+                  uint8_t effects[PFAN_IMG_MAX][3],
+                  int fastmode);
+
+int pfan_read_dir(char *path,
+                  char img_paths[PFAN_IMG_MAX][4096],
+                  uint8_t effects[PFAN_IMG_MAX][3],
+                  int fastmode);
 
 #endif /* !CONFIG_H_ */

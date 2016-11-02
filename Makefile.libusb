@@ -1,5 +1,9 @@
 EXE         = pfan
-COMMON_SRCS = src/common/config.c src/common/convert.c src/common/raster.c
+COMMON_SRCS = src/common/config.c \
+			  src/common/convert.c \
+			  src/common/ioutils.c \
+			  src/common/optutils.c \
+			  src/common/raster.c
 SRCS        = $(COMMON_SRCS) src/libusb/usb.c src/libusb/main.c
 OBJS        = $(SRCS:.c=.o)
 

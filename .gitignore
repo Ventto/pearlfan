@@ -9,6 +9,10 @@ src/common/*
 !src/common/convert.h
 !src/common/convert.c
 !src/common/devinfo.h
+!src/common/ioutils.c
+!src/common/ioutils.h
+!src/common/optutils.c
+!src/common/optutils.h
 !src/common/raster.h
 !src/common/raster.c
 
@@ -34,11 +38,13 @@ src/libusb/*
 !src/libusb/usb.h
 !src/libusb/main.c
 
-!tests/*
+!tests/
 tests/*
 !tests/check-userdriver.sh
-!tests/custom.config
-!tests/images/*
+!tests/images/
+tests/images/*
+!tests/images/file.config
+!tests/images/*.pbm
 
 !Makefile.libusb
 !Makefile.module

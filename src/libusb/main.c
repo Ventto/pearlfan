@@ -1,3 +1,5 @@
+#include <fcntl.h>
+#include <getopt.h>
 #include <libusb-1.0/libusb.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -7,72 +9,78 @@
 #include "config.h"
 #include "convert.h"
 #include "devinfo.h"
+#include "optutils.h"
 #include "raster.h"
 #include "usb.h"
 
 int main(int argc, char **argv)
 {
-	if (argc != 2) {
-		printf("Usage: pfan <config>\n");
+	pfan_opts opts;
+	int ret;
+
+	if (( ret = pfan_getopt(argc, argv, &opts) ) != PFAN_VALID_OPT)
+		return ret;
+
+	char    img_paths[PFAN_IMG_MAX][4096];
+	uint8_t effects[PFAN_IMG_MAX][3];
+	int     img_nbr;
+
+	if (opts.cflag &&
+		( img_nbr = pfan_read_cfg(opts.carg, img_paths, effects,
+				opts.fflag) ) < 0) {
+		fprintf(stderr, "Invalid config file.\n\n");
 		return 1;
 	}
 
-	char *config_file = argv[1];
-
-	if(access(config_file, F_OK ) == -1 ) {
-		printf("pfan: '%s' does not exist.\n", config_file);
+	if (opts.dflag &&
+		( img_nbr = pfan_read_dir(opts.darg, img_paths, effects,
+				opts.fflag) ) < 0) {
+		fprintf(stderr, "Can not open '%s' directory.\n\n", opts.darg);
 		return 1;
 	}
 
-	char image_paths[PFAN_DISPLAY_MAX][FILEPATH_MAX];
-	uint8_t effects[PFAN_DISPLAY_MAX][3];
-	int image_nbr;
-
-	if ((image_nbr = pfan_read_config(config_file, image_paths, effects)) < 0) {
-		printf("pfan: invalid config file.\n\n");
-		return 1;
-	}
-
-	if (!image_nbr)
+	if (!img_nbr) {
+		fprintf(stdout, "No PBM image found.\n\n");
 		return 0;
+	}
 
-	uint8_t **rasters = pfan_create_rasters(image_paths, image_nbr);
+	uint8_t **rasters = pfan_create_rasters(img_paths, img_nbr);
 
 	if (!rasters)
 		return 1;
 
-	uint16_t displays[PFAN_DISPLAY_MAX][PFAN_IMG_W];
+	uint16_t displays[PFAN_IMG_MAX][PFAN_IMG_W];
 
 	memset(displays, 0xFF, sizeof(displays));
 
-	for (int i = 0; i < image_nbr ; i++)
+	for (int i = 0; i < img_nbr ; i++)
 		pfan_convert_raster(i, rasters[i], displays[i]);
 
 	libusb_device_handle *usb_handle = NULL;
 	libusb_context *usb_ctx = NULL;
 
 	if (libusb_init(&usb_ctx) < 0) {
-		pfan_free_rasters(rasters, image_nbr);
-		printf("pfan: libusb initialization failed.\n\n");
+		pfan_free_rasters(rasters, img_nbr);
+		fprintf(stderr, "Libusb initialization failed.\n\n");
 		return 1;
 	}
 
 	usb_handle = pfan_open(usb_ctx, PFAN_VID, PFAN_PID);
 	if (!usb_handle) {
-		pfan_free_rasters(rasters, image_nbr);
+		pfan_free_rasters(rasters, img_nbr);
 		libusb_exit(usb_ctx);
 		return 1;
 	}
 
-	printf("pfan: device found.\n");
-	printf("pfan: transfer is starting.\n");
-	if (pfan_send(usb_handle, image_nbr, effects, displays) != 0) {
-		printf("pfan: transfer is not complete.\n\n");
+	printf("Device found.\n");
+	printf("Transfer is starting.\n");
+	if (pfan_send(usb_handle, img_nbr, effects, displays) != 0) {
+		fprintf(stderr, "Transfer is not complete.\n\n");
 		return 1;
 	}
-	printf("pfan: transfer is complete.\n\n");
+	printf("Transfer is complete.\n\n");
 	pfan_close(usb_ctx, usb_handle);
-	pfan_free_rasters(rasters, image_nbr);
+	pfan_free_rasters(rasters, img_nbr);
 
 	return 0;
 }

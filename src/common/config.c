@@ -1,3 +1,4 @@
+#include <dirent.h>
 #include <libgen.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -6,69 +7,69 @@
 #include <unistd.h>
 
 #include "config.h"
+#include "getopt.h"
 
 #define OPEN           0
 #define CLOSE          1
 #define BEFORE_CLOSE   2
 
-static void concat_path(char buf[FILEPATH_MAX],
-		const char *dir,
-		const char *relpath)
+static void concat_path(char buf[4096], const char *dir, const char *imgname)
 {
 	buf[0] = '\0';
 	strncat(buf, dir, strlen(dir));
-	strncat(buf, "/", 1);
-	strncat(buf, relpath, strlen(relpath));
+	if (dir[strlen(dir) - 1] != '/')
+		strncat(buf, "/", 1);
+	strncat(buf, imgname, strlen(imgname));
 }
 
-static inline int check_open(uint8_t value)
+static int isvalid_effect(uint8_t effect[3])
 {
-	return value >= 0 && value <= 6;
+	return effect[OPEN] <= 6 && effect[CLOSE] <= 6
+				&& (effect[BEFORE_CLOSE] == 0
+					|| effect[BEFORE_CLOSE] == 4
+					|| effect[BEFORE_CLOSE] == 6);
 }
 
-static inline int check_close(uint8_t value)
+int pfan_read_cfg(char *path,
+                  char img_paths[PFAN_IMG_MAX][4096],
+                  uint8_t effects[PFAN_IMG_MAX][3],
+                  int fastmode)
 {
-	return check_open(value);
-}
+	FILE *file = fopen(path, "r");
 
-static inline int check_beforeclose(uint8_t value)
-{
-	return value == 0 || value == 6;
-}
-
-int pfan_read_config(char *filename,
-		char image_paths[PFAN_DISPLAY_MAX][FILEPATH_MAX],
-		uint8_t effects[PFAN_DISPLAY_MAX][3])
-{
-	FILE *file = fopen(filename, "r");
-
-	if (!file) {
-		printf("%s: permission denied.\n", filename);
+	if (!file ) {
+		fprintf(stderr, "Can not open to '%s'.\n", path);
 		return -1;
 	}
 
-	char *dir = dirname(filename);
-	char relpath[FILEPATH_MAX];
+	char *dirpath = dirname(path);
+	char imgname[256];
 	int n = 0;
 	int matchs;
 
-	while (n < PFAN_DISPLAY_MAX && (matchs =
-			fscanf(file, "%[^+]+%hhu/%hhu/%hhu\n", relpath,
-					&effects[n][OPEN],
-					&effects[n][CLOSE],
-					&effects[n][BEFORE_CLOSE])) == 4) {
+	while (n < PFAN_IMG_MAX
+			&& ( matchs = fscanf(file, "%s%*[ \t]+%hhu-%hhu-%hhu\n", imgname,
+				&effects[n][OPEN],
+				&effects[n][CLOSE],
+				&effects[n][BEFORE_CLOSE]) ) == 4) {
 
-		concat_path(image_paths[n], dir, relpath);
+		char *ext = strrchr(imgname, '.');
 
-		if(access(image_paths[n], F_OK ) == -1 ) {
-			printf("pfan: image '%s' does not exist.\n", image_paths[n]);
+		if (!ext || strcmp(ext, ".pbm") != 0) {
+			fprintf(stderr, "%s: invalid extension, expected '.pbm'.\n",
+					imgname);
 			break;
 		}
 
-		if (!check_open(effects[n][OPEN])
-				|| !check_close(effects[n][CLOSE])
-				|| !check_beforeclose(effects[n][BEFORE_CLOSE])) {
-			printf("pfan: bad effect values for '%s'.\n", image_paths[n]);
+		concat_path(img_paths[n], dirpath, imgname);
+
+		if(access(img_paths[n], F_OK ) == -1 ) {
+			fprintf(stderr, "Image '%s' does not exist.\n", img_paths[n]);
+			break;
+		}
+
+		if (!isvalid_effect(effects[n])) {
+			fprintf(stderr, "Invalid effect value for '%s'.\n", img_paths[n]);
 			break;
 		}
 
@@ -77,7 +78,38 @@ int pfan_read_config(char *filename,
 
 	fclose(file);
 
-	if (matchs != EOF && n < PFAN_DISPLAY_MAX)
+	if (matchs != EOF && n < PFAN_IMG_MAX)
 		return -1;
+	return n;
+}
+
+int pfan_read_dir(char *path,
+                  char img_paths[PFAN_IMG_MAX][4096],
+                  uint8_t effects[PFAN_IMG_MAX][3],
+                  int fastmode)
+{
+	memset(effects, (uint8_t)(fastmode) ? 6 : 0, 24);
+
+	struct dirent *dp;
+	DIR *dir = opendir(path);
+	int n = 0;
+
+	if(!dir)
+		return -1;
+
+	while((dp = readdir(dir)) != NULL) {
+		char *ext = strrchr(dp->d_name, '.');
+
+		if (!ext)
+			continue;
+
+		if (strcmp(ext, ".pbm") == 0) {
+			concat_path(img_paths[n], path, dp->d_name);
+			fprintf(stdout, "%s\n", img_paths[n]);
+			++n;
+		}
+	}
+	fprintf(stdout, "\n");
+	closedir(dir);
 	return n;
 }
