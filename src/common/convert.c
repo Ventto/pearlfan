@@ -11,7 +11,7 @@
 #define BEFORE_CLOSE    2
 
 unsigned long long pfan_convert_effect(const char id,
-		const char unsigned effect[3])
+                                       const unsigned char effect[3])
 {
 	unsigned short opts = 0;
 
@@ -24,8 +24,9 @@ unsigned long long pfan_convert_effect(const char id,
 }
 EXPORT_SYMBOL(pfan_convert_effect);
 
-void pfan_convert_raster(char id, unsigned char *raster,
-		unsigned short display[PFAN_IMG_W])
+void pfan_convert_raster(char id,
+                         unsigned char *raster,
+                         unsigned short display[PFAN_IMG_W])
 {
 	unsigned char col_end;
 	unsigned char i;

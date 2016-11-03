@@ -18,7 +18,7 @@ int main(int argc, char **argv)
 	pfan_opts opts;
 	int ret;
 
-	if (( ret = pfan_getopt(argc, argv, &opts) ) != PFAN_VALID_OPT)
+	if ((ret = pfan_getopt(argc, argv, &opts)) != PFAN_VALID_OPT)
 		return ret;
 
 	char    img_paths[PFAN_IMG_MAX][4096];
@@ -26,15 +26,15 @@ int main(int argc, char **argv)
 	int     img_nbr;
 
 	if (opts.cflag &&
-		( img_nbr = pfan_read_cfg(opts.carg, img_paths, effects,
-				opts.fflag) ) < 0) {
+		(img_nbr = pfan_read_cfg(opts.carg, img_paths, effects,
+				opts.fflag)) < 0) {
 		fprintf(stderr, "Invalid config file.\n\n");
 		return 1;
 	}
 
 	if (opts.dflag &&
-		( img_nbr = pfan_read_dir(opts.darg, img_paths, effects,
-				opts.fflag) ) < 0) {
+		(img_nbr = pfan_read_dir(opts.darg, img_paths, effects,
+				opts.fflag)) < 0) {
 		fprintf(stderr, "Can not open '%s' directory.\n\n", opts.darg);
 		return 1;
 	}

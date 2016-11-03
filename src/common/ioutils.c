@@ -15,10 +15,10 @@ int pfan_isdir(char *path)
 }
 
 int pfan_readaccess_file(char *path)
- {
+{
 	FILE *file = fopen(path, "r");
 
-	if (!file ) {
+	if (!file) {
 		fprintf(stderr, "Can not open to '%s'.\n", path);
 		return 0;
 	}

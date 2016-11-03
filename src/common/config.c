@@ -37,7 +37,7 @@ int pfan_read_cfg(char *path,
 {
 	FILE *file = fopen(path, "r");
 
-	if (!file ) {
+	if (!file) {
 		fprintf(stderr, "Can not open to '%s'.\n", path);
 		return -1;
 	}
@@ -48,10 +48,10 @@ int pfan_read_cfg(char *path,
 	int matchs;
 
 	while (n < PFAN_IMG_MAX
-			&& ( matchs = fscanf(file, "%s%*[ \t]+%hhu-%hhu-%hhu\n", imgname,
+			&& (matchs = fscanf(file, "%s%*[ \t]+%hhu-%hhu-%hhu\n", imgname,
 				&effects[n][OPEN],
 				&effects[n][CLOSE],
-				&effects[n][BEFORE_CLOSE]) ) == 4) {
+				&effects[n][BEFORE_CLOSE])) == 4) {
 
 		char *ext = strrchr(imgname, '.');
 
@@ -63,7 +63,7 @@ int pfan_read_cfg(char *path,
 
 		concat_path(img_paths[n], dirpath, imgname);
 
-		if(access(img_paths[n], F_OK ) == -1 ) {
+		if (access(img_paths[n], F_OK) == -1) {
 			fprintf(stderr, "Image '%s' does not exist.\n", img_paths[n]);
 			break;
 		}
@@ -94,10 +94,10 @@ int pfan_read_dir(char *path,
 	DIR *dir = opendir(path);
 	int n = 0;
 
-	if(!dir)
+	if (!dir)
 		return -1;
 
-	while((dp = readdir(dir)) != NULL) {
+	while ((dp = readdir(dir)) != NULL) {
 		char *ext = strrchr(dp->d_name, '.');
 
 		if (!ext)
