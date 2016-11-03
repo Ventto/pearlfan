@@ -12,9 +12,9 @@
 int main(int argc, char **argv)
 {
 	pfan_opts opts;
-	int ret;
+	int ret = 0;
 
-	if (( ret = pfan_getopt(argc, argv, &opts) ) != PFAN_VALID_OPT)
+	if ((ret = pfan_getopt(argc, argv, &opts)) != PFAN_VALID_OPT)
 		return ret;
 
 	char    img_paths[PFAN_IMG_MAX][4096];
@@ -22,15 +22,15 @@ int main(int argc, char **argv)
 	int     img_nbr;
 
 	if (opts.cflag &&
-		( img_nbr = pfan_read_cfg(opts.carg, img_paths, effects,
-				opts.fflag) ) < 0) {
+		(img_nbr = pfan_read_cfg(opts.carg, img_paths, effects,
+				opts.fflag)) < 0) {
 		fprintf(stderr, "Invalid config file.\n\n");
 		return 1;
 	}
 
 	if (opts.dflag &&
-		( img_nbr = pfan_read_dir(opts.darg, img_paths, effects,
-				opts.fflag) ) < 0) {
+		(img_nbr = pfan_read_dir(opts.darg, img_paths, effects,
+				opts.fflag)) < 0) {
 		fprintf(stderr, "Can not open '%s' directory.\n\n", opts.darg);
 		return 1;
 	}
@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 	if (!images)
 		return 1;
 
-	int pfan_fd = open(PFAN_DEVNAME, O_RDWR);
+	int pfan_fd = open(PFAN_DEVNAME, O_WRONLY);
 
 	if (pfan_fd <= 0) {
 		pfan_free_rasters(images, img_nbr);
@@ -57,11 +57,20 @@ int main(int argc, char **argv)
 	fprintf(stdout, "Device found.\n");
 	fprintf(stdout, "Transfer is starting.\n");
 
-	if (send(pfan_fd, img_nbr, images, effects) < sizeof(struct pfan_data)) {
-		fprintf(stderr, "Transfer was aborted.\n\n");
+	int expected_transfer = 320 * img_nbr;
+	int bytes = send(pfan_fd, img_nbr, images, effects);
+
+	ret = 0;
+	if (bytes < expected_transfer) {
 		ret = 1;
-	} else
+		fprintf(stderr, "Transfer aborted.\n");
+		if (bytes >= 0)
+			fprintf(stderr, "( %d / %d )\n\n", bytes, expected_transfer);
+		else
+			fprintf(stderr, "Transfer error (usberr = %d)\n\n", bytes);
+	} else {
 		fprintf(stdout, "Transfer is complete.\n\n");
+	}
 
 	close(pfan_fd);
 	pfan_free_rasters(images, img_nbr);

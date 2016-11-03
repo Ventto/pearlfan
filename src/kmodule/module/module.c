@@ -26,6 +26,7 @@ static struct usb_driver pfan_driver;
 static int send(struct usb_device *udev, void *data)
 {
 	char buf[8];
+	int bytes = 0;
 	int l = 0;
 	int ret;
 
@@ -33,14 +34,16 @@ static int send(struct usb_device *udev, void *data)
 	buf[7] = 0x02;
 
 	ret = usb_control_msg(udev, usb_sndctrlpipe(udev, 0), 0x09, 0x21, 0x200,
-			0x00, data, 0x008, 10 * HZ);
-
-	if (ret <= 0)
+						0x00, data, 0x008, 10 * HZ);
+	if (ret < 0)
 		return ret;
+	bytes += ret;
 
-	usb_interrupt_msg(udev, usb_rcvintpipe(udev, 1), buf, 8, &l, 10 * HZ);
-
-	return 0;
+	ret = usb_interrupt_msg(udev, usb_rcvintpipe(udev, 1), buf, 8, &l,
+							10 * HZ);
+	if (ret < 0)
+		return ret;
+	return bytes;
 }
 
 static int pfan_open(struct inode *inode, struct file *file)
@@ -50,7 +53,7 @@ static int pfan_open(struct inode *inode, struct file *file)
 
 static int pfan_release(struct inode *inode, struct file *file)
 {
-  return 0;
+	return 0;
 }
 
 static ssize_t pfan_write(struct file *f,
@@ -60,8 +63,10 @@ static ssize_t pfan_write(struct file *f,
 {
 	struct pfan_data *data = NULL;
 	u16 display[PFAN_IMG_W];
+	int bytes = 0;
 	int i;
 	int j;
+	int ret;
 
 	if (cnt == 0) {
 		pr_err("%s: buffer size is null !\n", __func__);
@@ -83,15 +88,26 @@ static ssize_t pfan_write(struct file *f,
 
 	for (i = 0; i < data->n; ++i) {
 		u64 effect = pfan_convert_effect(i, data->effects[i]);
-		send(pfan_device, &effect);
+
+		ret = send(pfan_device, &effect);
+		if (ret < 0)
+			return ret;
+		else if (ret < 8)
+			break;
+		bytes += ret;
 		for (j = 0; j < 39; j++) {
 			memset(&display, 0xFF, sizeof(display));
 			pfan_convert_raster(i, data->images[i], display);
-			send(pfan_device, (u16 *)&display[j * 4]);
+			ret = send(pfan_device, (u16 *)&display[j * 4]);
+			if (ret < 0)
+				return ret;
+			else if (ret < 8)
+				break;
+			bytes += ret;
 		}
 	}
 
-	return 1;
+	return bytes;
 }
 
 static struct file_operations pfan_fops = {
@@ -107,7 +123,7 @@ static struct usb_class_driver pfan_class = {
 };
 
 static int pfan_probe(struct usb_interface *interface,
-                      const struct usb_device_id *id)
+		const struct usb_device_id *id)
 {
 	struct usb_device *udev = interface_to_usbdev(interface);
 	int ret = usb_register_dev(interface, &pfan_class);

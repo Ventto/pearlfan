@@ -72,15 +72,27 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	printf("Device found.\n");
-	printf("Transfer is starting.\n");
-	if (pfan_send(usb_handle, img_nbr, effects, displays) != 0) {
-		fprintf(stderr, "Transfer is not complete.\n\n");
-		return 1;
+	fprintf(stdout, "Device found.\n");
+	fprintf(stdout, "Transfer is starting.\n");
+
+
+	int expected_transfer = 320 * img_nbr;
+	int bytes = pfan_send(usb_handle, img_nbr, effects, displays);
+
+	ret = 0;
+
+	if (bytes < expected_transfer) {
+		fprintf(stderr, "Transfer aborted.\n");
+		if (bytes >= 0)
+			fprintf(stderr, "( %d / %d bytes)\n\n", bytes, expected_transfer);
+		else
+			fprintf(stderr, "Transfer error (libusberr = %d)\n\n", bytes);
+		ret = 1;
 	}
-	printf("Transfer is complete.\n\n");
+
+	fprintf(stdout, "Transfer is complete.\n\n");
 	pfan_close(usb_ctx, usb_handle);
 	pfan_free_rasters(rasters, img_nbr);
 
-	return 0;
+	return ret;
 }
