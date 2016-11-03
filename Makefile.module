@@ -17,6 +17,8 @@ all:
 install:
 	$(MAKE) $(MFLAGS) -C $(ML_DRIVER_SRCDIR) install
 	cp $(ML_SRCDIR)/rules.d/$(ML_UDEVRULE) /etc/udev/rules.d/$(ML_UDEVRULE)
+	udevadm control --reload-rules
+	insmod $(ML_DRIVER_SRCDIR)/$(ML_NAME).ko
 
 clean:
 	$(MAKE) $(MFLAGS) -C $(ML_DRIVER_SRCDIR) clean
@@ -26,10 +28,3 @@ clean:
 distclean: clean
 	$(RM) /etc/udev/rules.d/$(ML_UDEVRULE)
 	@rmmod $(ML_NAME)
-
-load:
-	udevadm control --reload-rules
-	insmod $(ML_DRIVER_SRCDIR)/$(ML_NAME).ko
-
-unload:
-	rmmod $(ML_NAME)

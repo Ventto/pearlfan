@@ -14,6 +14,5 @@ addons:
 script:
     make -f Makefile.module &&
     sudo make -f Makefile.module install &&
-    sudo make -f Makefile.module load &&
-    sudo make -f Makefile.module unload &&
+    sudo make -f Makefile.module distclean &&
     make -f Makefile.libusb

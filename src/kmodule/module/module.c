@@ -21,7 +21,6 @@ static struct usb_device_id id_table[] = {
 MODULE_DEVICE_TABLE(usb, id_table);
 
 static struct usb_device *pfan_device;
-static struct usb_driver pfan_driver;
 
 static int send(struct usb_device *udev, void *data)
 {
@@ -148,7 +147,7 @@ static void pfan_disconnect(struct usb_interface *interface)
 	dev_info(&interface->dev, "device now disconnected\n");
 }
 
-static struct usb_driver driver = {
+static struct usb_driver pfan_driver = {
 	.name       = "pfan",
 	.probe      = pfan_probe,
 	.disconnect = pfan_disconnect,
@@ -157,9 +156,7 @@ static struct usb_driver driver = {
 
 static int __init pfan_init(void)
 {
-	int ret = usb_register(&driver);
-
-	pfan_driver = driver;
+	int ret = usb_register(&pfan_driver);
 
 	if (ret < 0) {
 		pr_err("unable to register the driver\n");
