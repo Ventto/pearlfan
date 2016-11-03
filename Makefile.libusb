@@ -1,4 +1,4 @@
-EXE         = pfan
+EXE         = pearlfan
 COMMON_SRCS = src/common/config.c \
 			  src/common/convert.c \
 			  src/common/ioutils.c \

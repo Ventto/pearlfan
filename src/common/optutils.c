@@ -33,11 +33,39 @@ static int missing_optvar(char opt)
 
 static void usage(void)
 {
-	fprintf(stdout, "Usage: pfan <file.config>\n");
-	fprintf(stdout, "<file.config> has to follow the pattern below:\n");
-	fprintf(stdout, "{relative_imagepath}+{open}/{close}/{before_close}\n");
-	fprintf(stdout, "See more details:");
-	fprintf(stdout, "https://github.com/Ventto/pearlfan#configuration-file\n");
+	fprintf(stdout, "Usage:\tpearlfan [-f] [-c FILE]\n");
+	fprintf(stdout, "or:\tpearlfan [-f] [-d DIRECTORY]\n\n");
+	fprintf(stdout, "Options:\n\n");
+	fprintf(stdout, "Setting:\n");
+	fprintf(stdout, "  -c:\tDisplays at most eight images with transition ");
+	fprintf(stdout, "effects described in FILE.\n");
+	fprintf(stdout, "  -d:\tDisplays at most eight .PBM images ");
+	fprintf(stdout, "(11x156) in DIRECTORY.\n\n");
+	fprintf(stdout, "Mode:\n");
+	fprintf(stdout, "  -f:\tEnables fast-mode. Disables all others ");
+	fprintf(stdout, "effect transitions.\n\n");
+	fprintf(stdout, "Miscellaneous:\n");
+	fprintf(stdout, "  -h:\tPrints this help and exits.\n");
+	fprintf(stdout, "  -v:\tPrints version info and exits.\n\n");
+	fprintf(stdout, "Examples:\n\n");
+	fprintf(stdout, "Example of configuration file: ");
+	fprintf(stdout, "/usr/share/pearlfan/images/example.config\n\n");
+	fprintf(stdout, "Example of images: ");
+	fprintf(stdout, "/usr/share/pearlfan/images\n\n");
+	fprintf(stdout, "Documentation: <https://github.com/Ventto/pearlfan>\n\n");
+	fprintf(stdout, "Report bugs to <thomas.venries@gmail.com>\n\n");
+}
+
+static void version(void)
+{
+	fprintf(stdout, "Pearlfan 1.0\n\n");
+	fprintf(stdout, "Copyright (C) 2016 Thomas \"Ventto\" Venries.\n\n");
+	fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later "),
+	fprintf(stdout, "<http://gnu.org/licenses/gpl.html>.\n");
+	fprintf(stdout, "This is free software: you are free to change and ");
+	fprintf(stdout, "redistribute it.\n");
+	fprintf(stdout, "There is NO WARRANTY; not even for MERCHANTABILITY ");
+	fprintf(stdout, "or FITNESS FOR A PARTICULAR PURPOSE\n");
 }
 
 int pfan_getopt(int argc, char **argv, pfan_opts *opts)
@@ -53,10 +81,13 @@ int pfan_getopt(int argc, char **argv, pfan_opts *opts)
 
 	memset(opts, 0, sizeof(pfan_opts));
 
-	while ((opt = getopt(argc, argv, "c:d:fh")) != -1) {
+	while ((opt = getopt(argc, argv, "c:d:fhv")) != -1) {
 		switch (opt) {
 		case 'h':
 			usage();
+			return PFAN_NO_OPT;
+		case 'v':
+			version();
 			return PFAN_NO_OPT;
 		case 'c':
 			if (opts->dflag)

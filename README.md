@@ -1,4 +1,5 @@
 
+
 PearlFan
 =========
 
@@ -46,16 +47,27 @@ $ make -f Makefile.libusb
 $ sudo make -f Makefile.module install
 ```
 
-*  Reload udev rules and add the module with *insmod*:
-
-```
-$ sudo make -f Makefile.module load
-```
-
 ## Execute
 
+### Synopsis
+
 ```
-$ ./pfan <config_file>
+pfan [-f] [-c FILE | -d DIRECTORY]
+```
+
+### Options
+
+```
+Images: (can not be used in conjuntion):
+    -c:    Displays at most eight images with transition effects described in FILE
+    -d:    Displays at most eight images in DIRECTORY
+
+Mode: (can be used in conjuntion with image options):
+    -f:    Enables fast-mode. Disables all others effect transitions
+
+Miscellaneous:
+    -h:    Prints this help and exits
+    -v:    Prints version info and exists
 ```
 
 ## Configuration File
@@ -65,37 +77,35 @@ $ ./pfan <config_file>
 This an example of a pfan's configuration file
 
 ```
-images/pacman.pbm+2/2/6
-images/mario.pbm+1/1/6
-images/circle.pbm+0/0/0
-images/cols.pbm+3/3/6
-images/full.pbm+2/5/0
+pacman.pbm  +2-2-0
+mario.pbm   +1-1-6
+circle.pbm  +0-0-0
+cols.pbm    +3-3-6
+full.pbm    +2-5-0
 ```
 
-### How to write it ?
+### Specifications
 
-#### What about the pattern ?
-The config's pattern is: `+{relative_img_path}+{effects}`
-* relative\_img\_path: the relative image's path according to the config file's path
-* effects: the fan provides transition effects when displaying and switching images
-	* pattern: `{open}/{close}/{before_close}`
-	* open: opening transition effect when the fan is beggining displaying an image
-	* close: closing transition effect when the fan is ending displaying an image
-	* before\_close: before displaying the next image the fan can make the image turn and more
+Each configuration file consists of the following:
 
-#### Images
+* line pattern: `{imagename}.pbm+{effects}`
+* Whitespace (blanks and TABs) between `{imagename}.pbm` and `+` are ignored (cf. example above)
+* The image must be in the same directory than the configuration file
+* The image must be [.PBM](http://netpbm.sourceforge.net/doc/pbm.html) image
+* The image size must be: width=11px, height=156px
+* {effects}: the fan provides transition effects when displaying and switching images
+* Effect's pattern: `{open}-{close}-{beforeclose}`
+* Open, close and beforeclose's exclusive values are described in the table below
+* The fan can display at most 8 images
 
-* Image format: [.PBM](http://netpbm.sourceforge.net/doc/pbm.html) image
-* Image size: 11 x 156
-
-**The fan can display at most 8 images. So there is at most 8 lines in the config file.**
-
-#### Effects
+### Effect values
 
 | Effects/Value | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
 |---|---|---|---|---|---|---|---|---|
-| open | right-left | left-right | ecrase | appear | top-bottom | bottom-top | fast-mode |
-| close | left-right | right-left | ecrase | appar | top-bottom | bottom-top | fast-mode |
-| before\_close | none | x | x | turn right-left | x | x | turn left-right |
+| **open** | right-left | left-right | 2-side | red-carpet | top-bottom | bottom-top | x |
+| **close** | left-right | right-left | 2-side | red-carpet | top-bottom | bottom-top | x |
+| **before-close** | none | x | x | turn right-left | x | x | turn left-right |
 
-* fast-mode: skip the opening and before_close transition
+* x: unused and considered as invalid value
+* none: disable
+* fast-mode: skip the 'open' and 'before-close' transition effects

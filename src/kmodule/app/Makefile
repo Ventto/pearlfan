@@ -1,4 +1,4 @@
-EXE     = pfan
+EXE     = pearlfan
 SRCS    = ../../common/config.c \
 		  ../../common/ioutils.c \
 		  ../../common/optutils.c \
