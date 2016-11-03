@@ -20,7 +20,8 @@ static struct usb_device_id id_table[] = {
 };
 MODULE_DEVICE_TABLE(usb, id_table);
 
-static struct usb_device *pfan;
+static struct usb_device *pfan_device;
+static struct usb_driver pfan_driver;
 
 static int send(struct usb_device *udev, void *data)
 {
@@ -42,14 +43,14 @@ static int send(struct usb_device *udev, void *data)
 	return 0;
 }
 
-static int pfan_open(struct inode *i, struct file *f)
+static int pfan_open(struct inode *inode, struct file *file)
 {
 	return 0;
 }
 
-static int pfan_release(struct inode *i, struct file *f)
+static int pfan_release(struct inode *inode, struct file *file)
 {
-	return 0;
+  return 0;
 }
 
 static ssize_t pfan_write(struct file *f,
@@ -82,11 +83,11 @@ static ssize_t pfan_write(struct file *f,
 
 	for (i = 0; i < data->n; ++i) {
 		u64 effect = pfan_convert_effect(i, data->effects[i]);
-		send(pfan, &effect);
+		send(pfan_device, &effect);
 		for (j = 0; j < 39; j++) {
 			memset(&display, 0xFF, sizeof(display));
 			pfan_convert_raster(i, data->images[i], display);
-			send(pfan, (u16 *)&display[j * 4]);
+			send(pfan_device, (u16 *)&display[j * 4]);
 		}
 	}
 
@@ -96,7 +97,7 @@ static ssize_t pfan_write(struct file *f,
 static struct file_operations pfan_fops = {
 	.open    = pfan_open,
 	.release = pfan_release,
-	.write = pfan_write,
+	.write   = pfan_write
 };
 
 static struct usb_class_driver pfan_class = {
@@ -106,40 +107,32 @@ static struct usb_class_driver pfan_class = {
 };
 
 static int pfan_probe(struct usb_interface *interface,
-		const struct usb_device_id *id)
+                      const struct usb_device_id *id)
 {
-	struct usb_device *udev = NULL;
-	int ret;
-
-	udev = interface_to_usbdev(interface);
-
-	if (!udev) {
-		pr_info("%s: device is null.\n", __func__);
-		return -ENOMEM;
-	}
-
-	pfan = usb_get_dev(udev);
-
-	pr_info("%s: device has been connected\n", __func__);
-
-	ret = usb_register_dev(interface, &pfan_class);
+	struct usb_device *udev = interface_to_usbdev(interface);
+	int ret = usb_register_dev(interface, &pfan_class);
 
 	if (ret < 0) {
-		pr_info("%s: unable to register the device.\n", __func__);
+		pr_warn("register_dev() error\n");
 		return ret;
 	}
+
+	pfan_device = usb_get_dev(udev);
+
+	dev_info(&interface->dev, "device now attached\n");
+
 	return 0;
 }
 
 static void pfan_disconnect(struct usb_interface *interface)
 {
-	usb_set_intfdata(interface, NULL);
 	usb_deregister_dev(interface, &pfan_class);
-	kfree(usb_get_intfdata(interface));
-	pr_info("%s: the fan has been disconnected.\n", __func__);
+	usb_put_dev(pfan_device);
+
+	dev_info(&interface->dev, "device now disconnected\n");
 }
 
-static struct usb_driver pfan_driver = {
+static struct usb_driver driver = {
 	.name       = "pfan",
 	.probe      = pfan_probe,
 	.disconnect = pfan_disconnect,
@@ -148,19 +141,21 @@ static struct usb_driver pfan_driver = {
 
 static int __init pfan_init(void)
 {
-	int ret = usb_register(&pfan_driver);
+	int ret = usb_register(&driver);
+
+	pfan_driver = driver;
 
 	if (ret < 0) {
-		pr_info("%s: unable to register the driver.\n", __func__);
+		pr_err("unable to register the driver\n");
 		return ret;
 	}
-	pr_info("%s: the driver has been registered.\n", __func__);
+	pr_info("%s: driver now registered.\n", __func__);
 	return 0;
 }
 
 static void __exit pfan_exit(void)
 {
-	pr_info("%s: the driver has been unregistered.\n", __func__);
+	pr_info("driver now unregistered.\n");
 	usb_deregister(&pfan_driver);
 }
 
