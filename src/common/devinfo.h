@@ -25,17 +25,13 @@
 #define PFAN_PID           0x7701
 
 /**
- * struct ventilo_data - designed to be the buffer as parameter for the module
- * driver's write function.
- * @n: number of displays, eight maximum, [0 ; 7]
- * @effects: the configuration effects for the eight fan displays,
- * contains three options for display effects.
- *	- 1: open effect option  [0 ; 6] <-- range of values
- *	- 2: close effect option [0 ; 6]
- *	- 3: turn effect option  (0, 4, 6)
- * @displays: the eight bitmap displays, each one contains 1716 bytes or
- *	156 * 11 which represents 156 columns of 11 leds each.
- *	A 'display' means a whole ventilo's display.
+ * struct pfan_data - designed to the module driver's write
+ * @n: number of displays (at most 8)
+ * @effects: transition effects for displays:
+ *   - open         [0 ; 5]
+ *   - close        [0 ; 5]
+ *   - before_close (0, 4, 6)
+ * @images: PBM image rasters (156 x 11)
  */
 struct pfan_data {
 	unsigned char n;
