@@ -5,7 +5,7 @@ PearlFan
 
 [![Build Status](https://travis-ci.org/Ventto/bpep.svg?branch=master)](https://travis-ci.org/Ventto/pearlfan)
 [![License](https://img.shields.io/badge/license-GPLv3-blue.svg?style=flat)](https://github.com/Ventto/pearlfan/blob/master/LICENSE)
-[![Status](https://img.shields.io/badge/status-experimental-orange.svg?style=flat)](https://github.com/Ventto/pearlfan/)
+[![Status](https://img.shields.io/badge/status-Release_v1.0-blue.svg?style=flat)](https://github.com/Ventto/pearlfan/releases)
 
 *PearlFan provides a GNU/Linux Kernel driver and a libusb application for the "[PEARL.fr](https://www.pearl.fr/article/PX5939/ventilateur-usb-programmable-avec-message-defilant
 )" USB LED fan.*
@@ -24,12 +24,22 @@ Ubuntu:
 * *libnetpbm10-dev* - Netpbm libraries and header files
 * *libusb-1.0-dev* - Library that provides generic access to USB devices
 
-## Build
+## Install
+
+### Package (AUR)
+
+```
+$ yaourt -S pearlfan (or)
+$ pacaur -S pearlfan
+```
+
+### Manually
 
 * Kernel module and its user application:
 
 ```
 $ make -f Makefile.module
+$ sudo make -f Makefile.module install
 ```
 
 * Libusb application:
@@ -38,36 +48,28 @@ $ make -f Makefile.module
 $ make -f Makefile.libusb
 ```
 
-## Install the kernel module
-
-
-* Install the module and its udev rule file:
-
-```
-$ sudo make -f Makefile.module install
-```
-
 ## Execute
 
 ### Synopsis
 
 ```
-pfan [-f] [-c FILE | -d DIRECTORY]
+pearlfan [-f] [-c FILE]
+pearlfan [-f] [-d DIRECTORY]
 ```
 
 ### Options
 
 ```
-Images: (can not be used in conjuntion):
-    -c:    Displays at most eight images with transition effects described in FILE
-    -d:    Displays at most eight images in DIRECTORY
+Setting:
+  -c:  Displays at most eight images with transition effects described in FILE.
+  -d:  Displays at most eight .PBM images (156x11) in DIRECTORY.
 
-Mode: (can be used in conjuntion with image options):
-    -f:    Enables fast-mode. Disables all others effect transitions
+Mode:
+  -f:  Enables fast-mode. Disables all others effect transitions.
 
 Miscellaneous:
-    -h:    Prints this help and exits
-    -v:    Prints version info and exists
+  -h:  Prints this help and exits.
+  -v:  Prints version info and exits.
 ```
 
 ## Configuration File
@@ -104,7 +106,7 @@ Each configuration file consists of the following:
 |---|---|---|---|---|---|---|---|---|
 | **open** | right-left | left-right | 2-side | red-carpet | top-bottom | bottom-top | x |
 | **close** | left-right | right-left | 2-side | red-carpet | top-bottom | bottom-top | x |
-| **before-close** | none | x | x | turn right-left | x | x | turn left-right |
+| **before-close** | none | x | x | x | turn right-left | x | turn left-right |
 
 * x: unused and considered as invalid value
 * none: disable
