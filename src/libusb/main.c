@@ -62,7 +62,7 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-	uint8_t **rasters = pfan_create_rasters(img_paths, img_nbr);
+	uint8_t **rasters = pfan_create_img_rasters(img_paths, img_nbr);
 
 	if (!rasters)
 		return 1;

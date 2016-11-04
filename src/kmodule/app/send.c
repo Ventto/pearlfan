@@ -24,7 +24,7 @@
 #include "devinfo.h"
 #include "send.h"
 
-int send(int fd, int image_nbr, uint8_t **images, uint8_t effects[8][3])
+int pfan_send(int fd, int image_nbr, uint8_t **images, uint8_t effects[8][3])
 {
 	struct pfan_data *data = malloc(sizeof(struct pfan_data));
 

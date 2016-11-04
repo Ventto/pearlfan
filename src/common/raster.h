@@ -21,7 +21,7 @@
 
 #include <stdint.h>
 
-uint8_t **pfan_create_rasters(char image_paths[8][4096], int image_nbr);
+uint8_t **pfan_create_img_rasters(char image_paths[8][4096], int n);
 
 void pfan_free_rasters(uint8_t **rasters, int n);
 

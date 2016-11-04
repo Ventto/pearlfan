@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-	uint8_t **images = pfan_create_rasters(img_paths, img_nbr);
+	uint8_t **images = pfan_create_img_rasters(img_paths, img_nbr);
 
 	if (!images)
 		return 1;
@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 	fprintf(stdout, "Transfer is starting.\n");
 
 	int expected_transfer = 320 * img_nbr;
-	int bytes = send(pfan_fd, img_nbr, images, effects);
+	int bytes = pfan_send(pfan_fd, img_nbr, images, effects);
 
 	ret = 0;
 	if (bytes < expected_transfer) {

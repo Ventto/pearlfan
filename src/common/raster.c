@@ -25,7 +25,7 @@
 #define PFAN_IMG_W    156
 #define PFAN_IMG_H    11
 
-static bit *create_raster(FILE *img)
+static bit *create_img_raster(FILE *img)
 {
 	int cols;
 	int rows;
@@ -55,11 +55,11 @@ static bit *create_raster(FILE *img)
 	return raster;
 }
 
-uint8_t **pfan_create_rasters(char img_paths[8][4096], int img_nbr)
+uint8_t **pfan_create_img_rasters(char img_paths[8][4096], int n)
 {
 	pm_init("pfan", 0);
 
-	uint8_t **rasters = malloc(sizeof(void *) * img_nbr);
+	uint8_t **rasters = malloc(sizeof(void *) * n);
 
 	if (!rasters) {
 		fprintf(stderr, "Can not allocate raster container.\n");
@@ -68,14 +68,14 @@ uint8_t **pfan_create_rasters(char img_paths[8][4096], int img_nbr)
 
 	FILE *img = NULL;
 
-	for (int i = 0; i < img_nbr; ++i) {
+	for (int i = 0; i < n; ++i) {
 		img = pm_openr(img_paths[i]);
 		if (!img) {
 			pfan_free_rasters(rasters, i);
 			fprintf(stderr, "Can not open '%s'\n", img_paths[i]);
 			return NULL;
 		}
-		rasters[i] = create_raster(img);
+		rasters[i] = create_img_raster(img);
 		pm_close(img);
 	}
 
