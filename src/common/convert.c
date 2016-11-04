@@ -16,13 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Pearlfan.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef EXPORT_SYMBOL
-#define EXPORT_SYMBOL(sym)
-#endif
-
 #include <linux/kernel.h>
 
 #include "convert.h"
+
+#ifndef EXPORT_SYMBOL
+#define EXPORT_SYMBOL(sym)
+#endif
 
 #define OPEN            0
 #define CLOSE           1
