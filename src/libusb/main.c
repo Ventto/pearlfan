@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 	}
 
 	if (!img_nbr) {
-		fprintf(stdout, "No PBM image found.\n\n");
+		fprintf(stdout, "No .PBM image found.\n\n");
 		return 0;
 	}
 

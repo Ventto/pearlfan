@@ -58,7 +58,7 @@ static void usage(void)
 	fprintf(stdout, "  -c:\tDisplays at most eight images with transition ");
 	fprintf(stdout, "effects described in FILE.\n");
 	fprintf(stdout, "  -d:\tDisplays at most eight .PBM images ");
-	fprintf(stdout, "(11x156) in DIRECTORY.\n\n");
+	fprintf(stdout, "(156x11) in DIRECTORY.\n\n");
 	fprintf(stdout, "Mode:\n");
 	fprintf(stdout, "  -f:\tEnables fast-mode. Disables all others ");
 	fprintf(stdout, "effect transitions.\n\n");
@@ -66,10 +66,8 @@ static void usage(void)
 	fprintf(stdout, "  -h:\tPrints this help and exits.\n");
 	fprintf(stdout, "  -v:\tPrints version info and exits.\n\n");
 	fprintf(stdout, "Examples:\n\n");
-	fprintf(stdout, "Example of configuration file: ");
-	fprintf(stdout, "/usr/share/pearlfan/images/example.config\n\n");
-	fprintf(stdout, "Example of images: ");
-	fprintf(stdout, "/usr/share/pearlfan/images\n\n");
+	fprintf(stdout, "Example of configuration file and images: ");
+	fprintf(stdout, "/usr/share/pearlfan\n\n");
 	fprintf(stdout, "Documentation: <https://github.com/Ventto/pearlfan>\n\n");
 	fprintf(stdout, "Report bugs to <thomas.venries@gmail.com>\n\n");
 }

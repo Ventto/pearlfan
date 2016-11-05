@@ -35,18 +35,18 @@ static bit *create_img_raster(FILE *img)
 	pbm_readpbminit(img, &cols, &rows, &format);
 
 	if (cols != PFAN_IMG_W && rows != PFAN_IMG_H) {
-		printf("pfan: invalid image sizes, '11x156' is required.\n");
+		fprintf(stdout, "Invalid image size, '156x11' is required.\n");
 		return NULL;
 	}
 
 	if (format != PBM_FORMAT) {
-		printf("pfan: invalid image file sizes.\n");
+		fprintf(stdout, "Invalid .PBM format.\n");
 		return NULL;
 	}
 
 	raster = pbm_allocrow(PFAN_IMG_W * PFAN_IMG_H);
 	if (!raster) {
-		printf("pfan: cannot allocate the raster.\n");
+		fprintf(stdout, "Can not allocate the raster.\n");
 		return NULL;
 	}
 
@@ -62,7 +62,7 @@ uint8_t **pfan_create_img_rasters(char img_paths[8][4096], int n)
 	uint8_t **rasters = malloc(sizeof(void *) * n);
 
 	if (!rasters) {
-		fprintf(stderr, "Can not allocate raster container.\n");
+		fprintf(stderr, "Can not allocate the raster array.\n");
 		return NULL;
 	}
 
