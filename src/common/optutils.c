@@ -116,8 +116,10 @@ int pfan_getopt(int argc, char **argv, pfan_opts *opts)
 		case 'd':
 			if (opts->cflag)
 				return no_conjunction(opt, 'c');
-			if (!pfan_isdir(optarg))
+			if (!pfan_isdir(optarg)) {
+				fprintf(stderr, "%s: directory does not exist or can't be opened.\n", optarg);
 				return PFAN_INVALID_OPT;
+			}
 			opts->darg = optarg;
 			opts->dflag = 1;
 			break;
