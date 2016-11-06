@@ -26,27 +26,20 @@
 
 static int no_conjunction(char opt_a, char opt_b)
 {
-	fprintf(stderr, "Option -%c cannot be used in conjuntion with %c.\n",
+	fprintf(stderr, "Option -%c cannot be used in conjuntion with %c.\n\n",
 			opt_a, opt_b);
 	return PFAN_INVALID_OPT;
 }
 
 static int missing_optvar(char opt)
 {
-	int missing = PFAN_VALID_OPT;
-
 	switch (opt) {
 	case 'c':
-		missing = PFAN_INVALID_OPT;
-		break;
+		return 1;
 	case 'd':
-		missing = PFAN_INVALID_OPT;
-		break;
+		return 1;
 	}
-
-	if (missing == PFAN_INVALID_OPT)
-		fprintf(stderr, "Missing argument for option -%c.\n", opt);
-	return missing;
+	return 0;
 }
 
 static void usage(void)
@@ -117,7 +110,7 @@ int pfan_getopt(int argc, char **argv, pfan_opts *opts)
 			if (opts->cflag)
 				return no_conjunction(opt, 'c');
 			if (!pfan_isdir(optarg)) {
-				fprintf(stderr, "%s: directory does not exist or can't be opened.\n", optarg);
+				fprintf(stderr, "%s: directory does not exist or can't be opened.\n\n", optarg);
 				return PFAN_INVALID_OPT;
 			}
 			opts->darg = optarg;
@@ -127,12 +120,21 @@ int pfan_getopt(int argc, char **argv, pfan_opts *opts)
 			opts->fflag = 1;
 			break;
 		case '?':
-			if (!missing_optvar(optopt))
-				fprintf(stderr, "Unknown option `-%c'.\n", optopt);
+			if (missing_optvar(optopt))
+				fprintf(stderr, "Missing argument for option -%c.\n\n", optopt);
+			else
+				fprintf(stderr, "Unknown option `-%c'.\n\n", optopt);
 			return PFAN_INVALID_OPT;
 		default:
 			return PFAN_INVALID_OPT;
 		}
+	}
+	if (!opts->cflag && !opts->dflag) {
+		if (opts->fflag)
+			fprintf(stderr, "Missing setting option.\n\n");
+		else
+			fprintf(stderr, "Missing option.\n\n");
+		return PFAN_INVALID_OPT;
 	}
 	return PFAN_VALID_OPT;
 }
