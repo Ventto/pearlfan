@@ -104,7 +104,7 @@ Each configuration file consists of the following:
 
 | Effects/Value | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
 |---|---|---|---|---|---|---|---|---|
-| **open** | right-left | left-right | 2-side | red-carpet | top-bottom | bottom-top | x |
+| **open** | right-left | left-right | 2-side | red-carpet | top-bottom | bottom-top | fast-mode |
 | **close** | left-right | right-left | 2-side | red-carpet | top-bottom | bottom-top | x |
 | **before-close** | none | x | x | x | turn right-left | x | turn left-right |
 

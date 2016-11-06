@@ -25,6 +25,7 @@
 #include <unistd.h>
 
 #include "config.h"
+#include "defutils.h"
 #include "getopt.h"
 
 #define OPEN           0
@@ -42,10 +43,10 @@ static void concat_path(char buf[4096], const char *dir, const char *imgname)
 
 static int isvalid_effect(uint8_t effect[3])
 {
-	return effect[OPEN] <= 6 && effect[CLOSE] <= 6
-				&& (effect[BEFORE_CLOSE] == 0
-					|| effect[BEFORE_CLOSE] == 4
-					|| effect[BEFORE_CLOSE] == 6);
+	return effect[PFAN_OPEN] <= 6 && effect[PFAN_CLOSE] <= 5
+				&& (effect[PFAN_BEFORECLOSE] == 0
+					|| effect[PFAN_BEFORECLOSE] == 4
+					|| effect[PFAN_BEFORECLOSE] == 6);
 }
 
 int pfan_read_cfg(char *path,
