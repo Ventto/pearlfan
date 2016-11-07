@@ -1,5 +1,5 @@
 obj-m         += pfan.o
-pfan-objs     += ../../common/convert.o module.o
+pfan-objs     += ../../common/draw.o module.o
 ccflags-y += -I$(src)/../../common
 
 KDIR = /lib/modules/$(shell uname -r)/build
