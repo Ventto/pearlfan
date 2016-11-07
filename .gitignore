@@ -10,6 +10,7 @@ src/common/*
 !src/common/devinfo.h
 !src/common/draw.c
 !src/common/draw.h
+!src/common/font.h
 !src/common/ioutils.c
 !src/common/ioutils.h
 !src/common/optutils.c
