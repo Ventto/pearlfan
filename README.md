@@ -3,7 +3,7 @@
 PearlFan
 =========
 
-[![Build Status](https://travis-ci.org/Ventto/bpep.svg?branch=master)](https://travis-ci.org/Ventto/pearlfan)
+[![Build Status](https://travis-ci.org/Ventto/pearlfan.svg?branch=master)](https://travis-ci.org/Ventto/pearlfan)
 [![License](https://img.shields.io/badge/license-GPLv3-blue.svg?style=flat)](https://github.com/Ventto/pearlfan/blob/master/LICENSE)
 [![Status](https://img.shields.io/badge/status-Release_v1.0-blue.svg?style=flat)](https://github.com/Ventto/pearlfan/releases)
 
