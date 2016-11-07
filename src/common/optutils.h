@@ -26,9 +26,11 @@
 typedef struct {
 	int cflag;
 	int dflag;
+	int mflag;
 	int fflag;
 	char *carg;
 	char *darg;
+	char *marg;
 } pfan_opts;
 
 int pfan_getopt(int argc, char **argv, pfan_opts *opts);

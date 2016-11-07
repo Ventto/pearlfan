@@ -6,15 +6,16 @@ src/*
 src/common/*
 !src/common/config.c
 !src/common/config.h
-!src/common/convert.h
-!src/common/convert.c
+!src/common/defutils.h
 !src/common/devinfo.h
+!src/common/draw.c
+!src/common/draw.h
 !src/common/ioutils.c
 !src/common/ioutils.h
 !src/common/optutils.c
 !src/common/optutils.h
-!src/common/raster.h
 !src/common/raster.c
+!src/common/raster.h
 
 !src/kmodule
 src/kmodule/*
@@ -29,18 +30,15 @@ src/kmodule/rules.d/*
 src/kmodule/app/*
 !src/kmodule/app/Makefile
 !src/kmodule/app/main.c
-!src/kmodule/app/send.c
-!src/kmodule/app/send.h
 
 !src/libusb/
 src/libusb/*
+!src/libusb/main.c
 !src/libusb/usb.c
 !src/libusb/usb.h
-!src/libusb/main.c
 
 !tests/
 tests/*
-!tests/check-userdriver.sh
 !tests/images/
 
 !Makefile.libusb

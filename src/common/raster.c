@@ -16,14 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Pearlfan.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <linux/limits.h>
 #include <pbm.h>
 #include <stdio.h>
 
+#include "defutils.h"
 #include "raster.h"
-
-#define PFAN_IMG_W    156
-#define PFAN_IMG_H    11
 
 static bit *create_img_raster(FILE *img)
 {
@@ -34,7 +31,7 @@ static bit *create_img_raster(FILE *img)
 
 	pbm_readpbminit(img, &cols, &rows, &format);
 
-	if (cols != PFAN_IMG_W && rows != PFAN_IMG_H) {
+	if (cols != PFAN_MAX_W && rows != PFAN_MAX_H) {
 		fprintf(stdout, "Invalid image size, '156x11' is required.\n");
 		return NULL;
 	}
@@ -44,18 +41,19 @@ static bit *create_img_raster(FILE *img)
 		return NULL;
 	}
 
-	raster = pbm_allocrow(PFAN_IMG_W * PFAN_IMG_H);
+	raster = pbm_allocrow(PFAN_MAX_W * PFAN_MAX_H);
 	if (!raster) {
 		fprintf(stdout, "Can not allocate the raster.\n");
 		return NULL;
 	}
 
-	pbm_readpbmrow(img, raster, PFAN_IMG_W * PFAN_IMG_H, format);
+	pbm_readpbmrow(img, raster, PFAN_MAX_W * PFAN_MAX_H, format);
 
 	return raster;
 }
 
-uint8_t **pfan_create_img_rasters(char img_paths[8][4096], int n)
+uint8_t **pfan_create_img_rasters(char img_paths[PFAN_MAX_DISPLAY][MAX_PATH],
+                                  int n)
 {
 	pm_init("pfan", 0);
 
@@ -76,6 +74,7 @@ uint8_t **pfan_create_img_rasters(char img_paths[8][4096], int n)
 			return NULL;
 		}
 		rasters[i] = create_img_raster(img);
+		fprintf(stdout, "Raster: '%s'\n", img_paths[i]);
 		pm_close(img);
 	}
 
@@ -84,9 +83,14 @@ uint8_t **pfan_create_img_rasters(char img_paths[8][4096], int n)
 
 void pfan_free_rasters(uint8_t **rasters, int n)
 {
-	if (!rasters)
-		return;
 	for (int i = 0; i < n; ++i)
 		pbm_freerow(rasters[i]);
+	free(rasters);
+}
+
+void pfan_free_type_rasters(uint8_t **rasters, int n, uint8_t types[8])
+{
+	for (int i = 0; i < n; ++i)
+		(types[PFAN_IS_IMG]) ? pbm_freerow(rasters[i]) : free(rasters[i]);
 	free(rasters);
 }

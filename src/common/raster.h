@@ -25,4 +25,6 @@ uint8_t **pfan_create_img_rasters(char image_paths[8][4096], int n);
 
 void pfan_free_rasters(uint8_t **rasters, int n);
 
+void pfan_free_type_rasters(uint8_t **rasters, int n, uint8_t types[8]);
+
 #endif /* !RASTER_H_ */

@@ -1,6 +1,6 @@
 EXE         = pearlfan
 COMMON_SRCS = src/common/config.c \
-			  src/common/convert.c \
+			  src/common/draw.c \
 			  src/common/ioutils.c \
 			  src/common/optutils.c \
 			  src/common/raster.c

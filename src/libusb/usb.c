@@ -20,10 +20,9 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "convert.h"
+#include "draw.h"
+#include "defutils.h"
 #include "usb.h"
-
-#define PFAN_DISPLAY_MAX    8
 
 libusb_device_handle *pfan_open(libusb_context *ctx, int vid, int pid)
 {
@@ -79,8 +78,8 @@ static int send(libusb_device_handle *dev, void *data)
 }
 
 int pfan_send(libusb_device_handle *dev_handle, int img_n,
-		      uint8_t effects[PFAN_DISPLAY_MAX][3],
-		      uint16_t displays[PFAN_DISPLAY_MAX][PFAN_IMG_W])
+		      uint8_t effects[PFAN_MAX_DISPLAY][3],
+		      uint16_t displays[PFAN_MAX_DISPLAY][PFAN_MAX_W])
 {
 	int bytes = 0;
 	int ret = 0;

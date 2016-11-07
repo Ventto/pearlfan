@@ -38,6 +38,8 @@ static int missing_optvar(char opt)
 		return 1;
 	case 'd':
 		return 1;
+	case 'm':
+		return 1;
 	}
 	return 0;
 }
@@ -45,13 +47,15 @@ static int missing_optvar(char opt)
 static void usage(void)
 {
 	fprintf(stdout, "Usage:\tpearlfan [-f] [-c FILE]\n");
-	fprintf(stdout, "or:\tpearlfan [-f] [-d DIRECTORY]\n\n");
+	fprintf(stdout, "or:\tpearlfan [-f] [-d DIRECTORY]\n");
+	fprintf(stdout, "or:\tpearlfan [-f] [-t TEXT]\n\n");
 	fprintf(stdout, "Options:\n\n");
 	fprintf(stdout, "Setting:\n");
 	fprintf(stdout, "  -c:\tDisplays at most eight images with transition ");
 	fprintf(stdout, "effects described in FILE.\n");
 	fprintf(stdout, "  -d:\tDisplays at most eight .PBM images ");
-	fprintf(stdout, "(156x11) in DIRECTORY.\n\n");
+	fprintf(stdout, "(156x11) in DIRECTORY.\n");
+	fprintf(stdout, "  -m:\tDisplays a sentense of 26 characters max.\n\n");
 	fprintf(stdout, "Mode:\n");
 	fprintf(stdout, "  -f:\tEnables fast-mode. Disables all others ");
 	fprintf(stdout, "effect transitions.\n\n");
@@ -90,7 +94,7 @@ int pfan_getopt(int argc, char **argv, pfan_opts *opts)
 
 	memset(opts, 0, sizeof(pfan_opts));
 
-	while ((opt = getopt(argc, argv, "c:d:fhv")) != -1) {
+	while ((opt = getopt(argc, argv, "c:d:m:fhv")) != -1) {
 		switch (opt) {
 		case 'h':
 			usage();
@@ -101,6 +105,8 @@ int pfan_getopt(int argc, char **argv, pfan_opts *opts)
 		case 'c':
 			if (opts->dflag)
 				return no_conjunction(opt, 'd');
+			if (opts->mflag)
+				return no_conjunction(opt, 'm');
 			if (!pfan_readaccess_file(optarg))
 				return PFAN_INVALID_OPT;
 			opts->carg = optarg;
@@ -109,12 +115,22 @@ int pfan_getopt(int argc, char **argv, pfan_opts *opts)
 		case 'd':
 			if (opts->cflag)
 				return no_conjunction(opt, 'c');
+			if (opts->mflag)
+				return no_conjunction(opt, 'm');
 			if (!pfan_isdir(optarg)) {
 				fprintf(stderr, "%s: directory does not exist or can't be opened.\n\n", optarg);
 				return PFAN_INVALID_OPT;
 			}
 			opts->darg = optarg;
 			opts->dflag = 1;
+			break;
+		case 'm':
+			if (opts->cflag)
+				return no_conjunction(opt, 'c');
+			if (opts->dflag)
+				return no_conjunction(opt, 'd');
+			opts->marg = optarg;
+			opts->mflag = 1;
 			break;
 		case 'f':
 			opts->fflag = 1;
@@ -129,7 +145,7 @@ int pfan_getopt(int argc, char **argv, pfan_opts *opts)
 			return PFAN_INVALID_OPT;
 		}
 	}
-	if (!opts->cflag && !opts->dflag) {
+	if (!opts->cflag && !opts->dflag && !opts->mflag) {
 		if (opts->fflag)
 			fprintf(stderr, "Missing setting option.\n\n");
 		else

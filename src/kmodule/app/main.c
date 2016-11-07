@@ -19,13 +19,15 @@
 #include <fcntl.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "config.h"
+#include "defutils.h"
 #include "devinfo.h"
 #include "optutils.h"
 #include "raster.h"
-#include "send.h"
 
 int main(int argc, char **argv)
 {
@@ -35,38 +37,51 @@ int main(int argc, char **argv)
 	if ((ret = pfan_getopt(argc, argv, &opts)) != PFAN_VALID_OPT)
 		return ret;
 
-	char    img_paths[PFAN_IMG_MAX][4096];
-	uint8_t effects[PFAN_IMG_MAX][3];
-	int     img_nbr;
+	char   img_paths[PFAN_IMG_MAX][4096];
+	struct pfan_mldata data;
+
+	memset(&data, 0x00, sizeof(struct pfan_mldata));
 
 	if (opts.cflag &&
-		(img_nbr = pfan_read_cfg(opts.carg, img_paths, effects,
+		(data.display_nbr = pfan_read_cfg(opts.carg, img_paths, data.effects,
 				opts.fflag)) < 0) {
 		fprintf(stderr, "Invalid config file.\n\n");
 		return 1;
 	}
 
 	if (opts.dflag &&
-		(img_nbr = pfan_read_dir(opts.darg, img_paths, effects,
+		(data.display_nbr = pfan_read_dir(opts.darg, img_paths, data.effects,
 				opts.fflag)) < 0) {
 		fprintf(stderr, "Can not open '%s' directory.\n\n", opts.darg);
 		return 1;
 	}
 
-	if (!img_nbr) {
-		fprintf(stdout, "No PBM image found.\n\n");
-		return 0;
+	if (!opts.mflag) {
+		if (!data.display_nbr) {
+			fprintf(stdout, "No .PBM image found.\n\n");
+			return 0;
+		}
+		data.rasters = pfan_create_img_rasters(img_paths, data.display_nbr);
+		if (!data.rasters)
+			return 1;
 	}
 
-	uint8_t **images = pfan_create_img_rasters(img_paths, img_nbr);
-
-	if (!images)
-		return 1;
+	if (opts.mflag) {
+		if (strlen(opts.marg) > 26) {
+			fprintf(stderr, "Over the character limit of 26.\n\n");
+			return 1;
+		}
+		data.rasters = malloc(sizeof (void *));
+		data.rasters[0] = malloc(strlen(opts.marg) + 1);
+		memcpy(data.rasters[0], opts.marg, strlen(opts.marg) + 1);
+		data.types[0] = 1;
+		data.display_nbr = 1;
+	}
 
 	int pfan_fd = open(PFAN_DEVNAME, O_WRONLY);
 
 	if (pfan_fd <= 0) {
-		pfan_free_rasters(images, img_nbr);
+		pfan_free_type_rasters(data.rasters, data.display_nbr, data.types);
 		fprintf(stderr, "Device can not be opened or found.\n");
 		fprintf(stderr, "You may need permission.\n\n");
 		return 1;
@@ -75,8 +90,8 @@ int main(int argc, char **argv)
 	fprintf(stdout, "Device found.\n");
 	fprintf(stdout, "Transfer is starting.\n");
 
-	int expected_transfer = 320 * img_nbr;
-	int bytes = pfan_send(pfan_fd, img_nbr, images, effects);
+	int expected_transfer = 320 * data.display_nbr;
+	int bytes = write(pfan_fd, &data, sizeof (struct pfan_mldata));
 
 	ret = 0;
 	if (bytes < expected_transfer) {
@@ -87,10 +102,11 @@ int main(int argc, char **argv)
 		else
 			fprintf(stderr, "Transfer error (usberr = %d)\n\n", bytes);
 	} else {
-		fprintf(stdout, "Transfer is complete.\n\n");
+		fprintf(stdout, "Transfer is complete.\n");
+		fprintf(stdout, "( %d / %d )\n\n", bytes, expected_transfer);
 	}
 
 	close(pfan_fd);
-	pfan_free_rasters(images, img_nbr);
+	pfan_free_type_rasters(data.rasters, data.display_nbr, data.types);
 	return ret;
 }

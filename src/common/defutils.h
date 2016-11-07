@@ -12,4 +12,7 @@
 #define PFAN_CLOSE            1
 #define PFAN_BEFORECLOSE      2
 
+#define PFAN_IS_IMG           0
+#define PFAN_IS_TXT           1
+
 #endif /* !DEFUTILS_ */

@@ -27,16 +27,18 @@
 /**
  * struct pfan_data - designed to the module driver's write
  * @n: number of displays (at most 8)
+ * @types: 0 = raster, 1 = text
  * @effects: transition effects for displays:
  *   - open         [0 ; 5]
  *   - close        [0 ; 5]
  *   - before_close (0, 4, 6)
- * @images: PBM image rasters (156 x 11)
+ * @rasters: PBM image rasters (156 x 11) or text messages
  */
-struct pfan_data {
-	unsigned char n;
+struct pfan_mldata {
+	unsigned char display_nbr;
+	unsigned char types[8];
 	unsigned char effects[8][3];
-	unsigned char **images;
+	unsigned char **rasters;
 };
 
 #endif /* DATA_H_ */

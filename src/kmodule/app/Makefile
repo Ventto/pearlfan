@@ -3,7 +3,6 @@ SRCS    = ../../common/config.c \
 		  ../../common/ioutils.c \
 		  ../../common/optutils.c \
 		  ../../common/raster.c \
-		  send.c \
 		  main.c
 OBJS    = $(SRCS:.c=.o)
 

@@ -24,7 +24,8 @@
 #include <linux/slab.h>
 #include <linux/usb.h>
 
-#include "convert.h"
+#include "draw.h"
+#include "defutils.h"
 #include "devinfo.h"
 
 MODULE_LICENSE("GPL");
@@ -78,12 +79,12 @@ static ssize_t pfan_write(struct file *f,
 		size_t cnt,
 		loff_t *off)
 {
-	struct pfan_data *data = NULL;
-	u16 display[PFAN_IMG_W];
-	int bytes = 0;
-	int i;
-	int j;
-	int ret;
+	struct pfan_mldata *data = NULL;
+	u16    display[PFAN_MAX_W];
+	int    bytes = 0;
+	int    i;
+	int    j;
+	int    ret;
 
 	if (cnt == 0) {
 		pr_err("%s: buffer size is null !\n", __func__);
@@ -95,15 +96,20 @@ static ssize_t pfan_write(struct file *f,
 		return -EINVAL;
 	}
 
-	if (cnt > sizeof(struct pfan_data)
-			|| cnt < sizeof(struct pfan_data)) {
+	if (cnt > sizeof(struct pfan_mldata)
+			|| cnt < sizeof(struct pfan_mldata)) {
 		pr_err("%s: the size's value is unexpected !\n", __func__);
 		return -EINVAL;
 	}
 
-	data = (struct pfan_data *)buffer;
+	data = (struct pfan_mldata *)buffer;
 
-	for (i = 0; i < data->n; ++i) {
+	if (!data->rasters) {
+		pr_err("%s: rasters container is null.\n", __func__);
+		return -EINVAL;
+	}
+
+	for (i = 0; i < data->display_nbr; ++i) {
 		u64 effect = pfan_convert_effect(i, data->effects[i]);
 
 		ret = send(pfan_device, &effect);
@@ -114,7 +120,12 @@ static ssize_t pfan_write(struct file *f,
 		bytes += ret;
 		for (j = 0; j < 39; j++) {
 			memset(&display, 0xFF, sizeof(display));
-			pfan_convert_raster(i, data->images[i], display);
+			if (data->types[i] == PFAN_IS_IMG) {
+				pfan_draw_image(data->rasters[i], display);
+			} else {
+				pfan_draw_text(data->rasters[i], strlen(data->rasters[i]),
+						display);
+			}
 			ret = send(pfan_device, (u16 *)&display[j * 4]);
 			if (ret < 0)
 				return ret;

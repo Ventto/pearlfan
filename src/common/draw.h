@@ -16,28 +16,27 @@
  * You should have received a copy of the GNU General Public License
  * along with Pearlfan.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#ifndef CONVERT_H_
+#define CONVERT_H_
 
-#include "devinfo.h"
-#include "send.h"
+#include "defutils.h"
 
-int pfan_send(int fd, int image_nbr, uint8_t **images, uint8_t effects[8][3])
-{
-	struct pfan_data *data = malloc(sizeof(struct pfan_data));
+unsigned long long pfan_convert_effect(const char id,
+                                       const char unsigned effect[3]);
 
-	if (!data)
-		return 1;
+void pfan_draw_point(int xpos,
+                     int ypos,
+                     unsigned short display[PFAN_MAX_W]);
 
-	memset(data, 0, sizeof(struct pfan_data));
-	data->n = image_nbr;
-	memcpy(data->effects, effects, 24);
-	data->images = images;
+void pfan_draw_image(unsigned char *raster,
+                     unsigned short display[PFAN_MAX_W]);
 
-	int ret = write(fd, data, sizeof(struct pfan_data));
+void pfan_draw_char(int xpos,
+                    int c,
+                    unsigned short display[PFAN_MAX_W]);
 
-	free(data);
-	return ret;
-}
+void pfan_draw_text(char *text,
+                    int length,
+                    unsigned short display[PFAN_MAX_W]);
+
+#endif /* !CONVERT_H_ */

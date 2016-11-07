@@ -28,10 +28,6 @@
 #include "defutils.h"
 #include "getopt.h"
 
-#define OPEN           0
-#define CLOSE          1
-#define BEFORE_CLOSE   2
-
 static void concat_path(char buf[4096], const char *dir, const char *imgname)
 {
 	buf[0] = '\0';
@@ -50,8 +46,8 @@ static int isvalid_effect(uint8_t effect[3])
 }
 
 int pfan_read_cfg(char *path,
-                  char img_paths[PFAN_IMG_MAX][4096],
-                  uint8_t effects[PFAN_IMG_MAX][3],
+                  char img_paths[PFAN_MAX_DISPLAY][MAX_PATH],
+                  uint8_t effects[PFAN_MAX_DISPLAY][3],
                   int fastmode)
 {
 	FILE *file = fopen(path, "r");
@@ -66,11 +62,11 @@ int pfan_read_cfg(char *path,
 	int n = 0;
 	int matchs;
 
-	while (n < PFAN_IMG_MAX
+	while (n < PFAN_MAX_DISPLAY
 			&& (matchs = fscanf(file, "%s%*[ \t]+%hhu-%hhu-%hhu\n", imgname,
-				&effects[n][OPEN],
-				&effects[n][CLOSE],
-				&effects[n][BEFORE_CLOSE])) == 4) {
+				&effects[n][PFAN_OPEN],
+				&effects[n][PFAN_CLOSE],
+				&effects[n][PFAN_BEFORECLOSE])) == 4) {
 
 		char *ext = strrchr(imgname, '.');
 
@@ -97,14 +93,14 @@ int pfan_read_cfg(char *path,
 
 	fclose(file);
 
-	if (matchs != EOF && n < PFAN_IMG_MAX)
+	if (matchs != EOF && n < PFAN_MAX_DISPLAY)
 		return -1;
 	return n;
 }
 
 int pfan_read_dir(char *path,
-                  char img_paths[PFAN_IMG_MAX][4096],
-                  uint8_t effects[PFAN_IMG_MAX][3],
+                  char img_paths[PFAN_MAX_DISPLAY][MAX_PATH],
+                  uint8_t effects[PFAN_MAX_DISPLAY][3],
                   int fastmode)
 {
 	memset(effects, (uint8_t)(fastmode) ? 6 : 0, 24);
@@ -124,7 +120,6 @@ int pfan_read_dir(char *path,
 
 		if (strcmp(ext, ".pbm") == 0) {
 			concat_path(img_paths[n], path, dp->d_name);
-			fprintf(stdout, "%s\n", img_paths[n]);
 			++n;
 		}
 	}
