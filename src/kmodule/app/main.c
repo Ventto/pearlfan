@@ -37,21 +37,21 @@ int main(int argc, char **argv)
 	if ((ret = pfan_getopt(argc, argv, &opts)) != PFAN_VALID_OPT)
 		return ret;
 
-	char   img_paths[PFAN_IMG_MAX][4096];
+	char   img_paths[PFAN_MAX_DISPLAY][4096];
 	struct pfan_mldata data;
 
 	memset(&data, 0x00, sizeof(struct pfan_mldata));
 
 	if (opts.cflag &&
-		(data.display_nbr = pfan_read_cfg(opts.carg, img_paths, data.effects,
-				opts.fflag)) < 0) {
+		(data.display_nbr = pfan_read_cfg(opts.carg, img_paths,
+										  data.effects)) < 0) {
 		fprintf(stderr, "Invalid config file.\n\n");
 		return 1;
 	}
 
 	if (opts.dflag &&
-		(data.display_nbr = pfan_read_dir(opts.darg, img_paths, data.effects,
-				opts.fflag)) < 0) {
+		(data.display_nbr = pfan_read_dir(opts.darg, img_paths,
+										  data.effects)) < 0) {
 		fprintf(stderr, "Can not open '%s' directory.\n\n", opts.darg);
 		return 1;
 	}
@@ -77,6 +77,9 @@ int main(int argc, char **argv)
 		data.types[0] = 1;
 		data.display_nbr = 1;
 	}
+
+	if (opts.fflag)
+		memset(data.effects, 0x06, sizeof(data.effects));
 
 	int pfan_fd = open(PFAN_DEVNAME, O_WRONLY);
 

@@ -21,16 +21,14 @@
 
 #include <stdint.h>
 
-#define PFAN_IMG_MAX   8
+#include "defutils.h"
 
 int pfan_read_cfg(char *path,
-                  char img_paths[PFAN_IMG_MAX][4096],
-                  uint8_t effects[PFAN_IMG_MAX][3],
-                  int fastmode);
+                  char img_paths[PFAN_MAX_DISPLAY][4096],
+                  uint8_t effects[PFAN_MAX_DISPLAY][3]);
 
 int pfan_read_dir(char *path,
-                  char img_paths[PFAN_IMG_MAX][4096],
-                  uint8_t effects[PFAN_IMG_MAX][3],
-                  int fastmode);
+                  char img_paths[PFAN_MAX_DISPLAY][4096],
+                  uint8_t effects[PFAN_MAX_DISPLAY][3]);
 
 #endif /* !CONFIG_H_ */

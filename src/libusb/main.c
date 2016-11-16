@@ -40,28 +40,26 @@ int main(int argc, char **argv)
 	if ((ret = pfan_getopt(argc, argv, &opts)) != PFAN_VALID_OPT)
 		return ret;
 
-	char    img_paths[PFAN_IMG_MAX][4096];
+	char    img_paths[PFAN_MAX_DISPLAY][4096];
 	int     img_nbr;
-	uint8_t effects[PFAN_IMG_MAX][3];
+	uint8_t effects[PFAN_MAX_DISPLAY][3];
 
 	memset(effects, 0x00, sizeof(effects));
 
 	if (opts.cflag &&
-		(img_nbr = pfan_read_cfg(opts.carg, img_paths, effects,
-				opts.fflag)) < 0) {
+		(img_nbr = pfan_read_cfg(opts.carg, img_paths, effects)) < 0) {
 		fprintf(stderr, "Invalid config file.\n\n");
 		return 1;
 	}
 
 	if (opts.dflag &&
-		(img_nbr = pfan_read_dir(opts.darg, img_paths, effects,
-				opts.fflag)) < 0) {
+		(img_nbr = pfan_read_dir(opts.darg, img_paths, effects)) < 0) {
 		fprintf(stderr, "Can not open '%s' directory.\n\n", opts.darg);
 		return 1;
 	}
 
 	uint8_t **rasters = NULL;
-	uint16_t displays[PFAN_IMG_MAX][PFAN_MAX_W];
+	uint16_t displays[PFAN_MAX_DISPLAY][PFAN_MAX_W];
 
 	memset(displays, 0xFF, sizeof(displays));
 
@@ -85,6 +83,9 @@ int main(int argc, char **argv)
 		pfan_draw_text(opts.marg, strlen(opts.marg), displays[0]);
 		img_nbr = 1;
 	}
+
+	if (opts.fflag)
+		memset(effects, 0x06, sizeof(effects));
 
 	libusb_device_handle *usb_handle = NULL;
 	libusb_context *usb_ctx = NULL;

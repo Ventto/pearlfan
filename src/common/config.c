@@ -25,8 +25,6 @@
 #include <unistd.h>
 
 #include "config.h"
-#include "defutils.h"
-#include "getopt.h"
 
 static void concat_path(char buf[4096], const char *dir, const char *imgname)
 {
@@ -47,8 +45,7 @@ static int isvalid_effect(uint8_t effect[3])
 
 int pfan_read_cfg(char *path,
                   char img_paths[PFAN_MAX_DISPLAY][MAX_PATH],
-                  uint8_t effects[PFAN_MAX_DISPLAY][3],
-                  int fastmode)
+                  uint8_t effects[PFAN_MAX_DISPLAY][3])
 {
 	FILE *file = fopen(path, "r");
 
@@ -100,11 +97,8 @@ int pfan_read_cfg(char *path,
 
 int pfan_read_dir(char *path,
                   char img_paths[PFAN_MAX_DISPLAY][MAX_PATH],
-                  uint8_t effects[PFAN_MAX_DISPLAY][3],
-                  int fastmode)
+                  uint8_t effects[PFAN_MAX_DISPLAY][3])
 {
-	memset(effects, (uint8_t)(fastmode) ? 6 : 0, 24);
-
 	struct dirent *dp;
 	DIR *dir = opendir(path);
 	int n = 0;
