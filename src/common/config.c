@@ -50,7 +50,7 @@ int pfan_read_cfg(char *path,
 	FILE *file = fopen(path, "r");
 
 	if (!file) {
-		fprintf(stderr, "Can not open to '%s'.\n", path);
+		fprintf(stderr, "Can not open '%s'.\n", path);
 		return -1;
 	}
 
@@ -106,7 +106,7 @@ int pfan_read_dir(char *path,
 	if (!dir)
 		return -1;
 
-	while ((dp = readdir(dir)) != NULL) {
+	while (n < PFAN_MAX_DISPLAY && (dp = readdir(dir)) != NULL) {
 		char *ext = strrchr(dp->d_name, '.');
 
 		if (!ext)
@@ -117,6 +117,7 @@ int pfan_read_dir(char *path,
 			++n;
 		}
 	}
+
 	fprintf(stdout, "\n");
 	closedir(dir);
 	return n;

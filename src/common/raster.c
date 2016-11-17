@@ -74,10 +74,11 @@ uint8_t **pfan_create_img_rasters(char img_paths[PFAN_MAX_DISPLAY][MAX_PATH],
 			return NULL;
 		}
 		rasters[i] = create_img_raster(img);
-		fprintf(stdout, "Raster: '%s'\n", img_paths[i]);
+		fprintf(stdout, "raster: '%s'\n", img_paths[i]);
 		pm_close(img);
 	}
 
+	fprintf(stdout, "\n");
 	return rasters;
 }
 
