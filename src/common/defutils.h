@@ -4,7 +4,6 @@
 #define PFAN_MAX_W            156
 #define PFAN_MAX_H            11
 #define PFAN_MAX_DISPLAY      8
-#define PFAN_MAX_CHAR         26
 
 #define MAX_PATH              4096
 

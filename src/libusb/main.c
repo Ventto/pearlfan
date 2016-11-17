@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 
 	memset(displays, 0xFF, sizeof(displays));
 
-	if (!opts.mflag) {
+	if (!opts.tflag) {
 		if (!img_nbr) {
 			fprintf(stdout, "No .PBM image found.\n\n");
 			return 0;
@@ -75,13 +75,12 @@ int main(int argc, char **argv)
 			pfan_draw_image(rasters[i], displays[i]);
 	}
 
-	if (opts.mflag) {
-		if (strlen(opts.marg) > 26) {
-			fprintf(stderr, "Over the character limit of 26.\n\n");
+	if (opts.tflag) {
+		img_nbr = pfan_draw_paragraph(opts.targ, displays);
+		/* Not enough space to display text */
+		if (!img_nbr) {
 			return 1;
 		}
-		pfan_draw_text(opts.marg, strlen(opts.marg), displays[0]);
-		img_nbr = 1;
 	}
 
 	if (opts.fflag)

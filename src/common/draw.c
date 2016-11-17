@@ -104,4 +104,56 @@ void pfan_draw_text(char *text, int length, unsigned short display[PFAN_MAX_W])
 	for (i = 0; i < length; ++i)
 		pfan_draw_char(i * 6, text[i], display);
 }
-EXPORT_SYMBOL(pfan_draw_text);
+
+int pfan_draw_paragraph(char *text,
+                        unsigned short display[PFAN_MAX_DISPLAY][PFAN_MAX_W])
+{
+	int i;
+	int count = 0;
+	int chars = 0;
+	char *itr = text;
+
+	fprintf(stdout, "Displays:\n\n");
+	for (i = 0; i < PFAN_MAX_DISPLAY; ++i) {
+		if (*itr == '\0')
+			break;
+		for (;;) {
+			if (*itr == '\0')
+				break;
+			if (*itr > 32) {
+				chars = 0;
+				do {
+					chars++;
+					itr++;
+				} while (*itr > 32);
+				if (count + chars > PFAN_MAX_CHAR) {
+					itr -= chars;
+					break;
+				} else {
+					count += chars;
+				}
+			} else {
+				itr++;
+				count++;
+			}
+			if (count == PFAN_MAX_CHAR)
+				break;
+		}
+		if (count > 0) {
+			pfan_draw_text(itr - count, count, display[i]);
+			fprintf(stdout, "%d: [%.*s%*s]\n\n", i + 1, count, itr - count,
+					PFAN_MAX_CHAR - count, "");
+		} else {
+			fprintf(stderr, "Error: a word is over the character limit of %d.\n\n",
+					PFAN_MAX_CHAR);
+			return 0;
+		}
+		count = 0;
+	}
+
+	if (*itr == '\0')
+		return i;
+
+	fprintf(stderr, "Error: the text is over the display limit of 8.\n\n");
+	return 0;
+}

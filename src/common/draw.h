@@ -39,4 +39,7 @@ void pfan_draw_text(char *text,
                     int length,
                     unsigned short display[PFAN_MAX_W]);
 
+int pfan_draw_paragraph(char *text,
+                        unsigned short display[PFAN_MAX_DISPLAY][PFAN_MAX_W]);
+
 #endif /* !CONVERT_H_ */
