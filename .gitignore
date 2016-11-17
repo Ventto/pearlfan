@@ -18,20 +18,6 @@ src/common/*
 !src/common/raster.c
 !src/common/raster.h
 
-!src/kmodule
-src/kmodule/*
-!src/kmodule/module/
-src/kmodule/module/*
-!src/kmodule/module/Makefile
-!src/kmodule/module/module.c
-!src/kmodule/rules.d/
-src/kmodule/rules.d/*
-!src/kmodule/rules.d/99-pfan.rules
-!src/kmodule/app/
-src/kmodule/app/*
-!src/kmodule/app/Makefile
-!src/kmodule/app/main.c
-
 !src/libusb/
 src/libusb/*
 !src/libusb/main.c
@@ -42,8 +28,7 @@ src/libusb/*
 tests/*
 !tests/images/
 
-!Makefile.libusb
-!Makefile.module
+!Makefile
 !LICENSE
 !README.md
 !.travis.yml

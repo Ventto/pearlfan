@@ -7,12 +7,8 @@ compiler: gcc
 addons:
   apt:
     packages:
-    - linux-headers-$(uname -r)
     - libusb-1.0-0-dev
     - libnetpbm10-dev
 
 script:
-    make -f Makefile.module &&
-    sudo make -f Makefile.module install &&
-    sudo make -f Makefile.module distclean &&
-    make -f Makefile.libusb
+    make

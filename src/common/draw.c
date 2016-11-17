@@ -16,15 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Pearlfan.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <linux/kernel.h>
+#include <stdio.h>
 
-#include "defutils.h"
 #include "draw.h"
 #include "font.h"
 
-#ifndef EXPORT_SYMBOL
-# define EXPORT_SYMBOL(sym)
-#endif
+#define PFAN_LETTER_W         6
+#define PFAN_MAX_CHAR         (PFAN_MAX_W / PFAN_LETTER_W - 1)
 
 static unsigned short led_mask[] = {
 	0xFFF7,/* [0]  LED10*/
@@ -52,7 +50,6 @@ unsigned long long pfan_convert_effect(const char id,
 
 	return 0x00000055000010A0 | (opts << 16);
 }
-EXPORT_SYMBOL(pfan_convert_effect);
 
 void pfan_draw_point(int xpos,
                      int ypos,
@@ -64,7 +61,6 @@ void pfan_draw_point(int xpos,
 
 	display[155 - xpos] &= led_mask[ypos];
 }
-EXPORT_SYMBOL(pfan_draw_point);
 
 void pfan_draw_image(unsigned char *raster,
                      unsigned short display[PFAN_MAX_W])
@@ -78,7 +74,6 @@ void pfan_draw_image(unsigned char *raster,
 				pfan_draw_point(i, j, display);
 	}
 }
-EXPORT_SYMBOL(pfan_draw_image);
 
 void pfan_draw_char(int xpos,
                     int c,
@@ -98,7 +93,6 @@ void pfan_draw_char(int xpos,
 		}
 	}
 }
-EXPORT_SYMBOL(pfan_draw_char);
 
 void pfan_draw_text(char *text, int length, unsigned short display[PFAN_MAX_W])
 {
