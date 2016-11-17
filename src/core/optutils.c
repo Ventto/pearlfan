@@ -46,7 +46,7 @@ static int missing_optvar(char opt)
 
 static void usage(void)
 {
-	fprintf(stdout, "Usage:\tpearlfan [-f] [-c FILE | -d DIRECTORY | -t TEXT]\n");
+	fprintf(stdout, "Usage:\tpearlfan [-f] [-c FILE | -d DIRECTORY | -t TEXT]\n\n");
 	fprintf(stdout, "Options:\n\n");
 	fprintf(stdout, "Setting:\n");
 	fprintf(stdout, "  -c:\tDisplays at most eight images with transition ");

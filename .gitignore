@@ -2,21 +2,21 @@
 
 !src/
 src/*
-!src/common/
-src/common/*
-!src/common/config.c
-!src/common/config.h
-!src/common/defutils.h
-!src/common/devinfo.h
-!src/common/draw.c
-!src/common/draw.h
-!src/common/font.h
-!src/common/ioutils.c
-!src/common/ioutils.h
-!src/common/optutils.c
-!src/common/optutils.h
-!src/common/raster.c
-!src/common/raster.h
+!src/core/
+src/core/*
+!src/core/config.c
+!src/core/config.h
+!src/core/defutils.h
+!src/core/devinfo.h
+!src/core/draw.c
+!src/core/draw.h
+!src/core/font.h
+!src/core/ioutils.c
+!src/core/ioutils.h
+!src/core/optutils.c
+!src/core/optutils.h
+!src/core/raster.c
+!src/core/raster.h
 
 !src/libusb/
 src/libusb/*
