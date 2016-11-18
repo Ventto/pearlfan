@@ -19,6 +19,8 @@
 #ifndef DEFUTILS_H_
 #define DEFUTILS_H_
 
+/* WARNING: Do not modify these values. */
+
 #define PFAN_MAX_W            156
 #define PFAN_MAX_H            11
 #define PFAN_MAX_DISPLAY      8

@@ -21,8 +21,9 @@
 #include "draw.h"
 #include "font.h"
 
-#define PFAN_LETTER_W         6
-#define PFAN_MAX_CHAR         (PFAN_MAX_W / PFAN_LETTER_W - 1)
+#define PFAN_LSPACE        1
+#define PFAN_CHAR_SPACE    (PFAN_CHAR_W + PFAN_LSPACE)
+#define PFAN_MAX_CHAR      (PFAN_MAX_W / PFAN_CHAR_SPACE)
 
 static unsigned short led_mask[] = {
 	0xFFF7,/* [0]  LED10*/
@@ -59,7 +60,7 @@ void pfan_draw_point(int xpos,
 			|| ypos < 0 || ypos >= PFAN_MAX_H)
 		return;
 
-	display[155 - xpos] &= led_mask[ypos];
+	display[PFAN_MAX_W - 1 - xpos] &= led_mask[ypos];
 }
 
 void pfan_draw_image(unsigned char *raster,
@@ -88,21 +89,27 @@ void pfan_draw_char(int xpos,
 	for (j = 0; j < PFAN_MAX_H; ++j)  {
 		for (i = 0; i < PFAN_CHAR_W; ++i) {
 			/* Because of little indian */
-			if (pfan_6x11_font[c][j] & (0x01 << i))
+			if (pfan_font[c][j] & (0x01 << i))
 				pfan_draw_point(xpos + i, j, display);
 		}
 	}
 }
 
-void pfan_draw_text(char *text, int length, unsigned short display[PFAN_MAX_W])
+void pfan_draw_text(char *text,
+                    int lenght,
+                    int lspace,
+                    unsigned short display[PFAN_MAX_W])
 {
 	int i = 0;
 
-	if (length > PFAN_MAX_CHAR)
+	if (lenght == 0 || lenght > PFAN_MAX_CHAR)
 		return;
 
-	for (i = 0; i < length; ++i)
-		pfan_draw_char(i * 6, text[i], display);
+	pfan_draw_char(0, text[i], display);
+
+	/* From 1 because of first led column is disabled when it is rotating */
+	for (i = 1; i < lenght; ++i)
+		pfan_draw_char(i * (PFAN_CHAR_W + lspace), text[i], display);
 }
 
 int pfan_draw_paragraph(char *text,
@@ -127,7 +134,12 @@ int pfan_draw_paragraph(char *text,
 					itr++;
 				} while (*itr > 32);
 				if (count + chars > PFAN_MAX_CHAR) {
-					itr -= chars;
+					/* Big word */
+					if (!count) {
+						count = PFAN_MAX_CHAR;
+						itr -= chars - PFAN_MAX_CHAR;
+					} else
+						itr -= chars;
 					break;
 				} else {
 					count += chars;
@@ -140,7 +152,7 @@ int pfan_draw_paragraph(char *text,
 				break;
 		}
 		if (count > 0) {
-			pfan_draw_text(itr - count, count, display[i]);
+			pfan_draw_text(itr - count, count, PFAN_LSPACE, display[i]);
 			fprintf(stdout, "%d: [%.*s%*s]\n\n", i + 1, count, itr - count,
 					PFAN_MAX_CHAR - count, "");
 		} else {

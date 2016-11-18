@@ -36,7 +36,8 @@ void pfan_draw_char(int xpos,
                     unsigned short display[PFAN_MAX_W]);
 
 void pfan_draw_text(char *text,
-                    int length,
+                    int lenght,
+                    int lspace,
                     unsigned short display[PFAN_MAX_W]);
 
 int pfan_draw_paragraph(char *text,
