@@ -78,9 +78,10 @@ int main(int argc, char **argv)
 	if (opts.tflag) {
 		img_nbr = pfan_draw_paragraph(opts.targ, displays);
 		/* Not enough space to display text */
-		if (!img_nbr) {
+		if (!img_nbr)
 			return 1;
-		}
+		for(int i = 0; i < img_nbr; ++i)
+			effects[i][2] = 0x02;
 	}
 
 	if (opts.fflag)
