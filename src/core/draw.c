@@ -138,7 +138,10 @@ int pfan_draw_paragraph(char *text,
 					if (!count) {
 						count = PFAN_MAX_CHAR;
 						itr -= chars - PFAN_MAX_CHAR;
-					} else
+					} else if (chars > PFAN_MAX_CHAR) {
+						itr -= chars - (PFAN_MAX_CHAR - count);
+						count = PFAN_MAX_CHAR;
+					}	else
 						itr -= chars;
 					break;
 				} else {
@@ -151,15 +154,9 @@ int pfan_draw_paragraph(char *text,
 			if (count == PFAN_MAX_CHAR)
 				break;
 		}
-		if (count > 0) {
-			pfan_draw_text(itr - count, count, PFAN_LSPACE, display[i]);
-			fprintf(stdout, "%d: [%.*s%*s]\n\n", i + 1, count, itr - count,
-					PFAN_MAX_CHAR - count, "");
-		} else {
-			fprintf(stderr, "Error: a word is over the character limit of %d.\n\n",
-					PFAN_MAX_CHAR);
-			return 0;
-		}
+		pfan_draw_text(itr - count, count, PFAN_LSPACE, display[i]);
+		fprintf(stdout, "%d: [%.*s%*s]\n\n", i + 1, count, itr - count,
+				PFAN_MAX_CHAR - count, "");
 		count = 0;
 	}
 
