@@ -2,6 +2,7 @@
 
 !src/
 src/*
+!src/main.c
 !src/core/
 src/core/*
 !src/core/config.c
@@ -20,7 +21,6 @@ src/core/*
 
 !src/libusb/
 src/libusb/*
-!src/libusb/main.c
 !src/libusb/usb.c
 !src/libusb/usb.h
 

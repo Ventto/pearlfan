@@ -1,15 +1,16 @@
-EXE         = pearlfan
-CORE_SRCS   = src/core/config.c \
-              src/core/draw.c \
-              src/core/ioutils.c \
-              src/core/optutils.c \
-              src/core/raster.c
-SRCS        = $(CORE_SRCS) src/libusb/usb.c src/libusb/main.c
-OBJS        = $(SRCS:.c=.o)
+EXE    = pearlfan
+SRCS   = src/core/config.c \
+         src/core/draw.c \
+         src/core/ioutils.c \
+         src/core/optutils.c \
+         src/core/raster.c \
+         src/libusb/usb.c \
+         src/main.c
+OBJS   = $(SRCS:.c=.o)
 
-CC      = gcc
-INCS    = -Isrc/core -I/usr/include/netpbm
-CFLAGS  = -Wall -Werror -std=c99 $(INCS)
+CC     = gcc
+INCS   = -Isrc/core -Isrc/libusb -I/usr/include/netpbm
+CFLAGS = -Wall -Werror -std=c99 $(INCS)
 LIBS   += $(shell pkg-config --libs --cflags libusb-1.0)
 LIBS   += -lnetpbm
 
