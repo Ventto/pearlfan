@@ -39,7 +39,7 @@ static int isvalid_effect(uint8_t effect[3])
 {
 	return effect[PFAN_OPEN] <= 6 && effect[PFAN_CLOSE] <= 5
 				&& (effect[PFAN_BEFORECLOSE] == 0
-					|| effect[PFAN_BEFORECLOSE] == 4
+					|| effect[PFAN_BEFORECLOSE] == 2
 					|| effect[PFAN_BEFORECLOSE] == 6);
 }
 
