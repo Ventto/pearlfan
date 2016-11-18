@@ -1,5 +1,4 @@
 
-
 PearlFan
 =========
 
@@ -10,42 +9,36 @@ PearlFan
 *PearlFan provides a GNU/Linux Kernel driver and a libusb application for the "[PEARL.fr](https://www.pearl.fr/article/PX5939/ventilateur-usb-programmable-avec-message-defilant
 )" USB LED fan.*
 
-## Dependencies
-
-Archlinux:
-
-* *linux-headers* - Header files and scripts for building modules for Linux kernel
-* *libusb-1.0* - Library that provides generic access to USB devices
-* *netpbm* - Toolkit for manipulation of graphic images (with libraries and header files)
-
-Ubuntu:
-
-* *linux-headers-$(uname -r)*
-* *libnetpbm10-dev* - Netpbm libraries and header files
-* *libusb-1.0-dev* - Library that provides generic access to USB devices
-
 ## Install
 
-### Package (AUR)
+### Package
 
+* Archlinux
 ```
 $ yaourt -S pearlfan (or)
 $ pacaur -S pearlfan
 ```
 
-### Manually
-
-* Kernel module and its user application:
+* Ubuntu
 
 ```
-$ make -f Makefile.module
-$ sudo make -f Makefile.module install
+$ apt-get install pearlfan
 ```
 
-* Libusb application:
+### Manually (with dependencies)
+
+Archlinux:
+
+* *libusb-1.0* - Library that provides generic access to USB devices
+* *netpbm* - Toolkit for manipulation of graphic images (with libraries and header files)
+
+Ubuntu:
+
+* *libnetpbm10-dev* - Netpbm libraries and header files
+* *libusb-1.0-dev* - Library that provides generic access to USB devices
 
 ```
-$ make -f Makefile.libusb
+$ make
 ```
 
 ## Execute
@@ -53,16 +46,17 @@ $ make -f Makefile.libusb
 ### Synopsis
 
 ```
-pearlfan [-f] [-c FILE]
-pearlfan [-f] [-d DIRECTORY]
+pearlfan [-f] [-c FILE | -d DIRECTORY | -t TEXT]
 ```
 
 ### Options
 
 ```
 Setting:
-  -c:  Displays at most eight images with transition effects described in FILE.
+  -c:  Displays at most eight images with transition effects described
+       in the given config FILE.
   -d:  Displays at most eight .PBM images (156x11) in DIRECTORY.
+  -t:  Draws TEXT on multiple displays.
 
 Mode:
   -f:  Enables fast-mode. Disables all others effect transitions.
@@ -72,9 +66,25 @@ Miscellaneous:
   -v:  Prints version info and exits.
 ```
 
+## Examples
+
+```
+$ ls images/
+pacman.pbm
+mario.pbm
+file.config
+
+$ cat file.config
+pacman.pbm  +2-2-0
+mario.pbm   +1-1-6
+
+$ pearlfan -c images/file.config    (or)
+$ pearlfan -d images/               (without config file)
+```
+
 ## Configuration File
 
-### Example
+### Sample
 
 This an example of a pfan's configuration file
 
@@ -90,8 +100,8 @@ full.pbm    +2-5-0
 
 Each configuration file consists of the following:
 
-* line pattern: `{imagename}.pbm+{effects}`
-* Whitespace (blanks and TABs) between `{imagename}.pbm` and `+` are ignored (cf. example above)
+* line pattern: `{image_basename}.pbm+{effects}`
+* Whitespace (blanks and TABs) between `{image_basename}.pbm` and `+` are ignored (cf. example above)
 * The image must be in the same directory than the configuration file
 * The image must be [.PBM](http://netpbm.sourceforge.net/doc/pbm.html) image
 * The image size must be: width=11px, height=156px
