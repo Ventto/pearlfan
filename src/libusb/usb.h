@@ -22,9 +22,9 @@
 #include <libusb-1.0/libusb.h>
 #include <stdint.h>
 
-libusb_device_handle *pfan_open(libusb_context *ctx, int vid, int pid);
+libusb_device_handle *pfan_open(int vid, int pid);
 
-void pfan_close(libusb_context *ctx, libusb_device_handle *dev_handle);
+void pfan_close(libusb_device_handle *dev_handle);
 
 int pfan_send(libusb_device_handle *dev_handle, int img_n,
               uint8_t effects[8][3],

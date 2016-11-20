@@ -24,10 +24,10 @@
 #include "defutils.h"
 #include "usb.h"
 
-libusb_device_handle *pfan_open(libusb_context *ctx, int vid, int pid)
+libusb_device_handle *pfan_open(int vid, int pid)
 {
 	libusb_device_handle *dev_handle =
-		libusb_open_device_with_vid_pid(ctx, vid, pid);
+		libusb_open_device_with_vid_pid(NULL, vid, pid);
 
 	if (!dev_handle) {
 		fprintf(stderr, "Device can not be opened or found.\n");
@@ -52,10 +52,10 @@ libusb_device_handle *pfan_open(libusb_context *ctx, int vid, int pid)
 	return dev_handle;
 }
 
-void pfan_close(libusb_context *ctx, libusb_device_handle *dev_handle)
+void pfan_close(libusb_device_handle *dev_handle)
 {
 	libusb_close(dev_handle);
-	libusb_exit(ctx);
+	libusb_exit(NULL);
 }
 
 static int send(libusb_device_handle *dev, void *data)

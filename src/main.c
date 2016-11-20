@@ -88,20 +88,19 @@ int main(int argc, char **argv)
 		memset(effects, 0x06, sizeof(effects));
 
 	libusb_device_handle *usb_handle = NULL;
-	libusb_context *usb_ctx = NULL;
 
-	if (libusb_init(&usb_ctx) < 0) {
+	if (libusb_init(NULL) < 0) {
 		if (rasters)
 			pfan_free_rasters(rasters, img_nbr);
 		fprintf(stderr, "Libusb initialization failed.\n\n");
 		return 1;
 	}
 
-	usb_handle = pfan_open(usb_ctx, PFAN_VID, PFAN_PID);
+	usb_handle = pfan_open(PFAN_VID, PFAN_PID);
 	if (!usb_handle) {
+		libusb_exit(NULL);
 		if (rasters)
 			pfan_free_rasters(rasters, img_nbr);
-		libusb_exit(usb_ctx);
 		return 1;
 	}
 
@@ -123,7 +122,7 @@ int main(int argc, char **argv)
 
 	fprintf(stdout, "Transfer is complete.\n\n");
 	fprintf(stdout, "( %d / %d bytes)\n\n", bytes, expected_transfer);
-	pfan_close(usb_ctx, usb_handle);
+	pfan_close(usb_handle);
 	if (rasters)
 		pfan_free_rasters(rasters, img_nbr);
 	return ret;
