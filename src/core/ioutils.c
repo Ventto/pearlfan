@@ -41,8 +41,8 @@ int pfan_readaccess_file(char *path)
 		return 0;
 	}
 
+	fclose(file);
 	if (pfan_isdir(path)) {
-		fclose(file);
 		fprintf(stderr, "%s: is not a file.\n", path);
 		return 0;
 	}
