@@ -16,29 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Pearlfan.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef DATA_H_
-#define DATA_H_
+#ifndef DEFUTILS_H_
+#define DEFUTILS_H_
 
-#define PFAN_CLASSNAME    "usb/pfan0"
-#define PFAN_DEVNAME      "/dev/pfan0"
-#define PFAN_VID           0x0c45
-#define PFAN_PID           0x7701
+/* WARNING: Do not modify these values. */
 
-/**
- * struct pfan_data - designed to the module driver's write
- * @n: number of displays (at most 8)
- * @types: 0 = raster, 1 = text
- * @effects: transition effects for displays:
- *   - open         [0 ; 5]
- *   - close        [0 ; 5]
- *   - before_close (0, 4, 6)
- * @rasters: PBM image rasters (156 x 11) or text messages
- */
-struct pfan_mldata {
-	unsigned char display_nbr;
-	unsigned char types[8];
-	unsigned char effects[8][3];
-	unsigned char **rasters;
-};
+#define PFAN_VID              0x0c45
+#define PFAN_PID              0x7701
 
-#endif /* DATA_H_ */
+#define PFAN_MAX_W            156
+#define PFAN_MAX_H            11
+#define PFAN_MAX_DISPLAY      8
+
+#define MAX_PATH              4096
+
+#define PFAN_OPEN             0
+#define PFAN_CLOSE            1
+#define PFAN_BEFORECLOSE      2
+
+#define PFAN_IS_IMG           0
+#define PFAN_IS_TXT           1
+
+#endif /* !DEFUTILS_ */

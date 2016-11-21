@@ -27,7 +27,6 @@
 #include "config.h"
 #include "draw.h"
 #include "defutils.h"
-#include "devinfo.h"
 #include "optutils.h"
 #include "raster.h"
 #include "usb.h"
