@@ -4,7 +4,7 @@ PearlFan
 
 [![Build Status](https://travis-ci.org/Ventto/pearlfan.svg?branch=master)](https://travis-ci.org/Ventto/pearlfan)
 [![License](https://img.shields.io/badge/license-GPLv3-blue.svg?style=flat)](https://github.com/Ventto/pearlfan/blob/master/LICENSE)
-[![Status](https://img.shields.io/badge/status-Release_v1.0-blue.svg?style=flat)](https://github.com/Ventto/pearlfan/releases)
+[![Status](https://img.shields.io/badge/status-Release_v1.1-blue.svg?style=flat)](https://github.com/Ventto/pearlfan/releases)
 
 *PearlFan provides a GNU/Linux Kernel driver and a libusb application for the "[PEARL.fr](https://www.pearl.fr/article/PX5939/ventilateur-usb-programmable-avec-message-defilant
 )" USB LED fan.*

@@ -23,6 +23,8 @@
 #include "optutils.h"
 #include "ioutils.h"
 
+#define VERSION    "1.1"
+
 static int no_conjunction(char opt_a, char opt_b)
 {
 	fprintf(stderr, "Option -%c cannot be used in conjuntion with %c.\n\n",
@@ -68,7 +70,7 @@ static void usage(void)
 
 static void version(void)
 {
-	fprintf(stdout, "Pearlfan 1.0\n\n");
+	fprintf(stdout, "Pearlfan %s\n\n", VERSION);
 	fprintf(stdout, "Copyright (C) 2016 Thomas \"Ventto\" Venries.\n\n");
 	fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later "),
 	fprintf(stdout, "<http://gnu.org/licenses/gpl.html>.\n");
