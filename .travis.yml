@@ -11,4 +11,4 @@ addons:
     - libnetpbm10-dev
 
 script:
-    make
+    make && make -C tests/leds

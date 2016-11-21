@@ -27,6 +27,12 @@ src/utils/*
 !tests/
 tests/*
 !tests/images/
+!tests/leds
+tests/leds/*
+!tests/leds/Makefile
+!tests/leds/main.c
+!tests/leds/tests.c
+!tests/leds/tests.h
 
 !Makefile
 !LICENSE
