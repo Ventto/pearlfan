@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Pearlfan.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <dirent.h>
 #include <getopt.h>
 #include <stdio.h>
 #include <string.h>

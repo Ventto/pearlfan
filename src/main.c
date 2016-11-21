@@ -16,13 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Pearlfan.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <fcntl.h>
-#include <getopt.h>
 #include <libusb-1.0/libusb.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 
 #include "config.h"
 #include "draw.h"
