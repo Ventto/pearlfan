@@ -39,19 +39,6 @@ static unsigned short led_mask[] = {
 	0xFCFF,/* [10] LED0 */
 };
 
-unsigned long long pfan_convert_effect(const char id,
-                                       const unsigned char effect[3])
-{
-	unsigned short opts = 0;
-
-	opts |= effect[PFAN_CLOSE];
-	opts |= (effect[PFAN_OPEN] << 4);
-	opts |= (id << 8);
-	opts |= (effect[PFAN_BEFORECLOSE] << 12);
-
-	return 0x00000055000010A0 | (opts << 16);
-}
-
 void pfan_draw_point(int xpos,
                      int ypos,
                      unsigned short display[PFAN_MAX_W])

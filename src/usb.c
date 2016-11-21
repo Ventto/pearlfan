@@ -20,7 +20,6 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "draw.h"
 #include "defutils.h"
 #include "usb.h"
 
@@ -77,6 +76,17 @@ static int send(libusb_device_handle *dev, void *data)
 	return bytes;
 }
 
+static uint64_t encode_effect(const char id, const unsigned char effect[3])
+{
+	unsigned short opts = 0;
+
+	opts |= effect[PFAN_CLOSE];
+	opts |= (effect[PFAN_OPEN] << 4);
+	opts |= (id << 8);
+	opts |= (effect[PFAN_BEFORECLOSE] << 12);
+	return 0x00000055000010A0 | (opts << 16);
+}
+
 int pfan_send(libusb_device_handle *dev_handle, int img_n,
 		      uint8_t effects[PFAN_MAX_DISPLAY][3],
 		      uint16_t displays[PFAN_MAX_DISPLAY][PFAN_MAX_W])
@@ -85,7 +95,7 @@ int pfan_send(libusb_device_handle *dev_handle, int img_n,
 	int ret = 0;
 
 	for (uint8_t i = 0; i < img_n; i++) {
-		uint64_t effect = pfan_convert_effect(i, effects[i]);
+		uint64_t effect = encode_effect(i, effects[i]);
 
 		ret = send(dev_handle, &effect);
 		if (ret < 0)

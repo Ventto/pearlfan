@@ -21,9 +21,6 @@
 
 #include "defutils.h"
 
-unsigned long long pfan_convert_effect(const char id,
-                                       const char unsigned effect[3]);
-
 void pfan_draw_point(int xpos,
                      int ypos,
                      unsigned short display[PFAN_MAX_W]);
