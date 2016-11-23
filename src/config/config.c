@@ -117,7 +117,6 @@ int pfan_read_dir(char *path,
 		}
 	}
 
-	fprintf(stdout, "\n");
 	closedir(dir);
 	return n;
 }

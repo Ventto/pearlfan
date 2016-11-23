@@ -66,6 +66,7 @@ uint8_t **pfan_create_img_rasters(char img_paths[PFAN_MAX_DISPLAY][MAX_PATH],
 
 	FILE *img = NULL;
 
+	fprintf(stdout, "\nDisplays:\n");
 	for (int i = 0; i < n; ++i) {
 		img = pm_openr(img_paths[i]);
 		if (!img) {
@@ -74,11 +75,10 @@ uint8_t **pfan_create_img_rasters(char img_paths[PFAN_MAX_DISPLAY][MAX_PATH],
 			return NULL;
 		}
 		rasters[i] = create_img_raster(img);
-		fprintf(stdout, "raster: '%s'\n", img_paths[i]);
+		fprintf(stdout, "%d: '%s'\n", i + 1, img_paths[i]);
 		pm_close(img);
 	}
 
-	fprintf(stdout, "\n");
 	return rasters;
 }
 

@@ -107,7 +107,7 @@ int pfan_draw_paragraph(char *text,
 	int chars = 0;
 	char *itr = text;
 
-	fprintf(stdout, "Displays:\n\n");
+	fprintf(stdout, "\nDisplays:\n");
 	for (i = 0; i < PFAN_MAX_DISPLAY; ++i) {
 		if (*itr == '\0')
 			break;
@@ -142,7 +142,7 @@ int pfan_draw_paragraph(char *text,
 				break;
 		}
 		pfan_draw_text(itr - count, count, PFAN_LSPACE, display[i]);
-		fprintf(stdout, "%d: [%.*s%*s]\n\n", i + 1, count, itr - count,
+		fprintf(stdout, "%d: [%.*s%*s]\n", i + 1, count, itr - count,
 				PFAN_MAX_CHAR - count, "");
 		count = 0;
 	}

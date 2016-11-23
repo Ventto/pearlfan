@@ -83,6 +83,8 @@ int main(int argc, char **argv)
 	if (opts.fflag)
 		memset(effects, 0x06, sizeof(effects));
 
+	fprintf(stdout, "\n");
+
 	libusb_device_handle *usb_handle = NULL;
 
 	if (libusb_init(NULL) < 0) {
@@ -101,7 +103,7 @@ int main(int argc, char **argv)
 	}
 
 	fprintf(stdout, "Device found.\n");
-	fprintf(stdout, "Transfer is starting.\n");
+	fprintf(stdout, "Transfer started.\n");
 
 	int expected_transfer = 320 * img_nbr;
 	int bytes = pfan_send(usb_handle, img_nbr, effects, displays);
@@ -117,7 +119,7 @@ int main(int argc, char **argv)
 	}
 
 	fprintf(stdout, "Transfer is complete.\n\n");
-	fprintf(stdout, "( %d / %d bytes)\n\n", bytes, expected_transfer);
+
 	pfan_close(usb_handle);
 	if (rasters)
 		pfan_free_rasters(rasters, img_nbr);
