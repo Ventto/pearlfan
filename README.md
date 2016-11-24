@@ -9,20 +9,22 @@ PearlFan
 *PearlFan provides a GNU/Linux Kernel driver and a libusb application for the "[PEARL.fr](https://www.pearl.fr/article/PX5939/ventilateur-usb-programmable-avec-message-defilant
 )" USB LED fan.*
 
+[![](doc/pearlfan.gif)](https://www.pearl.fr/article/PX5939/ventilateur-usb-programmable-avec-message-defilant)
+
 ## Install
 
 ### Package
 
 * Archlinux
-```
-$ yaourt -S pearlfan (or)
-$ pacaur -S pearlfan
-```
-
-* Ubuntu
 
 ```
-$ apt-get install pearlfan
+$ yaourt -S pearlfan
+```
+
+### Ubuntu
+
+```
+ /* Soon ! */
 ```
 
 ### Manually (with dependencies)
@@ -39,6 +41,7 @@ Ubuntu:
 
 ```
 $ make
+$ sudo ./pearlfan [OPTIONS]
 ```
 
 ## Execute
@@ -56,7 +59,7 @@ Setting:
   -c:  Displays at most eight images with transition effects described
        in the given config FILE.
   -d:  Displays at most eight .PBM images (156x11) in DIRECTORY.
-  -t:  Draws TEXT on multiple displays.
+-t:  Draws TEXT (standard ASCII table). Words are not split, only huge words.
 
 Mode:
   -f:  Enables fast-mode. Disables all others effect transitions.

@@ -1,5 +1,10 @@
 /*
 
+!doc/
+doc/*
+!doc/pearlfan.gif
+!doc/pearlfan.jpg
+
 !src/
 src/*
 !src/main.c
