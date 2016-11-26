@@ -54,7 +54,8 @@ static void usage(void)
 	fprintf(stdout, "effects described in FILE.\n");
 	fprintf(stdout, "  -d:\tDisplays at most eight .PBM images ");
 	fprintf(stdout, "(156x11) in DIRECTORY.\n");
-	fprintf(stdout, "  -t:\tDraws TEXT on multiple displays.\n\n");
+	fprintf(stdout, "  -t:\tDraws TEXT (standard ASCII table).");
+	fprintf(stdout, " Words are not split, only huge words.	.\n\n");
 	fprintf(stdout, "Mode:\n");
 	fprintf(stdout, "  -f:\tEnables fast-mode. Disables all others ");
 	fprintf(stdout, "effect transitions.\n\n");
