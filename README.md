@@ -49,7 +49,9 @@ $ sudo ./pearlfan [OPTIONS]
 ### Synopsis
 
 ```
-pearlfan [-f] [-c FILE | -d DIRECTORY | -t TEXT]
+pearlfan -c FILE  [-f]
+pearlfan -d DIRECTORY [-f]
+pearlfan -t TEXT [-f]
 ```
 
 ### Options
@@ -59,7 +61,7 @@ Setting:
   -c:  Displays at most eight images with transition effects described
        in the given config FILE.
   -d:  Displays at most eight .PBM images (156x11) in DIRECTORY.
--t:  Draws TEXT (standard ASCII table). Words are not split, only huge words.
+  -t:  Draws TEXT (standard ASCII table). Words are not split, only huge words.
 
 Mode:
   -f:  Enables fast-mode. Disables all others effect transitions.
