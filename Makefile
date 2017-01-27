@@ -20,7 +20,7 @@ LIBS   +=  -lnetpbm
 all: $(EXE)
 
 $(EXE): $(OBJS)
-	$(CC) $(CFLAGS) $^ -o $(EXE) $(LIBS)
+	$(CC) $(CFLAGS) $^ -o $@ $(LIBS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
