@@ -4,30 +4,23 @@ PearlFan
 
 [![Build Status](https://travis-ci.org/Ventto/pearlfan.svg?branch=master)](https://travis-ci.org/Ventto/pearlfan)
 [![License](https://img.shields.io/badge/license-GPLv3-blue.svg?style=flat)](https://github.com/Ventto/pearlfan/blob/master/LICENSE)
-[![Status](https://img.shields.io/badge/status-Release_v1.1-blue.svg?style=flat)](https://github.com/Ventto/pearlfan/releases)
 
 *PearlFan provides a GNU/Linux Kernel driver and a libusb application for the "[PEARL.fr](https://www.pearl.fr/article/PX5939/ventilateur-usb-programmable-avec-message-defilant
 )" USB LED fan.*
 
 [![](doc/pearlfan.gif)](https://www.pearl.fr/article/PX5939/ventilateur-usb-programmable-avec-message-defilant)
 
-## Install
+# Installation
 
-### Package
-
-* Archlinux
+## Package
 
 ```
 $ yaourt -S pearlfan
 ```
 
-### Ubuntu
+## Manually
 
-```
- /* Soon ! */
-```
-
-### Manually (with dependencies)
+### Dependencies
 
 Archlinux:
 
@@ -39,24 +32,20 @@ Ubuntu:
 * *libnetpbm10-dev* - Netpbm libraries and header files
 * *libusb-1.0-dev* - Library that provides generic access to USB devices
 
+
+### Run
+
 ```
 $ make
-$ sudo ./pearlfan [OPTIONS]
 ```
 
-## Execute
-
-### Synopsis
+# Usage
 
 ```
 pearlfan -c FILE  [-f]
 pearlfan -d DIRECTORY [-f]
 pearlfan -t TEXT [-f]
-```
 
-### Options
-
-```
 Setting:
   -c:  Displays at most eight images with transition effects described
        in the given config FILE.
@@ -71,7 +60,7 @@ Miscellaneous:
   -v:  Prints version info and exits.
 ```
 
-## Examples
+# Examples
 
 ```
 $ ls images/
@@ -87,9 +76,9 @@ $ pearlfan -c images/file.config    (or)
 $ pearlfan -d images/               (without config file)
 ```
 
-## Configuration File
+# Configuration File
 
-### Sample
+## Sample
 
 This an example of a pfan's configuration file
 
@@ -101,7 +90,7 @@ cols.pbm    +3-3-6
 full.pbm    +2-5-0
 ```
 
-### Specifications
+## Specifications
 
 Each configuration file consists of the following:
 
@@ -115,7 +104,7 @@ Each configuration file consists of the following:
 * Open, close and beforeclose's exclusive values are described in the table below
 * The fan can display at most 8 images
 
-### Effect values
+## Effect values
 
 | Effects/Value | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
 |---|---|---|---|---|---|---|---|---|
