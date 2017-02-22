@@ -33,7 +33,7 @@ Ubuntu:
 * *libusb-1.0-dev* - Library that provides generic access to USB devices
 
 
-### Run
+### Build
 
 ```
 $ make
