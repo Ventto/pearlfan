@@ -15,7 +15,7 @@ PearlFan
 ## Package
 
 ```
-$ yaourt -S pearlfan
+$ pacaur -S pearlfan
 ```
 
 ## Manually
@@ -30,7 +30,7 @@ Archlinux:
 Ubuntu:
 
 * *libnetpbm10-dev* - Netpbm libraries and header files
-* *libusb-1.0-dev* - Library that provides generic access to USB devices
+* *libusb-1.0-0-dev* - Library that provides generic access to USB devices
 
 
 ### Build
