@@ -115,3 +115,8 @@ Each configuration file consists of the following:
 * x: unused and considered as invalid value
 * none: disable
 * fast-mode: skip the 'open' and 'before-close' transition effects
+
+TODO
+
+- [ ] Pealfan as an official Unix lib for USB LED fans 
+- [ ] Rename the project
