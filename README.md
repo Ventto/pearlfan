@@ -1,17 +1,24 @@
 
-MaplinFan
+PearlFan
 =========
 
-[![Build Status](https://travis-ci.org/jay-to-the-dee/pearlfan.svg?branch=master)](https://travis-ci.org/jay-to-the-dee/pearlfan)
-[![License](https://img.shields.io/badge/license-GPLv3-blue.svg?style=flat)](https://github.com/jay-to-the-dee/pearlfan/blob/master/LICENSE)
+[![Build Status](https://travis-ci.org/Ventto/pearlfan.svg?branch=master)](https://travis-ci.org/Ventto/pearlfan)
+[![License](https://img.shields.io/badge/license-GPLv3-blue.svg?style=flat)](https://github.com/Ventto/pearlfan/blob/master/LICENSE)
 
-This is a fork of PearlFan
-
-*7160 PearlFan fork provides a GNU/Linux Kernel driver and a libusb application for the Maplin USB Programmable LED fan.*
+*PearlFan provides a GNU/Linux Kernel driver and a libusb application for the "[PEARL.fr](https://www.pearl.fr/article/PX5939/ventilateur-usb-programmable-avec-message-defilant
+)" USB LED fan.*
 
 [![](doc/pearlfan.gif)](https://www.pearl.fr/article/PX5939/ventilateur-usb-programmable-avec-message-defilant)
 
 # Installation
+
+## Package
+
+```
+$ pacaur -S pearlfan
+```
+
+## Manually
 
 ### Dependencies
 
@@ -108,3 +115,8 @@ Each configuration file consists of the following:
 * x: unused and considered as invalid value
 * none: disable
 * fast-mode: skip the 'open' and 'before-close' transition effects
+
+TODO
+
+- [ ] Pealfan as an official Unix lib for USB LED fans 
+- [ ] Rename the project
