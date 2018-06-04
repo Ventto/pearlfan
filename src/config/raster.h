@@ -21,7 +21,9 @@
 
 #include <stdint.h>
 
-uint8_t **pfan_create_img_rasters(char image_paths[8][4096], int n);
+#include "defutils.h"
+
+uint8_t **pfan_create_img_rasters(char image_paths[8][MAX_PATH], int n);
 
 void pfan_free_rasters(uint8_t **rasters, int n);
 

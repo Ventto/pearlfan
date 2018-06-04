@@ -25,94 +25,106 @@
 
 libusb_device_handle *pfan_open(int vid, int pid)
 {
-	libusb_device_handle *dev_handle =
-		libusb_open_device_with_vid_pid(NULL, vid, pid);
+    libusb_device_handle *dev_handle =
+        libusb_open_device_with_vid_pid(NULL, vid, pid);
 
-	if (!dev_handle) {
-		fprintf(stderr, "Device can not be opened or found.\n");
-		fprintf(stderr, "You may need permission.\n\n");
-		return NULL;
-	}
+    if (!dev_handle) {
+        fprintf(stderr, "Device can not be opened or found.\n");
+        fprintf(stderr, "You may need permission.\n\n");
+        return NULL;
+    }
 
-	if (libusb_kernel_driver_active(dev_handle, 0) == 1) {
-		if (libusb_detach_kernel_driver(dev_handle, 0) != 0) {
-			libusb_close(dev_handle);
-			fprintf(stderr, "Can not dettach the device from the driver.\n\n");
-			return NULL;
-		}
-	}
+    if (libusb_kernel_driver_active(dev_handle, 0) == 1) {
+        if (libusb_detach_kernel_driver(dev_handle, 0) != 0) {
+            libusb_close(dev_handle);
+            fprintf(stderr, "Can not dettach the device from the driver.\n\n");
+            return NULL;
+        }
+    }
 
-	if (libusb_claim_interface(dev_handle, 0) < 0) {
-		libusb_close(dev_handle);
-		fprintf(stderr, "Cannot claim the interface.\n\n");
-		return NULL;
-	}
+    if (libusb_claim_interface(dev_handle, 0) < 0) {
+        libusb_close(dev_handle);
+        fprintf(stderr, "Cannot claim the interface.\n\n");
+        return NULL;
+    }
 
-	return dev_handle;
+    return dev_handle;
 }
 
 void pfan_close(libusb_device_handle *dev_handle)
 {
-	libusb_close(dev_handle);
-	libusb_exit(NULL);
+    libusb_close(dev_handle);
+    libusb_exit(NULL);
 }
 
 static int send(libusb_device_handle *dev, void *data)
 {
-	uint8_t buf[8];
-	int bytes = 0;
-	int l = 0;
-	int ret;
+    uint8_t buf[8];
+    int bytes = 0;
+    int l = 0;
 
-	memset((void *)buf, 0, 8);
-	buf[7] = 0x2;
+    memset((void *)buf, 0, 8);
+    buf[7] = 0x2;
 
-	bytes = libusb_control_transfer(dev, 0x21, 9, 0x200, 0, data, 8, 1000);
-	if (bytes < 0)
-		return bytes;
+    bytes = libusb_control_transfer(dev, 0x21, 9, 0x200, 0, data, 8, 1000);
 
-	if ((ret = libusb_interrupt_transfer(dev, 0x81, buf, 8, &l, 1000)) < 0)
-		return ret;
-	return bytes;
+    if (bytes < 0) {
+        return bytes;
+    }
+
+    int ret;
+
+    if ((ret = libusb_interrupt_transfer(dev, 0x81, buf, 8, &l, 1000)) < 0) {
+        return ret;
+    }
+
+    return bytes;
 }
 
 static uint64_t encode_effect(const char id, const unsigned char effect[3])
 {
-	unsigned short opts = 0;
+    unsigned short opts = 0;
 
-	opts |= effect[PFAN_CLOSE];
-	opts |= (effect[PFAN_OPEN] << 4);
-	opts |= (id << 8);
-	opts |= (effect[PFAN_BEFORECLOSE] << 12);
-	return 0x00000055000010A0 | (opts << 16);
+    opts |= effect[PFAN_CLOSE];
+    opts |= (effect[PFAN_OPEN] << 4);
+    opts |= (id << 8);
+    opts |= (effect[PFAN_BEFORECLOSE] << 12);
+
+    return 0x00000055000010A0 | (opts << 16);
 }
 
 int pfan_send(libusb_device_handle *dev_handle, int img_n,
-		      uint8_t effects[PFAN_MAX_DISPLAY][3],
-		      uint16_t displays[PFAN_MAX_DISPLAY][PFAN_MAX_W])
+              uint8_t effects[PFAN_MAX_DISPLAY][3],
+              uint16_t displays[PFAN_MAX_DISPLAY][PFAN_MAX_W])
 {
-	int bytes = 0;
-	int ret = 0;
+    int bytes = 0;
+    int ret = 0;
 
-	for (uint8_t i = 0; i < img_n; i++) {
-		uint64_t effect = encode_effect(i, effects[i]);
+    for (uint8_t i = 0; i < img_n; i++) {
+        uint64_t effect = encode_effect(i, effects[i]);
 
-		ret = send(dev_handle, &effect);
-		if (ret < 0)
-			return ret;
-		else if (ret < 8)
-			break;
-		bytes += 8;
+        ret = send(dev_handle, &effect);
 
-		for (uint8_t j = 0; j < 39; ++j) {
-			ret = send(dev_handle, &displays[i][j * 4]);
-			if (ret < 0)
-				return ret;
-			else if (ret < 8)
-				break;
-			bytes += 8;
-		}
-	}
+        if (ret < 0) {
+            return ret;
+        } else if (ret < 8) {
+            break;
+        }
 
-	return bytes;
+        bytes += 8;
+
+        for (uint8_t j = 0; j < 39; ++j) {
+            ret = send(dev_handle, &displays[i][j * 4]);
+
+            if (ret < 0) {
+                return ret;
+            } else if (ret < 8) {
+                break;
+            }
+
+            bytes += 8;
+        }
+    }
+
+    return bytes;
 }

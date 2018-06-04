@@ -28,7 +28,7 @@
 #define PFAN_MAX_H            11
 #define PFAN_MAX_DISPLAY      8
 
-#define MAX_PATH              4096
+#define MAX_PATH              1024
 
 #define PFAN_OPEN             0
 #define PFAN_CLOSE            1

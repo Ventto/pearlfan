@@ -27,130 +27,148 @@
 
 static int no_conjunction(char opt_a, char opt_b)
 {
-	fprintf(stderr, "Option -%c cannot be used in conjuntion with %c.\n\n",
-			opt_a, opt_b);
-	return PFAN_INVALID_OPT;
+    fprintf(stderr, "Option -%c cannot be used in conjuntion with %c.\n\n",
+            opt_a, opt_b);
+
+    return PFAN_INVALID_OPT;
 }
 
 static int missing_optvar(char opt)
 {
-	switch (opt) {
-	case 'c':
-		return 1;
-	case 'd':
-		return 1;
-	case 't':
-		return 1;
-	}
-	return 0;
+    switch (opt) {
+    case 'c': case 'd': case 't':
+        return 1;
+    }
+
+    return 0;
 }
 
 static void usage(void)
 {
-	fprintf(stdout, "Usage:\tpearlfan [-f] [-c FILE | -d DIRECTORY | -t TEXT]\n\n");
-	fprintf(stdout, "Options:\n\n");
-	fprintf(stdout, "Setting:\n");
-	fprintf(stdout, "  -c:\tDisplays at most eight images with transition ");
-	fprintf(stdout, "effects described in FILE.\n");
-	fprintf(stdout, "  -d:\tDisplays at most eight .PBM images ");
-	fprintf(stdout, "(156x11) in DIRECTORY.\n");
-	fprintf(stdout, "  -t:\tDraws TEXT (standard ASCII table).");
-	fprintf(stdout, " Words are not split, only huge words.	.\n\n");
-	fprintf(stdout, "Mode:\n");
-	fprintf(stdout, "  -f:\tEnables fast-mode. Disables all others ");
-	fprintf(stdout, "effect transitions.\n\n");
-	fprintf(stdout, "Miscellaneous:\n");
-	fprintf(stdout, "  -h:\tPrints this help and exits.\n");
-	fprintf(stdout, "  -v:\tPrints version info and exits.\n\n");
-	fprintf(stdout, "Examples:\n\n");
-	fprintf(stdout, "Example of configuration file and images: ");
-	fprintf(stdout, "/usr/share/pearlfan\n\n");
-	fprintf(stdout, "Documentation: <https://github.com/Ventto/pearlfan>\n\n");
-	fprintf(stdout, "Report bugs to <thomas.venries@gmail.com>\n\n");
+    fprintf(stdout, "Usage:\tpearlfan [-f] [-c FILE | -d DIRECTORY | -t TEXT]\n\n");
+    fprintf(stdout, "Options:\n\n");
+    fprintf(stdout, "Setting:\n");
+    fprintf(stdout, "  -c:\tDisplays at most eight images with transition ");
+    fprintf(stdout, "effects described in FILE.\n");
+    fprintf(stdout, "  -d:\tDisplays at most eight .PBM images ");
+    fprintf(stdout, "(156x11) in DIRECTORY.\n");
+    fprintf(stdout, "  -t:\tDraws TEXT (standard ASCII table).");
+    fprintf(stdout, " Words are not split, only huge words. .\n\n");
+    fprintf(stdout, "Mode:\n");
+    fprintf(stdout, "  -f:\tEnables fast-mode. Disables all others ");
+    fprintf(stdout, "effect transitions.\n\n");
+    fprintf(stdout, "Miscellaneous:\n");
+    fprintf(stdout, "  -h:\tPrints this help and exits.\n");
+    fprintf(stdout, "  -v:\tPrints version info and exits.\n\n");
+    fprintf(stdout, "Examples:\n\n");
+    fprintf(stdout, "Example of configuration file and images: ");
+    fprintf(stdout, "/usr/share/pearlfan\n\n");
+    fprintf(stdout, "Documentation: <https://github.com/Ventto/pearlfan>\n\n");
+    fprintf(stdout, "Report bugs to <thomas.venries@gmail.com>\n\n");
 }
 
 static void version(void)
 {
-	fprintf(stdout, "Pearlfan %s\n\n", VERSION);
-	fprintf(stdout, "Copyright (C) 2016 Thomas \"Ventto\" Venries.\n\n");
-	fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later "),
-	fprintf(stdout, "<http://gnu.org/licenses/gpl.html>.\n");
-	fprintf(stdout, "This is free software: you are free to change and ");
-	fprintf(stdout, "redistribute it.\n");
-	fprintf(stdout, "There is NO WARRANTY; not even for MERCHANTABILITY ");
-	fprintf(stdout, "or FITNESS FOR A PARTICULAR PURPOSE\n");
+    fprintf(stdout, "Pearlfan %s\n\n", VERSION);
+    fprintf(stdout, "Copyright (C) 2016 Thomas \"Ventto\" Venries.\n\n");
+    fprintf(stdout, "License GPLv3+: GNU GPL version 3 or later "),
+    fprintf(stdout, "<http://gnu.org/licenses/gpl.html>.\n");
+    fprintf(stdout, "This is free software: you are free to change and ");
+    fprintf(stdout, "redistribute it.\n");
+    fprintf(stdout, "There is NO WARRANTY; not even for MERCHANTABILITY ");
+    fprintf(stdout, "or FITNESS FOR A PARTICULAR PURPOSE\n");
 }
 
 int pfan_getopt(int argc, char **argv, pfan_opts *opts)
 {
-	int opt;
+    int opt;
 
-	opterr = 0;
+    opterr = 0;
 
-	if (argc == 1) {
-		usage();
-		return PFAN_NO_OPT;
-	}
+    if (argc == 1) {
+        usage();
+        return PFAN_NO_OPT;
+    }
 
-	memset(opts, 0, sizeof(pfan_opts));
+    memset(opts, 0, sizeof(pfan_opts));
 
-	while ((opt = getopt(argc, argv, "c:d:t:fhv")) != -1) {
-		switch (opt) {
-		case 'h':
-			usage();
-			return PFAN_NO_OPT;
-		case 'v':
-			version();
-			return PFAN_NO_OPT;
-		case 'c':
-			if (opts->dflag)
-				return no_conjunction(opt, 'd');
-			if (opts->tflag)
-				return no_conjunction(opt, 't');
-			if (!pfan_readaccess_file(optarg))
-				return PFAN_INVALID_OPT;
-			opts->carg = optarg;
-			opts->cflag = 1;
-			break;
-		case 'd':
-			if (opts->cflag)
-				return no_conjunction(opt, 'c');
-			if (opts->tflag)
-				return no_conjunction(opt, 't');
-			if (!pfan_isdir(optarg)) {
-				fprintf(stderr, "%s: directory does not exist or can't be opened.\n\n", optarg);
-				return PFAN_INVALID_OPT;
-			}
-			opts->darg = optarg;
-			opts->dflag = 1;
-			break;
-		case 't':
-			if (opts->cflag)
-				return no_conjunction(opt, 'c');
-			if (opts->dflag)
-				return no_conjunction(opt, 'd');
-			opts->targ = optarg;
-			opts->tflag = 1;
-			break;
-		case 'f':
-			opts->fflag = 1;
-			break;
-		case '?':
-			if (missing_optvar(optopt))
-				fprintf(stderr, "Missing argument for option -%c.\n\n", optopt);
-			else
-				fprintf(stderr, "Unknown option `-%c'.\n\n", optopt);
-			return PFAN_INVALID_OPT;
-		default:
-			return PFAN_INVALID_OPT;
-		}
-	}
-	if (!opts->cflag && !opts->dflag && !opts->tflag) {
-		if (opts->fflag)
-			fprintf(stderr, "Missing setting option.\n\n");
-		else
-			fprintf(stderr, "Missing option.\n\n");
-		return PFAN_INVALID_OPT;
-	}
-	return PFAN_VALID_OPT;
+    while ((opt = getopt(argc, argv, "c:d:t:fhv")) != -1) {
+        switch (opt) {
+        case 'h':
+            usage();
+            return PFAN_NO_OPT;
+        case 'v':
+            version();
+            return PFAN_NO_OPT;
+        case 'c':
+            if (opts->dflag) {
+                return no_conjunction(opt, 'd');
+            }
+
+            if (opts->tflag) {
+                return no_conjunction(opt, 't');
+            }
+
+            if (!pfan_readaccess_file(optarg)) {
+                return PFAN_INVALID_OPT;
+            }
+
+            opts->carg = optarg;
+            opts->cflag = 1;
+            break;
+        case 'd':
+            if (opts->cflag) {
+                return no_conjunction(opt, 'c');
+            }
+
+            if (opts->tflag) {
+                return no_conjunction(opt, 't');
+            }
+
+            if (!pfan_isdir(optarg)) {
+                fprintf(stderr, "%s: directory does not exist or can't be opened.\n\n", optarg);
+                return PFAN_INVALID_OPT;
+            }
+
+            opts->darg = optarg;
+            opts->dflag = 1;
+            break;
+        case 't':
+            if (opts->cflag) {
+                return no_conjunction(opt, 'c');
+            }
+
+            if (opts->dflag) {
+                return no_conjunction(opt, 'd');
+            }
+
+            opts->targ = optarg;
+            opts->tflag = 1;
+            break;
+        case 'f':
+            opts->fflag = 1;
+            break;
+        case '?':
+            if (missing_optvar(optopt)) {
+                fprintf(stderr, "Missing argument for option -%c.\n\n",
+                        optopt);
+            } else {
+                fprintf(stderr, "Unknown option `-%c'.\n\n", optopt);
+            }
+
+            return PFAN_INVALID_OPT;
+        default:
+            return PFAN_INVALID_OPT;
+        }
+    }
+    if (!opts->cflag && !opts->dflag && !opts->tflag) {
+        if (opts->fflag) {
+            fprintf(stderr, "Missing setting option.\n\n");
+        } else {
+            fprintf(stderr, "Missing option.\n\n");
+        }
+
+        return PFAN_INVALID_OPT;
+    }
+    return PFAN_VALID_OPT;
 }

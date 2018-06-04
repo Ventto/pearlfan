@@ -24,13 +24,13 @@
 #define PFAN_INVALID_OPT    2
 
 typedef struct {
-	int cflag;
-	int dflag;
-	int tflag;
-	int fflag;
-	char *carg;
-	char *darg;
-	char *targ;
+    int cflag;
+    int dflag;
+    int tflag;
+    int fflag;
+    char *carg;
+    char *darg;
+    char *targ;
 } pfan_opts;
 
 int pfan_getopt(int argc, char **argv, pfan_opts *opts);

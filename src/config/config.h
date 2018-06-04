@@ -24,11 +24,11 @@
 #include "defutils.h"
 
 int pfan_read_cfg(char *path,
-                  char img_paths[PFAN_MAX_DISPLAY][4096],
+                  char img_paths[PFAN_MAX_DISPLAY][MAX_PATH],
                   uint8_t effects[PFAN_MAX_DISPLAY][3]);
 
 int pfan_read_dir(char *path,
-                  char img_paths[PFAN_MAX_DISPLAY][4096],
+                  char img_paths[PFAN_MAX_DISPLAY][MAX_PATH],
                   uint8_t effects[PFAN_MAX_DISPLAY][3]);
 
 #endif /* !CONFIG_H_ */
