@@ -32,7 +32,7 @@ static void concat_path(char buf[MAX_PATH],
     buf[0] = '\0';
     strncat(buf, dir, strlen(dir));
     if (dir[strlen(dir) - 1] != '/') {
-        strncat(buf, "/", 1);
+        strcat(buf, "/\0");
     }
     strncat(buf, imgname, strlen(imgname));
 }
