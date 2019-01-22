@@ -5,8 +5,8 @@ PearlFan
 [![Build Status](https://travis-ci.org/Ventto/pearlfan.svg?branch=master)](https://travis-ci.org/Ventto/pearlfan)
 [![License](https://img.shields.io/badge/license-GPLv3-blue.svg?style=flat)](https://github.com/Ventto/pearlfan/blob/master/LICENSE)
 
-*PearlFan is a tool to draw on an "[PEARL.fr](https://www.pearl.fr/article/PX5939/ventilateur-usb-programmable-avec-message-defilant
-)" USB LED fan.*
+*PearlFan is a tool to draw on a [PEARL](https://www.pearl.fr/article/PX5939/ventilateur-usb-programmable-avec-message-defilant
+)'s USB LED fan.*
 
 [![](doc/pearlfan.gif)](https://www.pearl.fr/article/PX5939/ventilateur-usb-programmable-avec-message-defilant)
 
