@@ -27,7 +27,7 @@ libusb_device_handle *pfan_open(int vid, int pid);
 void pfan_close(libusb_device_handle *dev_handle);
 
 int pfan_send(libusb_device_handle *dev_handle, int img_n,
-              uint8_t effects[8][3],
-              uint16_t displays[8][156]);
+              uint8_t effects[PFAN_MAX_DISPLAY][3],
+              uint16_t displays[PFAN_MAX_DISPLAY][PFAN_MAX_W]);
 
 #endif /* !USB_H_ */
